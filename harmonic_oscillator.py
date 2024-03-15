@@ -36,7 +36,7 @@ class OscillatorSystem(CoupledDEVS):
         # self.singenerator = self.addSubModel(SinusoidalGenerator(name="sin", freq=1, amp=1, phi=0, samp=0.1))
         self.integrator1 = self.addSubModel(QSSIntegrator(name="qss1", dQMin=1e-6, dQRel=1e-3, gain=-1, x0=0, debug=False))
         self.integrator2 = self.addSubModel(QSSIntegrator(name="qss2", dQMin=1e-6, dQRel=1e-3, gain= 1, x0=1, debug=False))
-        self.collector   = self.addSubModel(Collector(name="Collector",filename="/output/output.csv"))
+        self.collector   = self.addSubModel(Collector(name="Collector",filename="output/output.csv"))
 
         # Only connect ...
         self.connectPorts(self.integrator1.OUT_q, self.integrator2.IN_dx)

@@ -17,7 +17,7 @@
 from pypdevs.simulator import Simulator
 
 # Import the model to be simulated
-from system import OscillatorSystem
+from multirobot_subframeworks import MultiRobotSystem
 
 # Configuration (parameter sweeping)
 #
@@ -32,7 +32,7 @@ from system import OscillatorSystem
 #  hierarchical model. This effectively instantiates the whole model 
 #  thanks to the recursion in the DEVS model constructors (__init__).
 #
-m = OscillatorSystem(name="Harmonic_Oscillator_System")
+m = MultiRobotSystem(name="Multi_Robot_System")
 
 #    ======================================================================
 
