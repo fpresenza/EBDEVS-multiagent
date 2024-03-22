@@ -61,26 +61,6 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.integrator1.OUT_q, self.OUT_x)
         self.connectPorts(self.integrator2.OUT_q, self.OUT_y)
 
-# class Environment(CoupledDEVS):
-#     def __init__(self, name=None):
-#        """
-#        A simple 
-#        """
-        # Always call parent class' constructor FIRST:
-#        CoupledDEVS.__init__(self, name)
-        # Sg: estructura que almacena los coeficientes 
-
-    # Funcion que se ejecuta cuando un atomico ejecuta su Y_up()
-#    def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
-#        super(Environment, self).globalTransition(e_g, x_b_micro, *args, **kwargs)
-        # almacena los coeficientes de los polinomios de las posiciones de los agentes
-
-    # Funcion que se ejecuta cuando un atomico pide informacion al estado global: Y_down()
-#    def getContextInformation(self, property, *args, **kwargs):
-#        super(Environment, self).getContextInformation(property)
-        # calculo de los vecinos de un atomico a pedido del router
-
-
 class MultiRobotSystem(CoupledDEVS):
     def __init__(self, name='MySystem'):
         """
