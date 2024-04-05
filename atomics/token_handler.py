@@ -13,11 +13,14 @@ class Token:
 
 
 class TokenHandler(AtomicDEVS):
-    def __init__(self, name=None):
+    def __init__(self, robot_id, name=None):
         """Atomic model for the toking handling protocol"""
 
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
+
+        # Robot identifier
+        self.robot_id = robot_id
 
         # Dictionary used to remember the last tokens retransmitted
         # {cretor: order}
