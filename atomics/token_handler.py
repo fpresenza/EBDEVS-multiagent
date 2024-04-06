@@ -3,6 +3,12 @@ from dataclasses import dataclass
 from pypdevs.DEVS import AtomicDEVS
 
 
+__all__ = (
+    'Token',
+    'TokenHandler'
+)
+
+
 @dataclass
 class Token:
     creator: str                # The robot that created it
