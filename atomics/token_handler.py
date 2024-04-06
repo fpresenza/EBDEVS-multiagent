@@ -86,8 +86,6 @@ class TokenHandler(AtomicDEVS):
     def handle_state_token_in(self, token):
         # TODO : Enviar la posición recibida al atómico 'positioning_system'
         # check if token creator is within extent
-        if token.hops_travelled < self.extent:
+        if token.hops_travelled <= self.extent:
             # send data to positioning system
             pass    # NOT IMPLEMENTED
-        except KeyError:
-            pass
