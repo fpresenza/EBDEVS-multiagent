@@ -12,6 +12,7 @@ __all__ = [
 @dataclass
 class Token:
     creator: str                # The robot that created it
+    kind: str                   # Whether it is action or state
     order: int                  # A counter to differentiate tokens
     data: object                # The data it carries
     hops_to_target: int         # The number of hops it must travel
@@ -27,7 +28,7 @@ class TokenHandler(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
-        self.extent = None          # The robot's subgraph extent
+        self.extent = np.inf        # The robot's subgraph extent
 
         # Dictionaries as records of tokens received
         # {'action': {creator: order}, 'state': {creator: order}}
@@ -52,19 +53,19 @@ class TokenHandler(AtomicDEVS):
 
             try:
                 # check if already received from creator
-                order = self.received[token.type][token.creator]
+                order = self.received[token.kind][token.creator]
             except KeyError:
                 # append to list of tokens received
-                self.received[token.type][token.creator] = token.order
                 order = -1
 
             # check if token is newer than last received
             if token.order > order:
+                self.received[token.kind][token.creator] = token.order
                 # check if retransmission is needed
                 if token.hops_travelled <= token.hops_to_target:
-                    if token.type == 'action':
+                    if token.kind == 'action':
                         self.handle_action_token_in(token)
-                    elif token.type == 'state':
+                    elif token.kind == 'state':
                         self.handle_state_token_in(token)
                     if token.hops_travelled < token.hops_to_target:
                         self.retransmit(token)
