@@ -61,14 +61,13 @@ class TokenHandler(AtomicDEVS):
             # check if token is newer than last received
             if token.order > order:
                 self.received[token.kind][token.creator] = token.order
+                if token.kind == 'action':
+                    self.handle_action_token_in(token)
+                elif token.kind == 'state':
+                    self.handle_state_token_in(token)
                 # check if retransmission is needed
-                if token.hops_travelled <= token.hops_to_target:
-                    if token.kind == 'action':
-                        self.handle_action_token_in(token)
-                    elif token.kind == 'state':
-                        self.handle_state_token_in(token)
-                    if token.hops_travelled < token.hops_to_target:
-                        self.retransmit(token)
+                if token.hops_travelled < token.hops_to_target:
+                    self.retransmit(token)
 
     def retransmit(self, token):
         # TODO : enviar token al atómico 'router'
