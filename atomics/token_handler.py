@@ -86,6 +86,7 @@ class TokenHandler(AtomicDEVS):
         #  (usually store returned references in local variables):
         self.OUT_token   = self.addOutPort(name="token_out")
         self.OUT_control = self.addOutPort(name="control_out")
+        self.OUT_state   = self.addInPort(name="state_out")
         self.IN_token    = self.addInPort(name="token_in")
         self.IN_control  = self.addInPort(name="control_in")
         self.IN_state    = self.addInPort(name="state_in")
@@ -143,9 +144,9 @@ class TokenHandler(AtomicDEVS):
                     self.handle_state_token_in(token)
                 # check if retransmission is needed
                 if token.hops_travelled < token.hops_to_target:
-                    self.retransmit(token)
+                    self.broadcast_token(token)
 
-    def retransmit(self, token):
+    def broadcast_token(self, token):
         # TODO : enviar token al atómico 'router'
         pass
 
@@ -163,5 +164,8 @@ class TokenHandler(AtomicDEVS):
         # TODO : Enviar la posición recibida al atómico 'positioning_system'
         # check if token creator is within extent
         if token.hops_travelled <= self.extent:
-            # send data to positioning system
+            # send data to controller
             pass    # NOT IMPLEMENTED
+            if token.hops_travelled == 1:
+                # send data to positioning system
+                pass    # NOT IMPLEMENTED
