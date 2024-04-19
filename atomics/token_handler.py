@@ -1,16 +1,15 @@
 import numpy as np
 from dataclasses import dataclass
 from pypdevs.DEVS import AtomicDEVS
+from pypdevs.infinity import INFINITY
 
-
-__all__ = [
-    'Token',
-    'TokenHandler'
-]
-
+#__all__ = [
+#    'Token',
+#    'TokenHandler'
+#]
 
 @dataclass
-class Token:
+class Token(object):
     creator: str                # The robot that created it
     kind: str                   # Whether it is action or state
     order: int                  # A counter to differentiate tokens
@@ -18,6 +17,52 @@ class Token:
     hops_to_target: int         # The number of hops it must travel
     hops_travelled: int = 0     # The number of hops it has travelled
 
+class TokenGenerator(AtomicDEVS):
+    def __init__(self, name=None):
+        """Atomic model for the toking handling protocol"""
+
+        # Always call parent class' constructor FIRST:
+        AtomicDEVS.__init__(self, name)
+
+        # Parameters
+
+        # TODO: definir estados
+
+        # PORTS:
+        #  Declare as many input and output ports as desired
+        #  (usually store returned references in local variables):
+        self.OUT_token    = self.addOutPort(name="token_out")
+        self.OUT_control  = self.addOutPort(name="control_out")
+        self.OUT_state    = self.addOutPort(name="state_out")
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        # TODO
+        return self.sigma 
+    
+    def intTransition(self):
+        """
+        Internal Transition Function.
+        """
+        self.sigma = INFINITY
+        return self.sigma
+    
+    def outputFnc(self):
+        """
+        Output Funtion.
+        """
+        # TODO
+        return {self.OUT: y}
+
+    def timeAdvance(self):
+        """
+        Time-Advance Function.
+        """
+        # Compute 'ta', the time to the next scheduled internal transition,
+        # based (typically) on current State.
+        return self.sigma
 
 class TokenHandler(AtomicDEVS):
     def __init__(self, robot_id, name=None):
@@ -32,7 +77,9 @@ class TokenHandler(AtomicDEVS):
 
         # Dictionaries as records of tokens received
         # {'action': {creator: order}, 'state': {creator: order}}
-        self.received = {'action': {}, 'state': {}}    
+        self.received = {'action': {}, 'state': {}}
+
+        # TODO: definir estados
 
         # PORTS:
         #  Declare as many input and output ports as desired
@@ -42,6 +89,35 @@ class TokenHandler(AtomicDEVS):
         self.IN_token    = self.addInPort(name="token_in")
         self.IN_control  = self.addInPort(name="control_in")
         self.IN_state    = self.addInPort(name="state_in")
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        handle_received_token() # TODO
+        return self.sigma 
+    
+    def intTransition(self):
+        """
+        Internal Transition Function.
+        """
+        self.sigma = INFINITY
+        return self.sigma
+    
+    def outputFnc(self):
+        """
+        Output Funtion.
+        """
+        return {self.OUT: y}
+
+    def timeAdvance(self):
+        """
+        Time-Advance Function.
+        """
+        # Compute 'ta', the time to the next scheduled internal transition,
+        # based (typically) on current State.
+        return self.sigma
+
 
     def handle_received_token(self, token):
         if token.creator == self.robot_id:
