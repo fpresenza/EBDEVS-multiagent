@@ -121,12 +121,20 @@ class TokenHandler(AtomicDEVS):
 
 
     def handle_received_token(self, token):
+        """Decide what to do with the received token"""
+        # the list of outputs to be returned
+        outputs = []
+
         if token.creator == self.robot_id:
             # do nothing if this robot is the creator
             pass
         else:
             # update the number of traversed hops
             token.hops_travelled += 1
+
+            # check if retransmission is needed
+            if token.hops_travelled < token.hops_to_target:
+                outputs.append((self.OUT_token, token))
 
             try:
                 # check if already received from creator
@@ -139,33 +147,24 @@ class TokenHandler(AtomicDEVS):
             if token.order > order:
                 self.received[token.kind][token.creator] = token.order
                 if token.kind == 'action':
-                    self.handle_action_token_in(token)
+                    try:
+                        # check if there is data for this robot
+                        data = token.data[self.robot_id]
+                        # send data to controller
+                        outputs.append((self.OUT_control, data))
+                    except KeyError:
+                        pass
+
                 elif token.kind == 'state':
-                    self.handle_state_token_in(token)
-                # check if retransmission is needed
-                if token.hops_travelled < token.hops_to_target:
-                    self.broadcast_token(token)
+                    # check if token creator is within extent
+                    if token.hops_travelled <= self.extent:
+                        # send data to controller
+                        data = (token.creator, token.data)
+                        outputs.append((self.OUT_control, data))
+                        if token.hops_travelled == 1:
+                            # send data to positioning system
+                            outputs.append((self.OUT_state, data))
 
-    def broadcast_token(self, token):
-        # TODO : enviar token al atómico 'router'
-        pass
+        return outputs
 
-    def handle_action_token_in(self, token):
-        # TODO : Enviar la accion de control al atómico 'controller'
-        try:
-            # check if there is data for this robot
-            data = token.data[self.robot_id]
-            # send data to controller
-            pass    # NOT IMPLEMENTED
-        except KeyError:
-            pass
 
-    def handle_state_token_in(self, token):
-        # TODO : Enviar la posición recibida al atómico 'positioning_system'
-        # check if token creator is within extent
-        if token.hops_travelled <= self.extent:
-            # send data to controller
-            pass    # NOT IMPLEMENTED
-            if token.hops_travelled == 1:
-                # send data to positioning system
-                pass    # NOT IMPLEMENTED
