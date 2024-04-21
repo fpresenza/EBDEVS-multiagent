@@ -7,6 +7,11 @@ from pypdevs.infinity import INFINITY
 #    'Token',
 #    'TokenHandler'
 #]
+TOKEN_KINDS = {
+    'action': 0,
+    'state' : 1, 
+}
+
 
 @dataclass
 class Token(object):
@@ -132,6 +137,7 @@ class TokenHandlerState:
     def get(self):
         return self._sigma, self._tvalue, self._data
 
+
 class TokenHandler(AtomicDEVS):
     def __init__(self,robot_id,name=None):
         """Atomic model for the toking handling protocol"""
@@ -254,7 +260,8 @@ class TokenHandler(AtomicDEVS):
             # check if token is newer than last received
             if token.order > order:
                 self.received[token.kind][token.creator] = token.order
-                if token.kind == 'action':
+                # check if token is of kind action
+                if TOKEN_KINDS[token.kind] == 0:
                     try:
                         # check if there is data for this robot
                         data = token.data[self.robot_id]
@@ -263,8 +270,8 @@ class TokenHandler(AtomicDEVS):
                         outputs.append((1, data))
                     except KeyError:
                         pass
-
-                elif token.kind == 'state':
+                # check if token is of kind state
+                elif TOKEN_KINDS[token.kind] == 1:
                     # check if token creator is within extent
                     if token.hops_travelled <= self.extent:
                         # send data to controller
