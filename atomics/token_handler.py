@@ -180,7 +180,7 @@ class TokenHandler(AtomicDEVS):
         if self.IN_token in inputs: # if token arrives through port IN_token
             token = inputs[self.IN_token]
             ret = self.handle_received_token(token) # events list
-            if (ret == None): # discard, the token received was sent by this same robot
+            if (ret == []): # discard, the token received was sent by this same robot
                 sigma = sigma - self.elapsed # holds last status
             else:
                 data  = ret # events list
@@ -208,12 +208,8 @@ class TokenHandler(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        if len(data)==0: # TODO: ERROR
-            y    = -99999
-            return {self.OUT_control: y}
-        else:
-            port = data[0]
-            y    = data[1]
+        port = data[0]
+        y    = data[1]
 
         if port==1:
             return {self.OUT_control: y}
