@@ -210,7 +210,7 @@ class TokenHandler(AtomicDEVS):
             sigma = INFINITY
         else:
             sigma = 0
-        return TokenHandlerState(sigma,current_time,data) 
+        return TokenHandlerState(sigma,current_time,data)
     
     def outputFnc(self):
         """
