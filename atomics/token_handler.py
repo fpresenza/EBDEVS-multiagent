@@ -204,9 +204,12 @@ class TokenHandler(AtomicDEVS):
         """
         Internal Transition Function.
         """
-        sigma, current_time, data = self.state.get()
-        sigma = INFINITY
-        data = []
+        _, current_time, data = self.state.get()
+        data.pop()
+        if len(data) == 0:
+            sigma = INFINITY
+        else:
+            sigma = 0
         return TokenHandlerState(sigma,current_time,data) 
     
     def outputFnc(self):
@@ -214,15 +217,8 @@ class TokenHandler(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        port = data[0]
-        y    = data[1]
-
-        if port==1:
-            return {self.OUT_control: y}
-        elif port==2:
-            return {self.OUT_state: y}
-        else:
-            return {self.OUT_token: y}
+        port, y = data[-1]
+        return {port: y}
 
     def timeAdvance(self):
         """
@@ -247,8 +243,7 @@ class TokenHandler(AtomicDEVS):
 
             # check if retransmission is needed
             if token.hops_travelled < token.hops_to_target:
-                # outputs.append((self.OUT_token, token))
-                outputs.append((0, token))
+                outputs.append((self.OUT_token, token))
 
             try:
                 # check if already received from creator
@@ -264,10 +259,9 @@ class TokenHandler(AtomicDEVS):
                 if TOKEN_KINDS[token.kind] == 0:
                     try:
                         # check if there is data for this robot
-                        data = token.data[self.robot_id]
+                        data = (token.creator, token.data[self.robot_id])
                         # send data to controller
-                        # outputs.append((self.OUT_control, data))
-                        outputs.append((1, data))
+                        outputs.append((self.OUT_control, data))
                     except KeyError:
                         pass
                 # check if token is of kind state
@@ -276,12 +270,10 @@ class TokenHandler(AtomicDEVS):
                     if token.hops_travelled <= self.extent:
                         # send data to controller
                         data = (token.creator, token.data)
-                        # outputs.append((self.OUT_control, data))
-                        outputs.append((1, data))
+                        outputs.append((self.OUT_control, data))
                         if token.hops_travelled == 1:
                             # send data to positioning system
-                            # outputs.append((self.OUT_state, data))
-                            outputs.append((2, data))
+                            outputs.append((self.OUT_state, data))
 
         return outputs
 
