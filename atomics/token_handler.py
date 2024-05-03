@@ -217,8 +217,7 @@ class TokenHandler(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        port, y = data[-1]
-        return {port: y}
+        return data[-1]
 
     def timeAdvance(self):
         """
@@ -243,7 +242,7 @@ class TokenHandler(AtomicDEVS):
 
             # check if retransmission is needed
             if token.hops_travelled < token.hops_to_target:
-                outputs.append((self.OUT_token, token))
+                outputs.append({self.OUT_token: token})
 
             try:
                 # check if already received from creator
@@ -261,7 +260,7 @@ class TokenHandler(AtomicDEVS):
                         # check if there is data for this robot
                         data = (token.creator, token.data[self.robot_id])
                         # send data to controller
-                        outputs.append((self.OUT_control, data))
+                        outputs.append({self.OUT_control: data})
                     except KeyError:
                         pass
                 # check if token is of kind state
@@ -270,10 +269,10 @@ class TokenHandler(AtomicDEVS):
                     if token.hops_travelled <= self.extent:
                         # send data to controller
                         data = (token.creator, token.data)
-                        outputs.append((self.OUT_control, data))
+                        outputs.append({self.OUT_control: data})
                         if token.hops_travelled == 1:
                             # send data to positioning system
-                            outputs.append((self.OUT_state, data))
+                            outputs.append({self.OUT_state: data})
 
         return outputs
 
