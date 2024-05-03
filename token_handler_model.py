@@ -48,7 +48,7 @@ class TokenHandlerSystem(CoupledDEVS):
         #)
 
         # Declare the coupled model's sub-models:
-        self.token_handler   = self.addSubModel(TokenHandler(robot_id='2',name='Robot_2'))
+        self.token_handler   = self.addSubModel(TokenHandler(robot_id='2',name='Token_Han'))
         self.token_generator = self.addSubModel(TokenGenerator(period=1,name='Token_Gen'))
         self.connectPorts(self.token_generator.OUT_token, self.token_handler.IN_token)
 
