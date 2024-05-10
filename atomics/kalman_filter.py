@@ -104,12 +104,12 @@ class KalmanFilter(AtomicDEVS):
         sigma, _, _ = self.state.get()
         return sigma
 
-    def prediction_step(self, token):
+    def prediction_step(self, control_action):
         """Prediction step based on control actions"""
         # the list of outputs to be returned
         return new_position
 
-    def update_step(self, token):
+    def update_step(self, neighbor_data):
         """Update step based on distance measurements with neighbors"""
         # the list of outputs to be returned
         return new_position
