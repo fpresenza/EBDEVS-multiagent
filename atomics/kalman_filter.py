@@ -14,7 +14,7 @@ class KalmanGeneratorState:
         """
         self.set(sigmaval, tval)
 
-    def set(self, sigmavalue, tvalue, ivalue):
+    def set(self, sigmavalue, tvalue):
         self._sigma  = sigmavalue
         self._tvalue = tvalue
 
@@ -63,7 +63,7 @@ class KalmanGenerator(AtomicDEVS):
         External Transition Function.
         """
         # it should never be executed
-        sigma, current_time, i = self.state.get()
+        sigma, current_time = self.state.get()
         current_time += self.elapsed
         return KalmanGeneratorState(sigma,current_time) 
     
@@ -93,7 +93,7 @@ class KalmanGenerator(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, current_time, i = self.state.get()
+        sigma, current_time = self.state.get()
         return sigma
 
 
@@ -202,11 +202,13 @@ class KalmanFilter(AtomicDEVS):
     def prediction_step(self, control_action):
         """Prediction step based on control actions"""
         # the list of outputs to be returned
+        new_position = control_action
         return new_position
 
     def update_step(self, ext_position, ext_covariance, dist):
         """Update step based on distance measurements with neighbors"""
         # the list of outputs to be returned
+        new_position = ext_position
         return new_position
 
 
