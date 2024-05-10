@@ -1,7 +1,7 @@
 import numpy as np
-from dataclasses import dataclass
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
+
 
 class KalmanGeneratorState:
     """
@@ -25,7 +25,7 @@ class KalmanGeneratorState:
 class KalmanGenerator(AtomicDEVS):
     def __init__(self,name=None,period=1):
         """
-        Atomic model for the toking handling protocol
+        Atomic model for the kalman filter inputs
         """
 
         # Always call parent class' constructor FIRST:
@@ -44,14 +44,14 @@ class KalmanGenerator(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.OUT_token = self.addOutPort(name="token_out")
-        self.OUT_control = self.addOutPort(name="control_out")
+        self.out_kalman_intpos = self.addOutPort(name="out_kalman_intpos")
+        self.out_kalman_intact = self.addOutPort(name="out_kalman_intact")
  
         # Parameters
         self.msgs = [
-            {self.OUT_control: np.array([.0, 1.0])},
-            {self.OUT_token: (np.array([1.0, 1.0]), np.eye(2), 1.0)},
-            {self.OUT_token: (np.array([0.0, 0.0]), np.zeros((2, 2)), 0.0)}
+            {self.out_kalman_intact: np.array([.0, 1.0])},
+            {self.out_kalman_intpos: (np.array([1.0, 1.0]), np.eye(2), 1.0)},
+            {self.out_kalman_intpos: (np.array([0.0, 0.0]), np.zeros((2, 2)), 0.0)}
         ]
         self.period = period
 
@@ -142,11 +142,11 @@ class KalmanFilter(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.OUT_control = self.addOutPort(name="control_out")
-        self.OUT_handler   = self.addOutPort(name="handler_out")
+        self.out_control_intpos = self.addOutPort(name="out_control_intpos")
+        self.out_handler_intpos   = self.addOutPort(name="out_handler_intpos")
         #
-        self.IN_control  = self.addInPort(name="control_in")
-        self.IN_handler    = self.addInPort(name="handler_in")
+        self.in_control_intact  = self.addInPort(name="in_control_intact")
+        self.in_handler_extpos    = self.addInPort(name="in_handler_extpos")
 
     def extTransition(self, inputs):
         """
@@ -155,18 +155,18 @@ class KalmanFilter(AtomicDEVS):
         sigma, current_time, data = self.state.get()
         current_time += self.elapsed
 
-        if self.IN_control in inputs: # if data arrives through port IN_control
-            control_action = inputs[self.IN_control]
+        if self.in_control_intact in inputs: # if data arrives through port in_control_intact
+            control_action = inputs[self.in_control_intact]
             new_position = self.prediction_step(control_action) # events list
             data = [
-                {self.OUT_control: new_position},
-                {self.OUT_handler: new_position}
+                {self.out_control_intpos: new_position},
+                {self.out_handler_intpos: new_position}
             ]
             sigma = 0 # holds last status
-        elif self.IN_handler in inputs: # if token arrives through port IN_control
-            ext_position, ext_covariance, dist = inputs[self.IN_handler]
+        elif self.in_handler_extpos in inputs: # if token arrives through port in_in_handler_extpos
+            ext_position, ext_covariance, dist = inputs[self.in_handler_extpos]
             new_position = self.update_step(ext_position, ext_covariance, dist) # events list
-            data = [{self.OUT_control: new_position}]
+            data = [{self.out_control_intpos: new_position}]
             sigma = 0 # holds last status
 
         return KalmanFilterState(sigma, current_time, data) 

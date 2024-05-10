@@ -50,7 +50,7 @@ class TokenHandlerSystem(CoupledDEVS):
         # Declare the coupled model's sub-models:
         self.token_handler   = self.addSubModel(TokenHandler(robot_id='2',name='Token_Han'))
         self.token_generator = self.addSubModel(TokenGenerator(period=1,name='Token_Gen'))
-        self.connectPorts(self.token_generator.OUT_token, self.token_handler.IN_token)
+        self.connectPorts(self.token_generator.out_handler_token, self.token_handler.in_router_token)
 
         # token_handler = TokenHandler(robot_id='2')
 

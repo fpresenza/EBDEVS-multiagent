@@ -61,14 +61,13 @@ class Controller(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.OUT_kalman   = self.addOutPort(name="kalman_out")
-        self.OUT_handler  = self.addOutPort(name="handler_out")
-        self.OUT_dynamics = self.addOutPort(name="dynamics_out")
+        self.out_kalman_intact   = self.addOutPort(name="out_kalman_intact")
+        self.out_handler_intact  = self.addOutPort(name="out_handler_intact")
+        self.out_physics_intact = self.addOutPort(name="out_physics_intact")
         
-        self.IN_kalman   = self.addInPort(name="kalman_in")
+        self.in_kalman_intpos   = self.addInPort(name="in_kalman_intpos")
         self.in_handler_extpos  = self.addInPort(name="in_handler_extpos")
         self.in_handler_extact  = self.addInPort(name="in_handler_extact")
-        self.IN_dynamics = self.addInPort(name="dynamics_in")
         
         self.first_control_call = True
 
@@ -79,8 +78,8 @@ class Controller(AtomicDEVS):
         sigma, current_time, last_position, ext_action = self.state.get()
         current_time += self.elapsed
 
-        if self.IN_kalman in inputs: # if data arrives through port IN_kalman
-            last_position = inputs[self.IN_kalman]
+        if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
+            last_position = inputs[self.in_kalman_intpos]
             sigma = sigma - self.elapsed # holds last status
         elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
             # TODO: agregar position a subframework
@@ -110,11 +109,11 @@ class Controller(AtomicDEVS):
         """
         sigma, current_time, last_position, ext_action = self.state.get()
         if self.first_control_call:
-            new_action = self.control_action(last_position, ext_action)
+            int_action, ext_action = self.control_action(last_position, ext_action)
             self.action = [
-                {self.OUT_kalman: new_action}, 
-                {self.OUT_handler: new_action},
-                {self.OUT_dynamics: new_action}
+                {self.out_kalman_intact: int_action}, 
+                {self.out_handler_intact: ext_action},
+                {self.out_physics_intact: int_action}
             ]
             self.first_control_call = False
 
@@ -133,8 +132,7 @@ class Controller(AtomicDEVS):
         """Compute control action"""
         # the list of outputs to be returned
         if position is None:
-            control_action = np.array([0.0, 0.0])
+            return np.array([0.0, 0.0]), {}
         else:
-            control_action = np.array([0.0, 0.0])
-        return control_action
+            return np.array([0.0, 0.0]), {}
 
