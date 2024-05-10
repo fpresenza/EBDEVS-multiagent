@@ -1,5 +1,4 @@
 import numpy as np
-from dataclasses import dataclass
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
@@ -64,11 +63,12 @@ class Controller(AtomicDEVS):
         #  (usually store returned references in local variables):
         self.OUT_kalman   = self.addOutPort(name="kalman_out")
         self.OUT_handler  = self.addOutPort(name="handler_out")
-        self.OUT_dynamics = self.addOutPort(name="handler_out")
+        self.OUT_dynamics = self.addOutPort(name="dynamics_out")
         
         self.IN_kalman   = self.addInPort(name="kalman_in")
-        self.IN_handler  = self.addInPort(name="handler_in")
-        self.IN_dynamics = self.addInPort(name="handler_in")
+        self.in_handler_extpos  = self.addInPort(name="in_handler_extpos")
+        self.in_handler_extact  = self.addInPort(name="in_handler_extact")
+        self.IN_dynamics = self.addInPort(name="dynamics_in")
         
         self.first_control_call = True
 
@@ -82,8 +82,10 @@ class Controller(AtomicDEVS):
         if self.IN_kalman in inputs: # if data arrives through port IN_kalman
             last_position = inputs[self.IN_kalman]
             sigma = sigma - self.elapsed # holds last status
-        elif self.IN_handler in inputs: # if token arrives through port IN_handler
-            ext_action += inputs[self.IN_handler]
+        elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
+            # TODO: agregar position a subframework
+        elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
+            ext_action += inputs[self.in_handler_extact]
             sigma = sigma - self.elapsed # holds last status
 
         return ControllerState(sigma, current_time, last_position, ext_action) 

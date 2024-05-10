@@ -169,7 +169,8 @@ class TokenHandler(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.OUT_token   = self.addOutPort(name="token_out")
-        self.OUT_control = self.addOutPort(name="control_out")
+        self.out_control_extpos = self.addOutPort(name="out_control_extpos")
+        self.out_control_extact = self.addOutPort(name="out_control_extact")
         self.OUT_state   = self.addOutPort(name="state_out")
         #
         self.IN_token    = self.addInPort(name="token_in")
@@ -260,7 +261,7 @@ class TokenHandler(AtomicDEVS):
                         # check if there is data for this robot
                         data = (token.creator, token.data[self.robot_id])
                         # send data to controller
-                        outputs.append({self.OUT_control: data})
+                        outputs.append({self.out_control_extact: data})
                     except KeyError:
                         pass
                 # check if token is of kind state
@@ -269,7 +270,7 @@ class TokenHandler(AtomicDEVS):
                     if token.hops_travelled <= self.extent:
                         # send data to controller
                         data = (token.creator, token.data)
-                        outputs.append({self.OUT_control: data})
+                        outputs.append({self.out_control_extpos: data})
                         if token.hops_travelled == 1:
                             # send data to positioning system
                             outputs.append({self.OUT_state: data})
