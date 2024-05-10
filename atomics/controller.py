@@ -4,25 +4,31 @@ from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
 
-
 class ControllerState:
     """
     Encapsulates the system's state
     """
 
-    def __init__(self, sigmaval=0.1, tval=0.0, dataval=[]):
+    def __init__(
+            self, 
+            sigmaval=0.1, 
+            tval=0.0, 
+            last_position=np.array([0.0, 0.0]), 
+            ext_action=np.array([0.0, 0.0])
+        ):
         """
         Constructor (parameterizable).
         """
         self.set(sigmaval, tval, dataval)
 
-    def set(self, sigmavalue, tvalue, datavalue):
+    def set(self, sigmavalue, tvalue, last_position, control_action):
         self._sigma  = sigmavalue
         self._tvalue = tvalue
-        self._data   = datavalue
+        self._last_position = last_position
+        self._ext_action = ext_action
 
     def get(self):
-        return self._sigma, self._tvalue, self._data
+        return self._sigma, self._tvalue, self._last_position, self._ext_action
 
 
 class Controller(AtomicDEVS):
@@ -40,8 +46,14 @@ class Controller(AtomicDEVS):
         #  Define 'state' attribute (initial sate):
         _time0  = 0.0
         _sigma0 = self.period # waits till firts token
-        _data0  = []
-        self.state = ControllerState(_sigma0,_time0,_data0) 
+        _last_position0 = None
+        _ext_action0 = np.array([0.0, 0.0])
+        self.state = ControllerState(
+            _sigma0,
+            _time0, 
+            _last_position0,
+            _ext_action0
+        ) 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -64,39 +76,39 @@ class Controller(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, data = self.state.get()
+        sigma, current_time, last_position, ext_action = self.state.get()
         current_time += self.elapsed
 
         if self.IN_kalman in inputs: # if data arrives through port IN_kalman
-            data[0] = inputs[self.IN_kalman]
+            last_position = inputs[self.IN_kalman]
             sigma = sigma - self.elapsed # holds last status
-        elif self.IN_handler in inputs: # if token arrives through port IN_kalman
-            data[1] += inputs[self.IN_handler]
+        elif self.IN_handler in inputs: # if token arrives through port IN_handler
+            ext_action += inputs[self.IN_handler]
             sigma = sigma - self.elapsed # holds last status
 
-        return ControllerState(sigma, current_time, data) 
+        return ControllerState(sigma, current_time, last_position, ext_action) 
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, _ = self.state.get()
+        _, current_time, last_position, _ = self.state.get()
         self.action.pop()
         if len(self.action) == 0:
             sigma = self.period
             self.first_control_call = True
-            data[1] = 0
+            ext_action = 0
         else:
             sigma = 0
-        return ControllerState(sigma,current_time,data) 
+        return ControllerState(sigma,current_time,last_position, ext_action) 
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        sigma, current_time, (position, ext_action) = self.state.get()
+        sigma, current_time, last_position, ext_action = self.state.get()
         if self.first_control_call:
-            new_action = self.control_action(position, ext_action)
+            new_action = self.control_action(last_position, ext_action)
             self.action = [
                 {self.OUT_kalman: new_action}, 
                 {self.OUT_handler: new_action},
@@ -118,5 +130,9 @@ class Controller(AtomicDEVS):
     def control_action(self, position, ext_action):
         """Compute control action"""
         # the list of outputs to be returned
-        return  np.zeros(2)
+        if position is None:
+            control_action = np.array([0.0, 0.0])
+        else:
+            control_action = np.array([0.0, 0.0])
+        return control_action
 
