@@ -3,6 +3,98 @@ from dataclasses import dataclass
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
+class KalmanGeneratorState:
+    """
+    Encapsulates the system's state
+    """
+
+    def __init__(self, sigmaval=0.1, tval=0.0):
+        """
+        Constructor (parameterizable).
+        """
+        self.set(sigmaval, tval)
+
+    def set(self, sigmavalue, tvalue, ivalue):
+        self._sigma  = sigmavalue
+        self._tvalue = tvalue
+
+    def get(self):
+        return self._sigma, self._tvalue
+
+
+class KalmanGenerator(AtomicDEVS):
+    def __init__(self,name=None,period=1):
+        """
+        Atomic model for the toking handling protocol
+        """
+
+        # Always call parent class' constructor FIRST:
+        AtomicDEVS.__init__(self, name)
+
+        # STATE:
+        #  Define 'state' attribute (initial sate):
+        _time0  = 0.0
+        _sigma0 = 0
+        self.state = KalmanGeneratorState(_sigma0,_time0) 
+        # ELAPSED TIME:
+        #  Initialize 'elapsed time' attribute if required
+        #  (by default, value is 0.0):
+        self.elapsed = 0.0
+
+        # PORTS:
+        #  Declare as many input and output ports as desired
+        #  (usually store returned references in local variables):
+        self.OUT_token = self.addOutPort(name="token_out")
+        self.OUT_control = self.addOutPort(name="control_out")
+ 
+        # Parameters
+        self.msgs = [
+            {self.OUT_control: np.array([.0, 1.0])},
+            {self.OUT_token: (np.array([1.0, 1.0]), np.eye(2), 1.0)},
+            {self.OUT_token: (np.array([0.0, 0.0]), np.zeros((2, 2)), 0.0)}
+        ]
+        self.period = period
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        # it should never be executed
+        sigma, current_time, i = self.state.get()
+        current_time += self.elapsed
+        return KalmanGeneratorState(sigma,current_time) 
+    
+    def intTransition(self):
+        """
+        Internal Transition Function.
+        """
+        sigma, current_time = self.state.get()
+        current_time += sigma
+        self.msgs.pop()
+        if len(self.msgs) == 0:
+            sigma = INFINITY
+        else:
+            sigma = self.period
+        return KalmanGeneratorState(sigma,current_time) 
+    
+    def outputFnc(self):
+        """
+        Output Funtion.
+        """
+        # sigma, current_time = self.state.get()
+        return self.msgs[-1]
+
+    def timeAdvance(self):
+        """
+        Time-Advance Function.
+        """
+        # Compute 'ta', the time to the next scheduled internal transition,
+        # based (typically) on current State.
+        sigma, current_time, i = self.state.get()
+        return sigma
 
 
 class KalmanFilterState:
@@ -66,12 +158,15 @@ class KalmanFilter(AtomicDEVS):
         if self.IN_control in inputs: # if data arrives through port IN_control
             control_action = inputs[self.IN_control]
             new_position = self.prediction_step(control_action) # events list
-            data = [(self.OUT_control, new_position), (self.OUT_handler, new_position)]
+            data = [
+                {self.OUT_control: new_position},
+                {self.OUT_handler: new_position}
+            ]
             sigma = 0 # holds last status
         elif self.IN_handler in inputs: # if token arrives through port IN_control
-            neighbor_data = inputs[self.IN_handler]
-            new_position = self.update_step(neighbor_data) # events list
-            data = [(self.OUT_control, new_position)]
+            ext_position, ext_covariance, dist = inputs[self.IN_handler]
+            new_position = self.update_step(ext_position, ext_covariance, dist) # events list
+            data = [{self.OUT_control: new_position}]
             sigma = 0 # holds last status
 
         return KalmanFilterState(sigma, current_time, data) 
@@ -109,7 +204,7 @@ class KalmanFilter(AtomicDEVS):
         # the list of outputs to be returned
         return new_position
 
-    def update_step(self, neighbor_data):
+    def update_step(self, ext_position, ext_covariance, dist):
         """Update step based on distance measurements with neighbors"""
         # the list of outputs to be returned
         return new_position
