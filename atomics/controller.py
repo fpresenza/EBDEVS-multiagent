@@ -14,7 +14,7 @@ class ControllerGeneratorState:
         """
         self.set(sigmaval, tval)
 
-    def set(self, sigmavalue, tvalue, ivalue):
+    def set(self, sigmavalue, tvalue):
         self._sigma  = sigmavalue
         self._tvalue = tvalue
 
@@ -94,7 +94,7 @@ class ControllerGenerator(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, current_time, i = self.state.get()
+        sigma, current_time = self.state.get()
         return sigma
 
 
@@ -113,13 +113,13 @@ class ControllerState:
         """
         Constructor (parameterizable).
         """
-        self.set(sigmaval, tval, dataval)
+        self.set(sigmaval, tval, last_position, ext_action)
 
     def set(self, sigmavalue, tvalue, last_position, control_action):
         self._sigma  = sigmavalue
         self._tvalue = tvalue
         self._last_position = last_position
-        self._ext_action = ext_action
+        self._ext_action = control_action
 
     def get(self):
         return self._sigma, self._tvalue, self._last_position, self._ext_action
@@ -178,7 +178,7 @@ class Controller(AtomicDEVS):
             last_position = inputs[self.in_kalman_intpos]
             sigma = sigma - self.elapsed # holds last status
         elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
-            node_id, ext_position = self.in_handler_extpos
+            node_id, ext_position = inputs[self.in_handler_extpos]
             self.subframework[node_id] = ext_position
         elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
             ext_action += inputs[self.in_handler_extact]
@@ -190,7 +190,7 @@ class Controller(AtomicDEVS):
         """
         Internal Transition Function.
         """
-        _, current_time, last_position, _ = self.state.get()
+        _, current_time, last_position, ext_action = self.state.get()
         self.action.pop()
         if len(self.action) == 0:
             sigma = self.period
@@ -222,7 +222,7 @@ class Controller(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _ = self.state.get()
+        sigma, _, _, _ = self.state.get()
         return sigma
 
     def control_action(self, position, ext_action):
