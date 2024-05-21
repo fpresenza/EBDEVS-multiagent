@@ -2,16 +2,16 @@
 
 ## Experiment Kalman Filter Model
 
-![KF](fig/KalmanFilterUnitTest.png)
+![KF](fig/KalmanFilterUnitTest.svg)
 
 ## Experiment Token Handler Model
 
-![TH](fig/TokenHandlerUnitTest.png)
+![TH](fig/TokenHandlerUnitTest.svg)
 
 ## Experiment Controller Model
 
-![CTRL](fig/ControllerUnitTest.png)
+![CTRL](fig/ControllerUnitTest.svg)
 
 ## Experiment Splitter Model
 
-![SP](fig/SplitterUnitTest.png)
+![SP](fig/SplitterUnitTest.svg)
