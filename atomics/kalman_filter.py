@@ -44,14 +44,14 @@ class KalmanGenerator(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.out_kalman_intpos = self.addOutPort(name="out_kalman_intpos")
+        self.out_kalman_extpos = self.addOutPort(name="out_kalman_extpos")
         self.out_kalman_intact = self.addOutPort(name="out_kalman_intact")
  
         # Parameters
         self.msgs = [
             {self.out_kalman_intact: np.array([.0, 1.0])},
-            {self.out_kalman_intpos: (np.array([1.0, 1.0]), np.eye(2), 1.0)},
-            {self.out_kalman_intpos: (np.array([0.0, 0.0]), np.zeros((2, 2)), 0.0)}
+            {self.out_kalman_extpos: (np.array([1.0, 1.0]), np.eye(2), 1.0)},
+            {self.out_kalman_extpos: (np.array([0.0, 0.0]), np.zeros((2, 2)), 0.0)}
         ]
         self.period = period
 

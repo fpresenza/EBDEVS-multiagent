@@ -22,6 +22,6 @@ class TestKalmanFilterSystem(CoupledDEVS):
         # Declare the coupled model's sub-models:
         self.kalman_filter   = self.addSubModel(KalmanFilter(robot_id='2',name='Kalman_Filter'))
         self.kalman_input_generator = self.addSubModel(KalmanGenerator(period=1,name='Kalman_Input_Gen'))
-        self.connectPorts(self.kalman_input_generator.out_kalman_intpos, self.kalman_filter.in_handler_extpos)
+        self.connectPorts(self.kalman_input_generator.out_kalman_extpos, self.kalman_filter.in_handler_extpos)
         self.connectPorts(self.kalman_input_generator.out_kalman_intact, self.kalman_filter.in_control_intact)
 
