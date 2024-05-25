@@ -49,9 +49,9 @@ class KalmanGenerator(AtomicDEVS):
  
         # Parameters
         self.msgs = [
-            {self.out_kalman_intact: np.array([.0, 1.0])},
-            {self.out_kalman_extpos: (np.array([1.0, 1.0]), np.eye(2), 1.0)},
-            {self.out_kalman_extpos: (np.array([0.0, 0.0]), np.zeros((2, 2)), 0.0)}
+            {self.out_kalman_intact: np.array([[0.0], [1.0]])},
+            {self.out_kalman_extpos: (np.array([[0.0], [5.0]]), 6.0)},
+            {self.out_kalman_extpos: (np.array([[7.0], [0.0]]), 6.0)}
         ]
         self.period = period
 
@@ -139,6 +139,13 @@ class KalmanFilter(AtomicDEVS):
         #  (by default, value is 0.0):
         self.elapsed = 0.0
 
+        # kalman filter parameters (hardcoded)
+        self.position = np.array([[0.0], [0.0]])
+        self.covariance = np.array([[1.0, 0.0], [0.0, 1.0]])
+        self.dynamic_process_covariance = np.array([[0.5, 0.0], [0.0, 0.5]])
+        self.distance_measurement_covariance = np.array([[1.5]])
+        self.position_measurement_covariance = np.array([[2.0, 0.0], [0.0, 2.0]])
+
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
@@ -164,8 +171,8 @@ class KalmanFilter(AtomicDEVS):
             ]
             sigma = 0 # holds last status
         elif self.in_handler_extpos in inputs: # if token arrives through port in_in_handler_extpos
-            ext_position, ext_covariance, dist = inputs[self.in_handler_extpos]
-            new_position = self.update_step(ext_position, ext_covariance, dist) # events list
+            ext_position, dist = inputs[self.in_handler_extpos]
+            new_position = self.update_step(ext_position, dist) # events list
             data = [{self.out_control_intpos: new_position}]
             sigma = 0 # holds last status
 
@@ -202,13 +209,26 @@ class KalmanFilter(AtomicDEVS):
     def prediction_step(self, control_action):
         """Prediction step based on control actions"""
         # the list of outputs to be returned
-        new_position = control_action
-        return new_position
+        self.position += control_action * self.elapsed      # debe ser el tiempo entre acciones de control (chequear)
+        self.covariance += self.dynamic_process_covariance * self.elapsed**2
+        return self.position.copy()
 
-    def update_step(self, ext_position, ext_covariance, dist):
-        """Update step based on distance measurements with neighbors"""
-        # the list of outputs to be returned
-        new_position = ext_position
-        return new_position
+    def update_step(self, ext_position, dist):
+        """Update step based on distance measurements with neighbors
+
+        args:
+        -----
+            ext_position : neighbor position
+            dist : distance measurements
+        """
+        r = self.position - ext_position
+        d = np.sqrt(np.square(r).sum())
+        H = r.T / d
+        PHt = self.covariance.dot(H.T)
+        Pz = H.dot(PHt) + self.distance_measurement_covariance
+        K = PHt / Pz
+        self.position += K.dot(dist - d)
+        self.covariance -= K.dot(H).dot(self.covariance)
+        return self.position.copy()
 
 
