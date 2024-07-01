@@ -18,4 +18,4 @@
 
 ## Experiment MultiRobot System Model
 
-![MRS](fig/UnitTest.svg)
+![MRS](fig/MultiRobotSystemUnitTest.svg)
