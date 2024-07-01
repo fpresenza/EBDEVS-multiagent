@@ -286,7 +286,7 @@ class Splitter(AtomicDEVS):
         i=0
         data = []
         for msg in in0:
-            data.append({self.out_splitter_msgs[i]: msg})
+            data.append({self.out_splitter_msgs[i]: [msg]})
             i += 1
         # data = [
         #        {self.out_splitter_port0: 0},
@@ -301,6 +301,7 @@ class Splitter(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
+        print("I'm the splitter, and I'm sending: {}".format(data[-1]))
         return data[-1]
     
     def timeAdvance(self):
