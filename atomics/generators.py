@@ -221,6 +221,30 @@ class SinusoidalGenerator(AtomicDEVS):
         # based (typically) on current State.
         return self.sampling 
 
+class SinusoidalGenerator10Hz(SinusoidalGenerator):
+    """
+    A sinusoidal generator with f = 10Hz
+    """
+  
+    def __init__(self, name=None, samptime=0.01):
+        """
+        Constructor (parameterizable).
+        """
+        # Always call parent class' constructor FIRST:
+        SinusoidalGenerator.__init__(self, name, freq=10, amp=1, phi=0, samp=samptime)
+    
+        # STATE:
+        #  Define 'state' attribute (initial sate):
+
+        # ELAPSED TIME:
+        #  Initialize 'elapsed time' attribute if required
+        #  (by default, value is 0.0):
+        self.elapsed = 0.0
+    
+        # PORTS:
+        #  Declare as many input and output ports as desired
+        #  (usually store returned references in local variables):
+
 ##############################################################################
 
 class PulseGeneratorState:
