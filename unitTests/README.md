@@ -15,3 +15,7 @@
 ## Experiment Splitter Model
 
 ![SP](fig/SplitterUnitTest.svg)
+
+## Experiment MultiRobot System Model
+
+![MRS](fig/UnitTest.svg)
