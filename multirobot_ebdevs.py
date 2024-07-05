@@ -312,6 +312,7 @@ class MultiRobotSystem(CoupledDEVS):
         #     self.micro_states['x'+str(i)] = 0
         #     self.micro_states['y'+str(i)] = 0
         self.current_time = 0
+        self.max_dist_sq = 35.0
 
         robot1 = Robot(name="Robot_1",
                        dQMin=1e-6,
@@ -358,15 +359,21 @@ class MultiRobotSystem(CoupledDEVS):
 
         micro_id, data = x_b_micro
         try:
-            self.micro_states['Physics'][micro_id] = data.copy()
+            self.micro_states['Physics'][micro_id] = data['Physics'].copy()
         except AttributeError:
-            self.micro_states['Physics'][micro_id] = data
+            self.micro_states['Physics'][micro_id] = data['Physics']
 
-        print("t: {} ms, I'm {} and the state of all my children is {}".format(self.current_time,self.name,self.micro_states))
+        print("t: {} ms, I'm {} and the state of all my children is {}".format(self.current_time,self.name,self.micro_states['Physics']))
 
-    def getContextInformation(self, *args, **kwargs):
+    def getContextInformation(self, transmitter):
         # return self.micro_states[]
-        return 0
+        physics = self.micro_states['Physics']
+        p = physics[transmitter]
+        return [
+            robot_id
+            for robot_id, q in physics.items()
+            if (p[0] - q[0])**2 + (p[1] - q[1])**2 < self.max_dist_sq
+        ]
 
     def select(self, immChildren):
         """
