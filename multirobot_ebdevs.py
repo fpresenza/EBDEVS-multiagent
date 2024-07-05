@@ -35,8 +35,6 @@ class QSSIntegrator_Yup(QSSIntegrator):
         """
         Constructor (parameterizable).
         """
-        self.y_up  = ""
-
         # Always call parent class' constructor FIRST:
         QSSIntegrator.__init__(self, 
                                name=name, 
@@ -46,6 +44,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
                                x0 = x0, 
                                debug = debug
                                )
+        self.y_up  = [self.name, None]
 
     def intTransition(self): # re-implement this function
         """
@@ -74,7 +73,10 @@ class QSSIntegrator_Yup(QSSIntegrator):
             print("Internal Transition Function @ {} - t: {}, xprev: {}, x: {}, q: {}, sigma: {}".format(self.name,current_time,xprev,x,q,sigma))
 
         # shares information to the parent to compute the Global Transition function
-        self.y_up = (self.name, q)
+        try:
+            self.y_up[1] = q.copy()
+        except AttributeError:
+            self.y_up[1] = q
 
         return QSSState(q,x,sigma,current_time)
 
@@ -127,7 +129,10 @@ class QSSIntegrator_Yup(QSSIntegrator):
             sigma = 0
 
         # shares information to the parent to compute the Global Transition function
-        self.y_up = (self.name, q)
+        try:
+            self.y_up[1] = q.copy()
+        except AttributeError:
+            self.y_up[1] = q
 
         return QSSState(q,x,sigma,current_time)
 
@@ -135,7 +140,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
 # Physics for Robot i
 #----------------------------
 class Physics(CoupledDEVS):
-    def __init__(self, name='Physics', dQMin=1e-6, dQRel=1e-3, x0=0, y0=0, gainx=1, gainy=1):
+    def __init__(self, name='Physics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1):
         """
         Robot's physics submodel composed of two integrators for x and y and a splitter.
         """
@@ -151,20 +156,19 @@ class Physics(CoupledDEVS):
         self.gainy = gainy
 
         # dictionary to save childrens' states
-        self.micro_states = {}
-        self.y_up = ""
+        self.y_up = [self.name, {'x': x0, 'y': y0}]
         self.current_time = 0
 
         # Declare childrens: splitterx2, QSS integ x 2
-        splitter     = Splitter(name=name+".splitter",numoutputs=2)
-        integrator_x = QSSIntegrator_Yup(name=name+".x", 
+        splitter     = Splitter(name="splitter",numoutputs=2)
+        integrator_x = QSSIntegrator_Yup(name="x", 
                                          dQMin=self.dQMin, 
                                          dQRel=self.dQRel, 
                                          gain=self.gainx, 
                                          x0=self.x0, 
                                          debug=False
                                          )
-        integrator_y = QSSIntegrator_Yup(name=name+".y",
+        integrator_y = QSSIntegrator_Yup(name="y",
                                          dQMin=self.dQMin, 
                                          dQRel=self.dQRel, 
                                          gain=self.gainy, 
@@ -190,9 +194,13 @@ class Physics(CoupledDEVS):
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         # update each coordinate separatedly, since the events in the integrators for the same robot do not need to be simultaneous
         self.current_time += e_g
-        #for micro_id, qval in x_b_micro:
-        #    self.micro_states[micro_id] = q_val
-        self.y_up = x_b_micro
+
+        micro_id, data = x_b_micro[0]
+        try:
+            self.y_up[1][micro_id] = data.copy()
+        except AttributeError:
+            self.y_up[1][micro_id] = data
+
         print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
 
     def select(self, immChildren):
@@ -206,7 +214,7 @@ class Physics(CoupledDEVS):
 # Robot i
 #----------------------------
 class Robot(CoupledDEVS):
-    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0, y0=0, gainx=1, gainy=1):
+    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1):
         """
         A robot model composed of the robot's pysics.
         """
@@ -221,11 +229,10 @@ class Robot(CoupledDEVS):
         self.gainx = gainx
         self.gainy = gainy
 
-        self.micro_states = {}
-        self.y_up = ""
+        self.y_up = [self.name, {'Physics': [x0,  y0]}]
         self.current_time = 0
 
-        physics = Physics(name=name+".Physics",
+        physics = Physics(name="Physics",
                           dQMin=self.dQMin,
                           dQRel=self.dQRel,
                           x0=self.x0,
@@ -234,7 +241,7 @@ class Robot(CoupledDEVS):
                           gainy=self.gainy
                          )
         splitter_gen = SplitterGenerator(period=1,
-                                         name=name+'.Splitter_Gen'
+                                         name='Splitter_Gen'
                                         )
         self.physics      = self.addSubModel(physics)
         self.splitter_gen = self.addSubModel(splitter_gen)
@@ -252,9 +259,17 @@ class Robot(CoupledDEVS):
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g
-        # for micro_id, qval in x_b_micro:
-        #     self.micro_states[micro_id] = qval
-        self.y_up = x_b_micro
+
+        micro_id, data = x_b_micro
+        # if micro_id == 'Physics'
+        try:
+            self.y_up[1]['Physics'][0] = data['x'].copy()
+            self.y_up[1]['Physics'][1] = data['y'].copy()
+        except AttributeError:
+            self.y_up[1]['Physics'][0] = data['x']
+            self.y_up[1]['Physics'][1] = data['y']
+
+
         print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
 
     def select(self, immChildren):
@@ -292,42 +307,41 @@ class MultiRobotSystem(CoupledDEVS):
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
 
-        self.micro_states = {}
+        self.micro_states = {'Physics': {}}
         # for i in range(number):
         #     self.micro_states['x'+str(i)] = 0
         #     self.micro_states['y'+str(i)] = 0
-        self.y_up = ""
         self.current_time = 0
 
         robot1 = Robot(name="Robot_1",
                        dQMin=1e-6,
                        dQRel=1e-3,
-                       x0=0,
-                       y0=0,
+                       x0=0.0,
+                       y0=0.0,
                        gainx=1,
                        gainy=1
                       )
         robot2 = Robot(name="Robot_2",
                        dQMin=1e-6,
                        dQRel=1e-3,
-                       x0=5,
-                       y0=3,
+                       x0=5.0,
+                       y0=3.0,
                        gainx=1,
                        gainy=1
                       )
         robot3 = Robot(name="Robot_3",
                        dQMin=1e-6,
                        dQRel=1e-3,
-                       x0=-2,
-                       y0=-2,
+                       x0=-2.0,
+                       y0=-2.0,
                        gainx=1,
                        gainy=1
                       )
         robot4 = Robot(name="Robot_4",
                        dQMin=1e-6,
                        dQRel=1e-3,
-                       x0=5,
-                       y0=-3,
+                       x0=5.0,
+                       y0=-3.0,
                        gainx=1,
                        gainy=1
                       )
@@ -341,8 +355,12 @@ class MultiRobotSystem(CoupledDEVS):
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g
-        for micro_id, qval in x_b_micro:
-            self.micro_states[micro_id] = qval
+
+        micro_id, data = x_b_micro
+        try:
+            self.micro_states['Physics'][micro_id] = data.copy()
+        except AttributeError:
+            self.micro_states['Physics'][micro_id] = data
 
         print("t: {} ms, I'm {} and the state of all my children is {}".format(self.current_time,self.name,self.micro_states))
 
