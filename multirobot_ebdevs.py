@@ -20,6 +20,7 @@ from pypdevs.infinity import INFINITY
 # Import all models to couple
 from atomics.qssintegrators import *
 from atomics.misc import *
+from atomics.router import *
 
 import sys
 
@@ -346,6 +347,8 @@ class MultiRobotSystem(CoupledDEVS):
                        gainx=1,
                        gainy=1
                       )
+        router = Router(number_of_robots=3, name='Router')
+        router_input_gen = TokenGenerator(number_of_robots=3, period=1,name='Router_Input_Gen')
         self.robot1 = self.addSubModel(robot1)
         self.robot2 = self.addSubModel(robot2)
         self.robot3 = self.addSubModel(robot3)
@@ -353,6 +356,9 @@ class MultiRobotSystem(CoupledDEVS):
         # robots' position evolution from initial conditions (no external source)
 
         # Declare the coupled model's output ports => no output ports
+        self.connectPorts(self.router_input_generator.out_router_token['0'], self.router.in_agent_token['0'])
+        self.connectPorts(self.router_input_generator.out_router_token['1'], self.router.in_agent_token['1'])
+        self.connectPorts(self.router_input_generator.out_router_token['2'], self.router.in_agent_token['2'])
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g
