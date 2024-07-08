@@ -21,6 +21,8 @@ from pypdevs.infinity import INFINITY
 from atomics.qssintegrators import *
 from atomics.misc import *
 from atomics.router import *
+from atomics.controller import Controller
+from atomics.token_handler import TokenHandler
 
 import sys
 
@@ -141,7 +143,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
 # Physics for Robot i
 #----------------------------
 class Physics(CoupledDEVS):
-    def __init__(self, name='Physics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1):
+    def __init__(self, name='Physics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
         """
         Robot's physics submodel composed of two integrators for x and y and a splitter.
         """
@@ -155,6 +157,7 @@ class Physics(CoupledDEVS):
         self.y0    = y0
         self.gainx = gainx
         self.gainy = gainy
+        self.debug = debug
 
         # dictionary to save childrens' states
         self.y_up = [self.name, {'x': x0, 'y': y0}]
@@ -202,7 +205,8 @@ class Physics(CoupledDEVS):
         except AttributeError:
             self.y_up[1][micro_id] = data
 
-        print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
+        if (self.debug):
+            print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
 
     def select(self, immChildren):
         """
@@ -215,7 +219,7 @@ class Physics(CoupledDEVS):
 # Robot i
 #----------------------------
 class Robot(CoupledDEVS):
-    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1):
+    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
         """
         A robot model composed of the robot's pysics.
         """
@@ -229,6 +233,7 @@ class Robot(CoupledDEVS):
         self.y0    = y0
         self.gainx = gainx
         self.gainy = gainy
+        self.debug = debug
 
         self.y_up = [self.name, {'Physics': [x0,  y0]}]
         self.current_time = 0
@@ -244,19 +249,29 @@ class Robot(CoupledDEVS):
         splitter_gen = SplitterGenerator(period=1,
                                          name='Splitter_Gen'
                                         )
-        self.physics      = self.addSubModel(physics)
-        self.splitter_gen = self.addSubModel(splitter_gen)
+        controller    = Controller(robot_id=self.name, name='Controller')
+        token_handler = TokenHandler(robot_id=self.name,name='Token_Handler')
+
+        self.physics       = self.addSubModel(physics)
+        self.splitter_gen  = self.addSubModel(splitter_gen)
+        self.controller    = self.addSubModel(controller)
+        self.token_handler = self.addSubModel(token_handler)
 
         # Declare the coupled model's output ports:
         # self.IN_vx_vy = self.addInPort(name="robot_vx_vy")
         self.OUT_x    = self.addOutPort(name="robot_x")
         self.OUT_y    = self.addOutPort(name="robot_y")
+        self.OUT_router_token = self.addOutPort(name="out_router")
+        self.IN_router_token  = self.addInPort(name="in_router")
 
         # Connect coupled model's ports with atomic models' ports
         self.connectPorts(self.physics.OUT_physics_x, self.OUT_x)
         self.connectPorts(self.physics.OUT_physics_y, self.OUT_y)
         # self.connectPorts(self.IN_vx_vy, self.splitter_gen.in_splitter_msgs)
-        self.connectPorts(self.splitter_gen.out_splitter_in, self.physics.IN_physics_vx_vy) 
+        self.connectPorts(self.splitter_gen.out_splitter_in, self.physics.IN_physics_vx_vy)
+        self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
+        self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
+        self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g
@@ -270,8 +285,8 @@ class Robot(CoupledDEVS):
             self.y_up[1]['Physics'][0] = data['x']
             self.y_up[1]['Physics'][1] = data['y']
 
-
-        print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
+        if (self.debug):
+            print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
 
     def select(self, immChildren):
         """
@@ -301,7 +316,7 @@ class Robot(CoupledDEVS):
         # calculo de los vecinos de un atomico a pedido del router
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', number=4):
+    def __init__(self, name='MultiRobotSystem', number=4, debug=False):
         """
         Multi robot system composed of N robots.
         """
@@ -314,35 +329,36 @@ class MultiRobotSystem(CoupledDEVS):
         #     self.micro_states['y'+str(i)] = 0
         self.current_time = 0
         self.max_dist = 6.0
+        self.debug = debug
 
         self.agents = [
             Robot(name="Robot_0",
-                       dQMin=1e-6,
-                       dQRel=1e-3,
+                       dQMin=1e-1,
+                       dQRel=0,
                        x0=0.0,
                        y0=0.0,
                        gainx=1,
                        gainy=1
                       ),
             Robot(name="Robot_1",
-                       dQMin=1e-6,
-                       dQRel=1e-3,
+                       dQMin=1e-1,
+                       dQRel=0,
                        x0=5.0,
                        y0=3.0,
                        gainx=1,
                        gainy=1
                       ),
             Robot(name="Robot_2",
-                       dQMin=1e-6,
-                       dQRel=1e-3,
+                       dQMin=1e-1,
+                       dQRel=0,
                        x0=-2.0,
                        y0=-2.0,
                        gainx=1,
                        gainy=1
                       ),
             Robot(name="Robot_3",
-                       dQMin=1e-6,
-                       dQRel=1e-3,
+                       dQMin=1e-1,
+                       dQRel=0,
                        x0=5.0,
                        y0=-2.0,
                        gainx=1,
@@ -351,7 +367,7 @@ class MultiRobotSystem(CoupledDEVS):
         ]
         agents_ids = [agent.name for agent in self.agents]
         router = Router(agents_ids, name='Router')
-        router_input_gen = TokenGenerator(agents_ids, period=1, name='Router_Input_Gen')
+        router_input_gen = TokenGenerator(agents_ids, period=0.2, name='Router_Input_Gen')
         [self.addSubModel(agent) for agent in self.agents]
         # self.robot1 = self.addSubModel(robot1)
         # self.robot2 = self.addSubModel(robot2)
@@ -366,6 +382,14 @@ class MultiRobotSystem(CoupledDEVS):
         self.connectPorts(self.router_input_generator.out_router_token['Robot_1'], self.router.in_agent_token['Robot_1'])
         self.connectPorts(self.router_input_generator.out_router_token['Robot_2'], self.router.in_agent_token['Robot_2'])
         self.connectPorts(self.router_input_generator.out_router_token['Robot_3'], self.router.in_agent_token['Robot_3'])
+        self.connectPorts(self.agents[0].OUT_router_token, self.router.in_agent_token['Robot_0'])
+        self.connectPorts(self.agents[1].OUT_router_token, self.router.in_agent_token['Robot_1'])
+        self.connectPorts(self.agents[2].OUT_router_token, self.router.in_agent_token['Robot_2'])
+        self.connectPorts(self.agents[3].OUT_router_token, self.router.in_agent_token['Robot_3'])
+        self.connectPorts(self.router.out_agent_token['Robot_0'], self.agents[0].IN_router_token)
+        self.connectPorts(self.router.out_agent_token['Robot_1'], self.agents[1].IN_router_token)
+        self.connectPorts(self.router.out_agent_token['Robot_2'], self.agents[2].IN_router_token)
+        self.connectPorts(self.router.out_agent_token['Robot_3'], self.agents[3].IN_router_token)
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g
@@ -375,8 +399,8 @@ class MultiRobotSystem(CoupledDEVS):
             self.micro_states['Physics'][micro_id] = data['Physics'].copy()
         except AttributeError:
             self.micro_states['Physics'][micro_id] = data['Physics']
-
-        print("t: {} ms, I'm {} and the state of all my children is {}".format(self.current_time,self.name,self.micro_states['Physics']))
+        if (self.debug):
+            print("t: {} ms, I'm {} and the state of all my children is {}".format(self.current_time,self.name,self.micro_states['Physics']))
 
     def getContextInformation(self, transmitter):
         # return self.micro_states[]

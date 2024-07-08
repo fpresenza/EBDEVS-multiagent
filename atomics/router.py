@@ -216,3 +216,6 @@ class Router(AtomicDEVS):
         # based (typically) on current State.
         sigma, _, _ = self.state.get()
         return sigma
+    
+    def __lt__(self, other):
+        return self.name < other.name

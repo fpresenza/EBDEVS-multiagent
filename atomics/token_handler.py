@@ -153,6 +153,8 @@ class TokenHandler(AtomicDEVS):
         # Dictionaries as records of tokens received
         # {'action': {creator: order}, 'state': {creator: order}}
         self.received = {'action': {}, 'state': {}}
+        self.action_token_order = 0
+        self.state_token_order = 0
 
         # STATE:
         #  Define 'state' attribute (initial sate):
@@ -190,13 +192,27 @@ class TokenHandler(AtomicDEVS):
             if (ret == []): # discard, the token received was sent by this same robot
                 sigma = sigma - self.elapsed # holds last status
             else:
-                data  = ret # events list
+                data += ret # events list
                 sigma = 0
+            print("t: {} ms, I'm {} and I received this token {} from {}".format(current_time,self.name,token,self.in_router_token))
+
         elif self.in_controller_intact in inputs: # if token arrives through port in_controller_intact
             # pass # do nothing
+            token = Token(
+                creator=self.name,
+                kind='action',
+                order=self.action_token_order,
+                data=inputs[self.in_controller_intact],
+                hops_to_target=1,
+                hops_travelled=0
+                )
+            data.append({self.out_router_token: token})
+            self.action_token_order+=1
+            print("t: {} ms, I'm {}.TokenHandler and I sent this token {}".format(current_time,self.parent.name,token))
             sigma = sigma - self.elapsed
         elif self.in_kalman_intpos in inputs:   # if token arrives through port in_kalman_intpos
             # pass # do nothing
+            self.state_token_order+=1
             sigma = sigma - self.elapsed
 
         return TokenHandlerState(sigma,current_time,data) 
@@ -206,7 +222,7 @@ class TokenHandler(AtomicDEVS):
         Internal Transition Function.
         """
         _, current_time, data = self.state.get()
-        data.pop()
+        data.pop(0)
         if len(data) == 0:
             sigma = INFINITY
         else:
@@ -218,7 +234,9 @@ class TokenHandler(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        return data[-1]
+        # return data[-1]
+        return data[0]
+    
 
     def timeAdvance(self):
         """
@@ -228,6 +246,9 @@ class TokenHandler(AtomicDEVS):
         # based (typically) on current State.
         sigma, _, _ = self.state.get()
         return sigma
+    
+    def __lt__(self, other):
+        return self.name < other.name
 
     def handle_received_token(self, token):
         """Decide what to do with the received token"""

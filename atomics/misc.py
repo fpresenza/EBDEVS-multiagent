@@ -226,7 +226,7 @@ class Splitter(AtomicDEVS):
     Split input message in as many outputs as elements the message has 
     """
   
-    def __init__(self, name=None, numoutputs=1):
+    def __init__(self, name=None, numoutputs=1, debug=False):
         """
         Constructor (parameterizable).
         """
@@ -235,6 +235,7 @@ class Splitter(AtomicDEVS):
     
         # PARAMETERS
         self.N  = numoutputs # number of output ports
+        self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
@@ -301,7 +302,8 @@ class Splitter(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        print("I'm the splitter, and I'm sending: {}".format(data[-1]))
+        if (self.debug):
+            print("I'm the splitter, and I'm sending: {}".format(data[-1]))
         return data[-1]
     
     def timeAdvance(self):

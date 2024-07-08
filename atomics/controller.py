@@ -225,11 +225,14 @@ class Controller(AtomicDEVS):
         sigma, _, _, _ = self.state.get()
         return sigma
 
+    def __lt__(self, other):
+        return self.name < other.name
+
     def control_action(self, position, ext_action):
         """Compute control action"""
         # the list of outputs to be returned
         if position is None:
-            return np.array([0.0, 0.0]), {}
+            return np.array([0.0, 0.0]), {'2': np.array([-4.0, 4.0])}
         else:
             return np.array([0.0, 0.0]), {}
 
