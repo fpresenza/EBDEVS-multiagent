@@ -367,21 +367,21 @@ class MultiRobotSystem(CoupledDEVS):
         ]
         agents_ids = [agent.name for agent in self.agents]
         router = Router(agents_ids, name='Router')
-        router_input_gen = TokenGenerator(agents_ids, period=0.2, name='Router_Input_Gen')
+        #router_input_gen = TokenGenerator(agents_ids, period=0.2, name='Router_Input_Gen')
         [self.addSubModel(agent) for agent in self.agents]
         # self.robot1 = self.addSubModel(robot1)
         # self.robot2 = self.addSubModel(robot2)
         # self.robot3 = self.addSubModel(robot3)
         # self.robot4 = self.addSubModel(robot4)
         self.router = self.addSubModel(router)
-        self.router_input_generator = self.addSubModel(router_input_gen)
+        #self.router_input_generator = self.addSubModel(router_input_gen)
         # robots' position evolution from initial conditions (no external source)
 
         # Declare the coupled model's output ports => no output ports
-        self.connectPorts(self.router_input_generator.out_router_token['Robot_0'], self.router.in_agent_token['Robot_0'])
-        self.connectPorts(self.router_input_generator.out_router_token['Robot_1'], self.router.in_agent_token['Robot_1'])
-        self.connectPorts(self.router_input_generator.out_router_token['Robot_2'], self.router.in_agent_token['Robot_2'])
-        self.connectPorts(self.router_input_generator.out_router_token['Robot_3'], self.router.in_agent_token['Robot_3'])
+        #self.connectPorts(self.router_input_generator.out_router_token['Robot_0'], self.router.in_agent_token['Robot_0'])
+        #self.connectPorts(self.router_input_generator.out_router_token['Robot_1'], self.router.in_agent_token['Robot_1'])
+        #self.connectPorts(self.router_input_generator.out_router_token['Robot_2'], self.router.in_agent_token['Robot_2'])
+        #self.connectPorts(self.router_input_generator.out_router_token['Robot_3'], self.router.in_agent_token['Robot_3'])
         self.connectPorts(self.agents[0].OUT_router_token, self.router.in_agent_token['Robot_0'])
         self.connectPorts(self.agents[1].OUT_router_token, self.router.in_agent_token['Robot_1'])
         self.connectPorts(self.agents[2].OUT_router_token, self.router.in_agent_token['Robot_2'])
