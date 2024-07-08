@@ -402,14 +402,12 @@ class MultiRobotSystem(CoupledDEVS):
         if (self.debug):
             print("t: {} ms, I'm {} and the state of all my children is {}".format(self.current_time,self.name,self.micro_states['Physics']))
 
-    def getContextInformation(self, transmitter):
-        # return self.micro_states[]
-        physics = self.micro_states['Physics']
-        p = physics[transmitter]
+    def getContextInformation(self, robot_id_1):
+        p_1 = self.micro_states['Physics'][robot_id_1]
         return [
-            (robot_id, self.distance(p, q))
-            for robot_id, q in physics.items()
-            if self.connected(p, q)
+            (robot_id_2, self.distance(p_1, p_2))
+            for robot_id_2, p_2 in self.micro_states['Physics'].items()
+            if self.connected(robot_id_1, robot_id_2)
         ]
 
     def select(self, immChildren):
@@ -419,8 +417,14 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def distance(self, p, q):
-        return np.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)
+    def distance(self, p_1, p_2):
+        return np.sqrt((p_1[0] - p_2[0])**2 + (p_1[1] - p_2[1])**2)
 
-    def connected(self, p, q):
-        return self.distance(p, q) < self.max_dist
+    def connected(self, robot_id_1, robot_id_2):
+        if robot_id_1 == robot_id_2:
+            return False
+
+        p_1 = self.micro_states['Physics'][robot_id_1]
+        p_2 = self.micro_states['Physics'][robot_id_2]
+
+        return self.distance(p_1, p_2) < self.max_dist
