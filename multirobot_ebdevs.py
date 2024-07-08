@@ -315,50 +315,57 @@ class MultiRobotSystem(CoupledDEVS):
         self.current_time = 0
         self.max_dist = 6.0
 
-        robot1 = Robot(name="Robot_1",
+        self.agents = [
+            Robot(name="Robot_0",
                        dQMin=1e-6,
                        dQRel=1e-3,
                        x0=0.0,
                        y0=0.0,
                        gainx=1,
                        gainy=1
-                      )
-        robot2 = Robot(name="Robot_2",
+                      ),
+            Robot(name="Robot_1",
                        dQMin=1e-6,
                        dQRel=1e-3,
                        x0=5.0,
                        y0=3.0,
                        gainx=1,
                        gainy=1
-                      )
-        robot3 = Robot(name="Robot_3",
+                      ),
+            Robot(name="Robot_2",
                        dQMin=1e-6,
                        dQRel=1e-3,
                        x0=-2.0,
                        y0=-2.0,
                        gainx=1,
                        gainy=1
-                      )
-        robot4 = Robot(name="Robot_4",
+                      ),
+            Robot(name="Robot_3",
                        dQMin=1e-6,
                        dQRel=1e-3,
                        x0=5.0,
-                       y0=-3.0,
+                       y0=-2.0,
                        gainx=1,
                        gainy=1
                       )
-        router = Router(number_of_robots=3, name='Router')
-        router_input_gen = TokenGenerator(number_of_robots=3, period=1,name='Router_Input_Gen')
-        self.robot1 = self.addSubModel(robot1)
-        self.robot2 = self.addSubModel(robot2)
-        self.robot3 = self.addSubModel(robot3)
-        self.robot4 = self.addSubModel(robot4)
+        ]
+        agents_ids = [agent.name for agent in self.agents]
+        router = Router(agents_ids, name='Router')
+        router_input_gen = TokenGenerator(agents_ids, period=1, name='Router_Input_Gen')
+        [self.addSubModel(agent) for agent in self.agents]
+        # self.robot1 = self.addSubModel(robot1)
+        # self.robot2 = self.addSubModel(robot2)
+        # self.robot3 = self.addSubModel(robot3)
+        # self.robot4 = self.addSubModel(robot4)
+        self.router = self.addSubModel(router)
+        self.router_input_generator = self.addSubModel(router_input_gen)
         # robots' position evolution from initial conditions (no external source)
 
         # Declare the coupled model's output ports => no output ports
-        self.connectPorts(self.router_input_generator.out_router_token['0'], self.router.in_agent_token['0'])
-        self.connectPorts(self.router_input_generator.out_router_token['1'], self.router.in_agent_token['1'])
-        self.connectPorts(self.router_input_generator.out_router_token['2'], self.router.in_agent_token['2'])
+        self.connectPorts(self.router_input_generator.out_router_token['Robot_0'], self.router.in_agent_token['Robot_0'])
+        self.connectPorts(self.router_input_generator.out_router_token['Robot_1'], self.router.in_agent_token['Robot_1'])
+        self.connectPorts(self.router_input_generator.out_router_token['Robot_2'], self.router.in_agent_token['Robot_2'])
+        self.connectPorts(self.router_input_generator.out_router_token['Robot_3'], self.router.in_agent_token['Robot_3'])
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g

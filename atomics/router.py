@@ -34,7 +34,7 @@ class TokenGeneratorState:
         return self._sigma, self._tvalue, self._ivalue
 
 class TokenGenerator(AtomicDEVS):
-    def __init__(self, number_of_robots, name=None,period=1):
+    def __init__(self, agents_ids, name=None, period=1):
         """
         Atomic model for the toking handling protocol
         """
@@ -44,12 +44,13 @@ class TokenGenerator(AtomicDEVS):
 
         # Parameters
         # self.agents = range(number_of_robots)
-        self.agents = ['0', '1', '2']
+        self.agents = agents_ids
 
         self.tokens = {
-            '0': Token(creator='0',kind='action',order=127,data={'3': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=1),
-            '1': Token(creator='1',kind='action',order=127,data={'2': np.array([2.0, 4.0])},hops_to_target=4,hops_travelled=2),
-            '2': Token(creator='2',kind='action',order=128,data={'2': np.array([4.0, 6.0])},hops_to_target=4,hops_travelled=2),
+            0: Token(creator='0',kind='action',order=127,data={'3': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=1),
+            1: Token(creator='1',kind='action',order=127,data={'2': np.array([2.0, 4.0])},hops_to_target=4,hops_travelled=2),
+            2: Token(creator='2',kind='action',order=128,data={'2': np.array([4.0, 6.0])},hops_to_target=4,hops_travelled=2),
+            3: Token(creator='3',kind='action',order=128,data={'4': np.array([5.0, -3.0])},hops_to_target=4,hops_travelled=2),
         }
         self.N = len(self.tokens)
         self.period = period
@@ -68,7 +69,7 @@ class TokenGenerator(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.out_router_token = {
-            i: self.addOutPort(name="out_router_token_{}".format(i)) for i in self.agents
+            agent: self.addOutPort(name="out_router_token_{}".format(i)) for i, agent in enumerate(self.agents)
         }
 
     def __lt__(self, other):
@@ -102,7 +103,7 @@ class TokenGenerator(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, i = self.state.get()
-        return {self.out_router_token[self.agents[i]]: self.tokens[self.agents[i]]}
+        return {self.out_router_token[self.agents[i]]: self.tokens[i]}
 
     def timeAdvance(self):
         """
@@ -135,7 +136,7 @@ class RouterState:
 
 
 class Router(AtomicDEVS):
-    def __init__(self, number_of_robots, name=None):
+    def __init__(self, agents_ids, name=None):
         """Atomic model for the Router """
 
         # Always call parent class' constructor FIRST:
@@ -143,12 +144,8 @@ class Router(AtomicDEVS):
 
         # Parameters
         # self.agents = range(number_of_robots)
-        self.agents = ['0', '1', '2']
-        self.adjacency_list = {
-            '0': ['1'],
-            '1': ['0', '2'],
-            '2': ['1']
-        }
+        self.agents = agents_ids
+        num_agents = len(agents_ids)
         # self.status = []          # TODO
 
         # STATE:
@@ -166,11 +163,13 @@ class Router(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.out_agent_token = {
-            i: self.addOutPort(name="out_agent_token_{}".format(i)) for i in self.agents
+            agent: self.addOutPort(name="out_agent_token_{}".format(i)) for i, agent in enumerate(self.agents)
         }
         self.in_agent_token = {
-            i: self.addInPort(name="in_agent_token_{}".format(i)) for i in self.agents
+            agent: self.addInPort(name="in_agent_token_{}".format(i)) for i,agent in enumerate(self.agents)
         }
+
+        self.in_port_mapping = {"in_agent_token_{}".format(i): agent_id for i, agent_id in enumerate(self.agents)}
 
     def extTransition(self, inputs):
         """
@@ -180,10 +179,11 @@ class Router(AtomicDEVS):
         current_time += self.elapsed
 
         port, token = list(inputs.items())[0]
-        transmitter = port.name[-1]
-        receivers = self.adjacency_list[transmitter]
+        transmitter = self.in_port_mapping[port.name]
+        print("Router: transmitter={}".format(transmitter))
+        receivers = self.parent.getContextInformation(transmitter)
         print("Token received from {}, sending to {}".format(transmitter, receivers))
-        data = [{self.out_agent_token[i]: token} for i in receivers]
+        data = [{self.out_agent_token[agent]: token} for agent, _ in receivers]
         # (no me acuerdo para que era lo de abajo pero lo copie de otro lado)
         sigma = 0 # holds last status
 
