@@ -313,7 +313,7 @@ class MultiRobotSystem(CoupledDEVS):
         #     self.micro_states['x'+str(i)] = 0
         #     self.micro_states['y'+str(i)] = 0
         self.current_time = 0
-        self.max_dist_sq = 35.0
+        self.max_dist = 6.0
 
         robot1 = Robot(name="Robot_1",
                        dQMin=1e-6,
@@ -376,9 +376,9 @@ class MultiRobotSystem(CoupledDEVS):
         physics = self.micro_states['Physics']
         p = physics[transmitter]
         return [
-            robot_id
+            (robot_id, self.distance(p, q))
             for robot_id, q in physics.items()
-            if (p[0] - q[0])**2 + (p[1] - q[1])**2 < self.max_dist_sq
+            if self.connected(p, q)
         ]
 
     def select(self, immChildren):
@@ -388,3 +388,8 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
+    def distance(self, p, q):
+        return np.sqrt((p[0] - q[0])**2 + (p[1] - q[1])**2)
+
+    def connected(self, p, q):
+        return self.distance(p, q) < self.max_dist
