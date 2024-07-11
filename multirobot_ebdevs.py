@@ -321,20 +321,20 @@ class Robot(CoupledDEVS):
         return immChildren[0]
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', number=4, debug=True):
+    def __init__(self, name='MultiRobotSystem', debug=True):
         """
         Multi robot system composed of N robots.
         """
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
 
-        self.micro_states = {'Physics': {}}
-        # for i in range(number):
-        #     self.micro_states['x'+str(i)] = 0
-        #     self.micro_states['y'+str(i)] = 0
-        self.current_time = 0
-        self.max_dist = 6.0
         self.debug = debug
+
+        self.micro_states = {'Physics': {}}
+        self.current_time = 0
+
+        network_config = read_json_file('network.json')
+        self.max_dist = network_config['connection_range']
 
         self.robots = {}
         robots_config = read_json_file('robots.json')
