@@ -258,6 +258,9 @@ class Splitter(AtomicDEVS):
             self.out_splitter_msgs.append(self.addOutPort(name="out_splitter_port_{}".format(i)))
         # self.out_splitter_port0 = self.addOutPort(name="out_splitter_port0")
         # self.out_splitter_port1 = self.addOutPort(name="out_splitter_port1")
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+
 
     def __lt__(self, other):
         return self.name < other.name
@@ -266,12 +269,15 @@ class Splitter(AtomicDEVS):
         """
         Internal Transition Function.
         """
-        _, current_time, data = self.state.get()
+        sigma, current_time, data = self.state.get()
+        current_time += sigma
         data.pop()
         if len(data) == 0:
             sigma = INFINITY
         else:
             sigma = 0.0
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
         return SplitterState(sigma,current_time,data)
 
@@ -294,6 +300,8 @@ class Splitter(AtomicDEVS):
         #        {self.out_splitter_port1: 1}
         # ]
         sigma = 0
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time,self.name))
 
         return SplitterState(sigma,current_time,data) 
 
@@ -303,7 +311,8 @@ class Splitter(AtomicDEVS):
         """
         sigma, current_time, data = self.state.get()
         if (self.debug):
-            print("I'm the splitter, and I'm sending: {}".format(data[-1]))
+            print("t: {} s, Atomic name: {}, Output Function, data: ".format(current_time,self.name, data[-1]))
+
         return data[-1]
     
     def timeAdvance(self):

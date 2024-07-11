@@ -139,7 +139,7 @@ class TokenHandlerState:
 
 
 class TokenHandler(AtomicDEVS):
-    def __init__(self,robot_id,name=None):
+    def __init__(self,robot_id,name=None,debug=False):
         """Atomic model for the toking handling protocol"""
 
         # Always call parent class' constructor FIRST:
@@ -149,6 +149,7 @@ class TokenHandler(AtomicDEVS):
         self.robot_id = robot_id    # Robot identifier
         self.extent = INFINITY      # The robot's subgraph extent
         # self.status = []          # TODO
+        self.debug = debug
 
         # Dictionaries as records of tokens received
         # {'action': {creator: order}, 'state': {creator: order}}
@@ -170,14 +171,17 @@ class TokenHandler(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.out_router_token   = self.addOutPort(name="out_router_token")
+        self.out_router_token      = self.addOutPort(name="out_router_token")
         self.out_controller_extpos = self.addOutPort(name="out_controller_extpos")
         self.out_controller_extact = self.addOutPort(name="out_controller_extact")
-        self.out_kalman_extpos   = self.addOutPort(name="out_kalman_extpos")
+        self.out_kalman_extpos     = self.addOutPort(name="out_kalman_extpos")
         #
-        self.in_router_token    = self.addInPort(name="in_router_token")
+        self.in_router_token       = self.addInPort(name="in_router_token")
         self.in_controller_intact  = self.addInPort(name="in_controller_intact")
-        self.in_kalman_intpos    = self.addInPort(name="in_kalman_intpos")
+        self.in_kalman_intpos      = self.addInPort(name="in_kalman_intpos")
+
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
 
     def extTransition(self, inputs):
         """
@@ -194,6 +198,8 @@ class TokenHandler(AtomicDEVS):
             else:
                 data += ret # events list
                 sigma = 0
+            if (self.debug):
+                print("t: {} s, Atomic name: {}, External Transition Function, token: {} from Router".format(current_time,self.name,token))
 
         elif self.in_controller_intact in inputs: # if token arrives through port in_controller_intact
             # pass # do nothing
@@ -209,10 +215,14 @@ class TokenHandler(AtomicDEVS):
             self.action_token_order+=1
             # sigma = sigma - self.elapsed
             sigma = 0
+            if (self.debug):
+                print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Controller".format(current_time,self.name,self.parent.name,token))
         elif self.in_kalman_intpos in inputs:   # if token arrives through port in_kalman_intpos
             # pass # do nothing
             self.state_token_order+=1
             sigma = sigma - self.elapsed
+            if (self.debug):
+                print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Kalman".format(current_time,self.name,self.parent.name,token))
 
         return TokenHandlerState(sigma,current_time,data) 
     
@@ -226,6 +236,8 @@ class TokenHandler(AtomicDEVS):
             sigma = INFINITY
         else:
             sigma = 0
+        if (self.debug):
+            print("t: {} s, Atomic name: {}@{}, Internal Transition Function".format(current_time,self.name,self.parent.name))
         return TokenHandlerState(sigma,current_time,data)
     
     def outputFnc(self):
@@ -233,6 +245,8 @@ class TokenHandler(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
+        if (self.debug):
+            print("t: {} s, Atomic name: {}@{}, Output Function, data: ".format(current_time,self.name,self.parent.name, data[0]))
         return data[0]
     
 

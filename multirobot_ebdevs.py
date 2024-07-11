@@ -55,6 +55,9 @@ class QSSIntegrator_Yup(QSSIntegrator):
                                )
         self.y_up  = [self.name, None]
 
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+
     def intTransition(self): # re-implement this function
         """
         Internal Transition Function.
@@ -78,8 +81,8 @@ class QSSIntegrator_Yup(QSSIntegrator):
                   "invalid state sigma <%f> in internal transition function"\
                   % sigma)
 
-        if self.debug:
-            print("Internal Transition Function @ {} - t: {}, xprev: {}, x: {}, q: {}, sigma: {}".format(self.name,current_time,xprev,x,q,sigma))
+        if (self.debug):
+            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function, xprev: {}, x: {}, q: {}, sigma: {}".format(current_time,self.name,xprev,x,q,sigma))
 
         # shares information to the parent to compute the Global Transition function
         try:
@@ -129,9 +132,9 @@ class QSSIntegrator_Yup(QSSIntegrator):
                 if (abs(x[0] - q) > self.dQ):
                     sigma = 0
 
-                if self.debug:
-                    print("External Transition Function @ {} - t: {}, dx: {}, x: {}, sigma: {}, sigma_lo: {}, sigma_up: {}"\
-                            .format(self.name,current_time,derx_val,x,sigma,sigma_lo,sigma_up))
+                if (self.debug):
+                    print("t: {:.2f} s, Atomic name: {}, External Transition Function, dx: {}, x: {}, sigma: {}, sigma_lo: {}, sigma_up: {}"\
+                            .format(current_time,self.name,derx_val,x,sigma,sigma_lo,sigma_up))
 
         else:
             x[0] = derx_val
@@ -170,20 +173,23 @@ class Physics(CoupledDEVS):
         self.current_time = 0
 
         # Declare childrens: splitterx2, QSS integ x 2
-        splitter     = Splitter(name="splitter",numoutputs=2)
+        splitter     = Splitter(name="splitter",
+                                numoutputs=2,
+                                debug=self.debug
+                                )
         integrator_x = QSSIntegrator_Yup(name="x", 
                                          dQMin=self.dQMin, 
                                          dQRel=self.dQRel, 
                                          gain=self.gainx, 
                                          x0=self.x0, 
-                                         debug=False
+                                         debug=self.debug
                                          )
         integrator_y = QSSIntegrator_Yup(name="y",
                                          dQMin=self.dQMin, 
                                          dQRel=self.dQRel, 
                                          gain=self.gainy, 
                                          x0=self.y0, 
-                                         debug=False
+                                         debug=self.debug
                                          )
         self.splitter     = self.addSubModel(splitter)
         self.integrator_x = self.addSubModel(integrator_x)
@@ -201,6 +207,9 @@ class Physics(CoupledDEVS):
         self.connectPorts(self.integrator_x.OUT_q, self.OUT_physics_x)
         self.connectPorts(self.integrator_y.OUT_q, self.OUT_physics_y)
 
+        if (self.debug):
+            print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
+
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         # update each coordinate separatedly, since the events in the integrators for the same robot do not need to be simultaneous
         self.current_time += e_g
@@ -212,7 +221,8 @@ class Physics(CoupledDEVS):
             self.y_up[1][micro_id] = data
 
         if (self.debug):
-            print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
+            # print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
+            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(self.current_time,self.name,x_b_micro))
 
     def select(self, immChildren):
         """
@@ -250,13 +260,19 @@ class Robot(CoupledDEVS):
                           x0=self.x0,
                           y0=self.y0,
                           gainx=self.gainx,
-                          gainy=self.gainy
+                          gainy=self.gainy,
+                          debug=self.debug
                          )
         splitter_gen = SplitterGenerator(period=1,
                                          name='Splitter_Gen'
                                         )
-        controller    = Controller(robot_id=self.name, name='Controller')
-        token_handler = TokenHandler(robot_id=self.name,name='Token_Handler')
+        controller    = Controller(robot_id=self.name, 
+                                   name='Controller'
+                                   )
+        token_handler = TokenHandler(robot_id=self.name,
+                                     name='Token_Handler',
+                                     debug=self.debug
+                                     )
 
         self.physics       = self.addSubModel(physics)
         self.splitter_gen  = self.addSubModel(splitter_gen)
@@ -279,6 +295,9 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
         self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)
 
+        if (self.debug):
+            print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
+
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g
 
@@ -292,7 +311,7 @@ class Robot(CoupledDEVS):
             self.y_up[1]['Physics'][1] = data['y']
 
         if (self.debug):
-            print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
+            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(self.current_time,self.name,x_b_micro))
 
     def select(self, immChildren):
         """
@@ -301,28 +320,8 @@ class Robot(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-
-# class Environment(CoupledDEVS):
-#     def __init__(self, name=None):
-#        """
-#        A simple 
-#        """
-        # Always call parent class' constructor FIRST:
-#        CoupledDEVS.__init__(self, name)
-        # Sg: estructura que almacena los coeficientes 
-
-    # Funcion que se ejecuta cuando un atomico ejecuta su Y_up()
-#    def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
-#        super(Environment, self).globalTransition(e_g, x_b_micro, *args, **kwargs)
-        # almacena los coeficientes de los polinomios de las posiciones de los agentes
-
-    # Funcion que se ejecuta cuando un atomico pide informacion al estado global: Y_down()
-#    def getContextInformation(self, property, *args, **kwargs):
-#        super(Environment, self).getContextInformation(property)
-        # calculo de los vecinos de un atomico a pedido del router
-
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', number=4, debug=False):
+    def __init__(self, name='MultiRobotSystem', number=4, debug=True):
         """
         Multi robot system composed of N robots.
         """
@@ -354,16 +353,18 @@ class MultiRobotSystem(CoupledDEVS):
         self.connectPorts(self.router.out_agent_token['Robot_2'], self.robots['Robot_2'].IN_router_token)
         self.connectPorts(self.router.out_agent_token['Robot_3'], self.robots['Robot_3'].IN_router_token)
 
+        if (self.debug):
+            print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
+
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g
-
         micro_id, data = x_b_micro
         try:
             self.micro_states['Physics'][micro_id] = data['Physics'].copy()
         except AttributeError:
             self.micro_states['Physics'][micro_id] = data['Physics']
         if (self.debug):
-            print("t: {} ms, I'm {} and the state of all my children is {}".format(self.current_time,self.name,self.micro_states['Physics']))
+            print("t: X s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: ".format(self.name,x_b_micro,self.micro_states['Physics']))
 
     def getContextInformation(self, robot_id_1):
         p_1 = self.micro_states['Physics'][robot_id_1]
