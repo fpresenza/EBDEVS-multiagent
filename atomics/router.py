@@ -181,10 +181,11 @@ class Router(AtomicDEVS):
         port, token = list(inputs.items())[0]
         transmitter = self.in_port_mapping[port.name]
         receivers = self.parent.getContextInformation(transmitter)
-        data += [{self.out_agent_token[agent]: token} for agent, _ in receivers]
-        # (no me acuerdo para que era lo de abajo pero lo copie de otro lado)
-        sigma = 0 # holds last status
-
+        if len(receivers) > 0:
+            data += [{self.out_agent_token[agent]: token} for agent, _ in receivers]
+            sigma = 0 # holds last status
+        else:
+            sigma = INFINITY
         return RouterState(sigma, current_time, data) 
     
     def intTransition(self):
