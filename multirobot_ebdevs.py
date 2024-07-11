@@ -25,6 +25,12 @@ from atomics.controller import Controller
 from atomics.token_handler import TokenHandler
 
 import sys
+import json
+
+def read_json_file(filename):
+    with open(filename, 'r') as file:
+        config_dict = json.load(file)
+    return config_dict
 
 #-----------------------------------
 # QSS_Integrator with Y_up: QSS integrator with micro-macro state communication with its parent.
@@ -331,65 +337,22 @@ class MultiRobotSystem(CoupledDEVS):
         self.max_dist = 6.0
         self.debug = debug
 
-        self.agents = [
-            Robot(name="Robot_0",
-                       dQMin=1e-1,
-                       dQRel=0,
-                       x0=0.0,
-                       y0=0.0,
-                       gainx=1,
-                       gainy=1
-                      ),
-            Robot(name="Robot_1",
-                       dQMin=1e-1,
-                       dQRel=0,
-                       x0=5.0,
-                       y0=3.0,
-                       gainx=1,
-                       gainy=1
-                      ),
-            Robot(name="Robot_2",
-                       dQMin=1e-1,
-                       dQRel=0,
-                       x0=-2.0,
-                       y0=-2.0,
-                       gainx=1,
-                       gainy=1
-                      ),
-            Robot(name="Robot_3",
-                       dQMin=1e-1,
-                       dQRel=0,
-                       x0=5.0,
-                       y0=-2.0,
-                       gainx=1,
-                       gainy=1
-                      )
-        ]
-        agents_ids = [agent.name for agent in self.agents]
-        router = Router(agents_ids, name='Router')
-        #router_input_gen = TokenGenerator(agents_ids, period=0.2, name='Router_Input_Gen')
-        [self.addSubModel(agent) for agent in self.agents]
-        # self.robot1 = self.addSubModel(robot1)
-        # self.robot2 = self.addSubModel(robot2)
-        # self.robot3 = self.addSubModel(robot3)
-        # self.robot4 = self.addSubModel(robot4)
-        self.router = self.addSubModel(router)
-        #self.router_input_generator = self.addSubModel(router_input_gen)
-        # robots' position evolution from initial conditions (no external source)
+        self.robots = {}
+        robots_config = read_json_file('robots.json')
+        for robot, config in robots_config.items():
+            self.robots[robot] = self.addSubModel(Robot(**config))
 
-        # Declare the coupled model's output ports => no output ports
-        #self.connectPorts(self.router_input_generator.out_router_token['Robot_0'], self.router.in_agent_token['Robot_0'])
-        #self.connectPorts(self.router_input_generator.out_router_token['Robot_1'], self.router.in_agent_token['Robot_1'])
-        #self.connectPorts(self.router_input_generator.out_router_token['Robot_2'], self.router.in_agent_token['Robot_2'])
-        #self.connectPorts(self.router_input_generator.out_router_token['Robot_3'], self.router.in_agent_token['Robot_3'])
-        self.connectPorts(self.agents[0].OUT_router_token, self.router.in_agent_token['Robot_0'])
-        self.connectPorts(self.agents[1].OUT_router_token, self.router.in_agent_token['Robot_1'])
-        self.connectPorts(self.agents[2].OUT_router_token, self.router.in_agent_token['Robot_2'])
-        self.connectPorts(self.agents[3].OUT_router_token, self.router.in_agent_token['Robot_3'])
-        self.connectPorts(self.router.out_agent_token['Robot_0'], self.agents[0].IN_router_token)
-        self.connectPorts(self.router.out_agent_token['Robot_1'], self.agents[1].IN_router_token)
-        self.connectPorts(self.router.out_agent_token['Robot_2'], self.agents[2].IN_router_token)
-        self.connectPorts(self.router.out_agent_token['Robot_3'], self.agents[3].IN_router_token)
+        self.router = self.addSubModel(
+            Router(agents_ids=list(robots_config.keys()), name='Router')
+        )
+        self.connectPorts(self.robots['Robot_0'].OUT_router_token, self.router.in_agent_token['Robot_0'])
+        self.connectPorts(self.robots['Robot_1'].OUT_router_token, self.router.in_agent_token['Robot_1'])
+        self.connectPorts(self.robots['Robot_2'].OUT_router_token, self.router.in_agent_token['Robot_2'])
+        self.connectPorts(self.robots['Robot_3'].OUT_router_token, self.router.in_agent_token['Robot_3'])
+        self.connectPorts(self.router.out_agent_token['Robot_0'], self.robots['Robot_0'].IN_router_token)
+        self.connectPorts(self.router.out_agent_token['Robot_1'], self.robots['Robot_1'].IN_router_token)
+        self.connectPorts(self.router.out_agent_token['Robot_2'], self.robots['Robot_2'].IN_router_token)
+        self.connectPorts(self.router.out_agent_token['Robot_3'], self.robots['Robot_3'].IN_router_token)
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         self.current_time += e_g

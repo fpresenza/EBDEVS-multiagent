@@ -180,10 +180,8 @@ class Router(AtomicDEVS):
 
         port, token = list(inputs.items())[0]
         transmitter = self.in_port_mapping[port.name]
-        print("Router: transmitter={}".format(transmitter))
         receivers = self.parent.getContextInformation(transmitter)
-        print("Token received from {}, sending to {}".format(transmitter, receivers))
-        data = [{self.out_agent_token[agent]: token} for agent, _ in receivers]
+        data += [{self.out_agent_token[agent]: token} for agent, _ in receivers]
         # (no me acuerdo para que era lo de abajo pero lo copie de otro lado)
         sigma = 0 # holds last status
 
@@ -194,7 +192,7 @@ class Router(AtomicDEVS):
         Internal Transition Function.
         """
         _, current_time, data = self.state.get()
-        data.pop()
+        data.pop(0)
         if len(data) == 0:
             sigma = INFINITY
         else:
@@ -206,7 +204,7 @@ class Router(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        return data[-1]
+        return data[0]
 
     def timeAdvance(self):
         """

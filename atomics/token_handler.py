@@ -194,22 +194,21 @@ class TokenHandler(AtomicDEVS):
             else:
                 data += ret # events list
                 sigma = 0
-            print("t: {} ms, I'm {} and I received this token {} from {}".format(current_time,self.name,token,self.in_router_token))
 
         elif self.in_controller_intact in inputs: # if token arrives through port in_controller_intact
             # pass # do nothing
             token = Token(
-                creator=self.name,
+                creator=self.parent.name,
                 kind='action',
                 order=self.action_token_order,
                 data=inputs[self.in_controller_intact],
                 hops_to_target=1,
                 hops_travelled=0
-                )
+            )
             data.append({self.out_router_token: token})
             self.action_token_order+=1
-            print("t: {} ms, I'm {}.TokenHandler and I sent this token {}".format(current_time,self.parent.name,token))
-            sigma = sigma - self.elapsed
+            # sigma = sigma - self.elapsed
+            sigma = 0
         elif self.in_kalman_intpos in inputs:   # if token arrives through port in_kalman_intpos
             # pass # do nothing
             self.state_token_order+=1
@@ -234,7 +233,6 @@ class TokenHandler(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        # return data[-1]
         return data[0]
     
 
