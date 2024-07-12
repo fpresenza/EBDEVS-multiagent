@@ -6,6 +6,18 @@ Model from the PhD thesis of Francisco Presenza.
 
 ![MRS](fig/MultiRobotSystem.svg)
 
+Coupled and Atomics DEVS Models:
+1. [Experiment](experiment_multirobot_ebdevs.py)
+2. [Multirobot EB-DEVS](multirobot_ebdevs.py)
+3. [Controller](atomics/controller.py)
+4. [Kalman Filter](atomics/kalman_filter.py)
+5. [Token Handler](atomics/token_handler.py)
+6. [Router](atomics/router.py)
+7. [Splitter](atomics/misc.py)
+
+Settings:
+* [robots](robots.json)
+
 ## System model
 
 The model created in `system.py` is a simple harmonic oscillator, whose equations are as follows:
