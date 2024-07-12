@@ -136,7 +136,7 @@ class RouterState:
 
 
 class Router(AtomicDEVS):
-    def __init__(self, agents_ids, name=None):
+    def __init__(self, agents_ids, name=None, debug=False):
         """Atomic model for the Router """
 
         # Always call parent class' constructor FIRST:
@@ -147,6 +147,7 @@ class Router(AtomicDEVS):
         self.agents = agents_ids
         num_agents = len(agents_ids)
         # self.status = []          # TODO
+        self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
@@ -171,6 +172,10 @@ class Router(AtomicDEVS):
 
         self.in_port_mapping = {"in_agent_token_{}".format(i): agent_id for i, agent_id in enumerate(self.agents)}
 
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+
+
     def extTransition(self, inputs):
         """
         External Transition Function.
@@ -186,6 +191,10 @@ class Router(AtomicDEVS):
             sigma = 0 # holds last status
         else:
             sigma = INFINITY
+
+        if (self.debug):
+                print("t: {} s, Atomic name: {}, External Transition Function, transmitter: {} -> receivers: {}".format(current_time,self.name,transmitter,receivers))
+
         return RouterState(sigma, current_time, data) 
     
     def intTransition(self):
@@ -198,6 +207,10 @@ class Router(AtomicDEVS):
             sigma = INFINITY
         else:
             sigma = 0
+
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+
         return RouterState(sigma,current_time,data) 
     
     def outputFnc(self):
@@ -205,6 +218,9 @@ class Router(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, Output Function, data: {}".format(current_time,self.name,data[0]))
+
         return data[0]
 
     def timeAdvance(self):
