@@ -7,8 +7,8 @@ Model from the PhD thesis of Francisco Presenza.
 ![MRS](fig/MultiRobotSystem.svg)
 
 Coupled and Atomics DEVS Models:
-1. [Experiment](experiment_multirobot_ebdevs.py)
-2. [Multirobot EB-DEVS](multirobot_ebdevs.py)
+1. [Experiment (Classic DEVS)](experiment_multirobot_ebdevs.py)
+2. [Multirobot System, Robot, Physics, QSSIntegrator_Yup](multirobot_ebdevs.py)
 3. [Controller](atomics/controller.py)
 4. [Kalman Filter](atomics/kalman_filter.py)
 5. [Token Handler](atomics/token_handler.py)
@@ -17,6 +17,10 @@ Coupled and Atomics DEVS Models:
 
 Settings:
 * [robots](robots.json)
+
+## Unitary tests
+
+[Unitary tests](unitTests/)
 
 ## System model
 
