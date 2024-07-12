@@ -321,7 +321,7 @@ class Robot(CoupledDEVS):
         return immChildren[0]
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', number=4, debug=True):
+    def __init__(self, name='MultiRobotSystem', number=4, debug=False):
         """
         Multi robot system composed of N robots.
         """
@@ -339,10 +339,13 @@ class MultiRobotSystem(CoupledDEVS):
         self.robots = {}
         robots_config = read_json_file('robots.json')
         for robot, config in robots_config.items():
-            self.robots[robot] = self.addSubModel(Robot(**config))
+            self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
 
         self.router = self.addSubModel(
-            Router(agents_ids=list(robots_config.keys()), name='Router')
+            Router(agents_ids=list(robots_config.keys()), 
+                   name='Router',
+                   debug=self.debug
+                   )
         )
         self.connectPorts(self.robots['Robot_0'].OUT_router_token, self.router.in_agent_token['Robot_0'])
         self.connectPorts(self.robots['Robot_1'].OUT_router_token, self.router.in_agent_token['Robot_1'])
@@ -364,7 +367,7 @@ class MultiRobotSystem(CoupledDEVS):
         except AttributeError:
             self.micro_states['Physics'][micro_id] = data['Physics']
         if (self.debug):
-            print("t: X s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: ".format(self.name,x_b_micro,self.micro_states['Physics']))
+            print("t: X s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}".format(self.name,x_b_micro,self.micro_states['Physics']))
 
     def getContextInformation(self, robot_id_1):
         p_1 = self.micro_states['Physics'][robot_id_1]

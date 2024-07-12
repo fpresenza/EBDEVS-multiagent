@@ -246,7 +246,7 @@ class TokenHandler(AtomicDEVS):
         """
         sigma, current_time, data = self.state.get()
         if (self.debug):
-            print("t: {} s, Atomic name: {}@{}, Output Function, data: ".format(current_time,self.name,self.parent.name, data[0]))
+            print("t: {} s, Atomic name: {}@{}, Output Function, data: {}".format(current_time,self.name,self.parent.name, data[0]))
         return data[0]
     
 

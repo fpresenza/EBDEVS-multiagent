@@ -32,7 +32,7 @@ from multirobot_ebdevs import MultiRobotSystem
 #  hierarchical model. This effectively instantiates the whole model 
 #  thanks to the recursion in the DEVS model constructors (__init__).
 #
-m = MultiRobotSystem(name="MultiRobotSystem")
+m = MultiRobotSystem(name="MultiRobotSystem", debug=False)
 
 #    ======================================================================
 
