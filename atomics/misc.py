@@ -80,7 +80,7 @@ class Gain(AtomicDEVS):
 
     def outputFnc(self):
         """
-        Output Funtion.
+        Output Function.
         """
    
         # A colourblind observer sees "grey" instead of "red" or "green".
@@ -188,7 +188,7 @@ class SplitterGenerator(AtomicDEVS):
     
     def outputFnc(self):
         """
-        Output Funtion.
+        Output Function.
         """
         # sigma, current_time = self.state.get()
         return self.msgs[-1]
@@ -202,6 +202,89 @@ class SplitterGenerator(AtomicDEVS):
         sigma, current_time = self.state.get()
         return sigma
 
+class SplitterGeneratorCircTraj(AtomicDEVS):
+    def __init__(self,name=None,period=1,radius=2,freq=1,debug=False):
+        """
+        Atomic model for generating the splitter inputs
+        """
+
+        # Always call parent class' constructor FIRST:
+        AtomicDEVS.__init__(self, name)
+
+        # STATE:
+        #  Define 'state' attribute (initial sate):
+        _time0  = 0.0
+        _sigma0 = 0
+        self.state = SplitterGeneratorState(_sigma0,_time0) 
+        # ELAPSED TIME:
+        #  Initialize 'elapsed time' attribute if required
+        #  (by default, value is 0.0):
+        self.elapsed = 0.0
+
+        # PORTS:
+        #  Declare as many input and output ports as desired
+        #  (usually store returned references in local variables):
+        self.out_splitter_in = self.addOutPort(name="out_splitter_in")
+ 
+        # Parameters
+        self.period = period
+        self.radius = radius
+        self.omega  = 2*np.pi*freq
+        self.debug  = debug
+
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function, radius = {}".format(self.name, self.radius))
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        # it should never be executed
+        sigma, current_time = self.state.get()
+        current_time += self.elapsed
+
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time,self.name))
+
+        return SplitterGeneratorState(sigma,current_time) 
+    
+    def intTransition(self):
+        """
+        Internal Transition Function.
+        """
+        sigma, current_time = self.state.get()
+        current_time += sigma
+        sigma = self.period
+
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+
+        return SplitterGeneratorState(sigma,current_time) 
+    
+    def outputFnc(self):
+        """
+        Output Function.
+        """
+        sigma, current_time = self.state.get()
+        x = -self.radius*self.omega*np.sin(self.omega*current_time)
+        y =  self.radius*self.omega*np.cos(self.omega*current_time)
+        data = np.array([x, y])
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, Output Function, data: {}".format(current_time,self.name, data))
+        return {self.out_splitter_in: data}
+
+    def timeAdvance(self):
+        """
+        Time-Advance Function.
+        """
+        # Compute 'ta', the time to the next scheduled internal transition,
+        # based (typically) on current State.
+        sigma, current_time = self.state.get()
+        return sigma
+    
 class SplitterState:
     """
     Encapsulates the system's state
@@ -307,7 +390,7 @@ class Splitter(AtomicDEVS):
 
     def outputFnc(self):
         """
-        Output Funtion.
+        Output Function.
         """
         sigma, current_time, data = self.state.get()
         if (self.debug):

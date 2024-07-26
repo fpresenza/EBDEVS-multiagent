@@ -26,6 +26,7 @@ from atomics.token_handler import TokenHandler
 
 import sys
 import json
+import random
 
 def read_json_file(filename):
     with open(filename, 'r') as file:
@@ -243,13 +244,13 @@ class Robot(CoupledDEVS):
         CoupledDEVS.__init__(self, name)
 
         # Parameters
-        self.dQMin = dQMin
-        self.dQRel = dQRel
-        self.x0    = x0
-        self.y0    = y0
-        self.gainx = gainx
-        self.gainy = gainy
-        self.debug = debug
+        self.dQMin  = dQMin
+        self.dQRel  = dQRel
+        self.x0     = x0
+        self.y0     = y0
+        self.gainx  = gainx
+        self.gainy  = gainy
+        self.debug  = debug
 
         self.y_up = [self.name, {'Physics': [x0,  y0]}]
         self.current_time = 0
@@ -263,9 +264,10 @@ class Robot(CoupledDEVS):
                           gainy=self.gainy,
                           debug=self.debug
                          )
-        splitter_gen = SplitterGenerator(period=1,
-                                         name='Splitter_Gen'
-                                        )
+        splitter_gen = SplitterGeneratorCircTraj(period=0.01,
+                                                 radius=random.randint(1,10),
+                                                 name='Splitter_Gen'
+                                                )
         controller    = Controller(robot_id=self.name, 
                                    name='Controller'
                                    )
@@ -321,7 +323,7 @@ class Robot(CoupledDEVS):
         return immChildren[0]
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', number=4, debug=False):
+    def __init__(self, name='MultiRobotSystem', number=4, max_dist=6, debug=False):
         """
         Multi robot system composed of N robots.
         """
@@ -332,8 +334,8 @@ class MultiRobotSystem(CoupledDEVS):
         # for i in range(number):
         #     self.micro_states['x'+str(i)] = 0
         #     self.micro_states['y'+str(i)] = 0
-        self.current_time = 0
-        self.max_dist = 6.0
+        self.current_time = 0 # TODO: time cannot be managed as in the other coupled/atomic models
+        self.max_dist = max_dist
         self.debug = debug
 
         self.robots = {}
