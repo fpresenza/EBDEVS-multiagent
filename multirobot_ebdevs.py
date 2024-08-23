@@ -330,13 +330,13 @@ class MultiRobotSystem(CoupledDEVS):
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
 
-        self.micro_states = {'Physics': {}}
-        # for i in range(number):
-        #     self.micro_states['x'+str(i)] = 0
-        #     self.micro_states['y'+str(i)] = 0
-        self.current_time = 0 # TODO: time cannot be managed as in the other coupled/atomic models
-        self.max_dist = max_dist
         self.debug = debug
+
+        self.micro_states = {'Physics': {}}
+        self.current_time = 0 # TODO: time cannot be managed as in the other coupled/atomic models
+
+        network_config = read_json_file('network.json')
+        self.max_dist = network_config['connection_range']
 
         self.robots = {}
         robots_config = read_json_file('robots.json')
