@@ -150,10 +150,10 @@ class QSSIntegrator_Yup(QSSIntegrator):
         return QSSState(q,x,sigma,current_time)
 
 #----------------------------
-# Physics for Robot i
+# Dynamics for Robot i
 #----------------------------
-class Physics(CoupledDEVS):
-    def __init__(self, name='Physics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
+class RobotDynamics(CoupledDEVS):
+    def __init__(self, name='Dynamics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
         """
         Robot's physics submodel composed of two integrators for x and y and a splitter.
         """
@@ -236,7 +236,7 @@ class Physics(CoupledDEVS):
 # Robot i
 #----------------------------
 class Robot(CoupledDEVS):
-    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
+    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, comm_range=np.inf, debug=False):
         """
         A robot model composed of the robot's pysics.
         """
@@ -250,12 +250,13 @@ class Robot(CoupledDEVS):
         self.y0     = y0
         self.gainx  = gainx
         self.gainy  = gainy
+        self.comm_range = comm_range
         self.debug  = debug
 
-        self.y_up = [self.name, {'Physics': [x0,  y0]}]
+        self.y_up = [self.name, {'Pose': [x0,  y0], 'CommRange': comm_range}]
         self.current_time = 0
 
-        physics = Physics(name="Physics",
+        physics = RobotDynamics(name="Dynamics",
                           dQMin=self.dQMin,
                           dQRel=self.dQRel,
                           x0=self.x0,
@@ -304,13 +305,12 @@ class Robot(CoupledDEVS):
         self.current_time += e_g
 
         micro_id, data = x_b_micro
-        # if micro_id == 'Physics'
         try:
-            self.y_up[1]['Physics'][0] = data['x'].copy()
-            self.y_up[1]['Physics'][1] = data['y'].copy()
+            self.y_up[1]['Pose'][0] = data['x'].copy()
+            self.y_up[1]['Pose'][1] = data['y'].copy()
         except AttributeError:
-            self.y_up[1]['Physics'][0] = data['x']
-            self.y_up[1]['Physics'][1] = data['y']
+            self.y_up[1]['Pose'][0] = data['x']
+            self.y_up[1]['Pose'][1] = data['y']
 
         if (self.debug):
             print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(self.current_time,self.name,x_b_micro))
@@ -332,17 +332,17 @@ class MultiRobotSystem(CoupledDEVS):
 
         self.debug = debug
 
-        self.micro_states = {'Physics': {}}
         self.current_time = 0 # TODO: time cannot be managed as in the other coupled/atomic models
-
-        network_config = read_json_file('network.json')
-        self.max_dist = network_config['connection_range']
 
         self.robots = {}
         robots_config = read_json_file('robots.json')
         for robot, config in robots_config.items():
             self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
 
+        self.micro_states = {
+            'Robots': {robot_id: {} for robot_id in self.robots.keys()}
+        }
+        
         self.router = self.addSubModel(
             Router(agents_ids=list(robots_config.keys()), 
                    name='Router',
@@ -358,6 +358,7 @@ class MultiRobotSystem(CoupledDEVS):
         self.connectPorts(self.router.out_agent_token['Robot_2'], self.robots['Robot_2'].IN_router_token)
         self.connectPorts(self.router.out_agent_token['Robot_3'], self.robots['Robot_3'].IN_router_token)
 
+
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
 
@@ -365,18 +366,21 @@ class MultiRobotSystem(CoupledDEVS):
         self.current_time += e_g
         micro_id, data = x_b_micro
         try:
-            self.micro_states['Physics'][micro_id] = data['Physics'].copy()
+            self.micro_states['Robots'][micro_id]['Pose'] = data['Pose'].copy()
         except AttributeError:
-            self.micro_states['Physics'][micro_id] = data['Physics']
+            self.micro_states['Robots'][micro_id]['Pose'] = data['Pose']
+        self.micro_states['Robots'][micro_id]['CommRange'] = data['CommRange']
         if (self.debug):
-            print("t: X s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}".format(self.name,x_b_micro,self.micro_states['Physics']))
+            print(
+                "t: X s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"
+                .format(self.name,x_b_micro,self.micro_states['Robots'])
+            )
 
-    def getContextInformation(self, robot_id_1):
-        p_1 = self.micro_states['Physics'][robot_id_1]
+    def getContextInformation(self, transmitter_id):
         return [
-            (robot_id_2, self.distance(p_1, p_2))
-            for robot_id_2, p_2 in self.micro_states['Physics'].items()
-            if self.connected(robot_id_1, robot_id_2)
+            (receiver_id, None)
+            for receiver_id, _ in self.micro_states['Robots'].items()
+            if self.connected(transmitter_id, receiver_id)
         ]
 
     def select(self, immChildren):
@@ -389,11 +393,15 @@ class MultiRobotSystem(CoupledDEVS):
     def distance(self, p_1, p_2):
         return np.sqrt((p_1[0] - p_2[0])**2 + (p_1[1] - p_2[1])**2)
 
-    def connected(self, robot_id_1, robot_id_2):
-        if robot_id_1 == robot_id_2:
+    def connected(self, transmitter_id, receiver_id):
+        if transmitter_id == receiver_id:
             return False
 
-        p_1 = self.micro_states['Physics'][robot_id_1]
-        p_2 = self.micro_states['Physics'][robot_id_2]
+        transmitter_pose = self.micro_states['Robots'][transmitter_id]['Pose']
+        receiver_pose = self.micro_states['Robots'][receiver_id]['Pose']
 
-        return self.distance(p_1, p_2) < self.max_dist
+        distance = self.distance(transmitter_pose, receiver_pose)
+        trasmiter_range = self.micro_states['Robots'][transmitter_id]['CommRange']
+        receiver_range = self.micro_states['Robots'][receiver_id]['CommRange']
+
+        return (distance < trasmiter_range) and (distance < receiver_range)
