@@ -323,7 +323,7 @@ class Robot(CoupledDEVS):
         return immChildren[0]
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', number=4, max_dist=6, debug=False):
+    def __init__(self, name='MultiRobotSystem', debug=False):
         """
         Multi robot system composed of N robots.
         """
