@@ -1,6 +1,7 @@
 import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
+import random
 
 
 class ControllerGeneratorState:
@@ -149,6 +150,12 @@ class Controller(AtomicDEVS):
             _ext_action0
         )
         self.subframework = {}
+
+        self.period = 0.01
+        self.freq   = 1
+        self.radius = random.randint(1,10)
+        self.omega  = 2*np.pi*self.freq
+
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -230,9 +237,14 @@ class Controller(AtomicDEVS):
 
     def control_action(self, position, ext_action):
         """Compute control action"""
+        _, current_time, _, _ = self.state.get()
+        x = -self.radius*self.omega*np.sin(self.omega*current_time)
+        y =  self.radius*self.omega*np.cos(self.omega*current_time)
         # the list of outputs to be returned
-        if position is None:
-            return np.array([0.0, 0.0]), {'2': np.array([-4.0, 4.0])}
+        if position is None: # if Kalman filter has not yet sent an estimation of position
+            # return np.array([0.0, 0.0]), {'2': np.array([-4.0, 4.0])}
+            return np.array([x, y]), {}
         else:
-            return np.array([0.0, 0.0]), {}
+            # return np.array([0.0, 0.0]), {}
+            return np.array([x, y]), {}
 
