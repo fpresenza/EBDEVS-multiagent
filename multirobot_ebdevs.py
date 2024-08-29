@@ -27,6 +27,7 @@ from atomics.token_handler import TokenHandler
 import sys
 import json
 import random
+import csv
 
 def read_json_file(filename):
     with open(filename, 'r') as file:
@@ -54,7 +55,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
                                x0 = x0, 
                                debug = debug
                                )
-        self.y_up  = [self.name, None]
+        self.y_up  = [self.name, 0.0, None]
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -87,9 +88,11 @@ class QSSIntegrator_Yup(QSSIntegrator):
 
         # shares information to the parent to compute the Global Transition function
         try:
-            self.y_up[1] = q.copy()
+            self.y_up[2] = q.copy()
+            self.y_up[1] = current_time.copy()
         except AttributeError:
-            self.y_up[1] = q
+            self.y_up[2] = q
+            self.y_up[1] = current_time
 
         return QSSState(q,x,sigma,current_time)
 
@@ -143,9 +146,11 @@ class QSSIntegrator_Yup(QSSIntegrator):
 
         # shares information to the parent to compute the Global Transition function
         try:
-            self.y_up[1] = q.copy()
+            self.y_up[2] = q.copy()
+            self.y_up[1] = current_time.copy()
         except AttributeError:
-            self.y_up[1] = q
+            self.y_up[2] = q
+            self.y_up[1] = current_time
 
         return QSSState(q,x,sigma,current_time)
 
@@ -170,7 +175,7 @@ class Physics(CoupledDEVS):
         self.debug = debug
 
         # dictionary to save childrens' states
-        self.y_up = [self.name, {'x': x0, 'y': y0}]
+        self.y_up = [self.name, {'t': 0.0, 'x': x0, 'y': y0}]
         self.current_time = 0
 
         # Declare childrens: splitterx2, QSS integ x 2
@@ -213,17 +218,19 @@ class Physics(CoupledDEVS):
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         # update each coordinate separatedly, since the events in the integrators for the same robot do not need to be simultaneous
-        self.current_time += e_g
+        # self.current_time += e_g
 
-        micro_id, data = x_b_micro[0]
+        micro_id, children_time, data = x_b_micro[0]
         try:
             self.y_up[1][micro_id] = data.copy()
+            self.y_up[1]['t'] = children_time.copy()
         except AttributeError:
             self.y_up[1][micro_id] = data
+            self.y_up[1]['t'] = children_time
 
         if (self.debug):
             # print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
-            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(self.current_time,self.name,x_b_micro))
+            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(children_time,self.name,x_b_micro))
 
     def select(self, immChildren):
         """
@@ -252,7 +259,7 @@ class Robot(CoupledDEVS):
         self.gainy  = gainy
         self.debug  = debug
 
-        self.y_up = [self.name, {'Physics': [x0,  y0]}]
+        self.y_up = [self.name, {'Physics': [0.0, x0, y0]}]
         self.current_time = 0
 
         physics = Physics(name="Physics",
@@ -264,10 +271,10 @@ class Robot(CoupledDEVS):
                           gainy=self.gainy,
                           debug=self.debug
                          )
-        splitter_gen = SplitterGeneratorCircTraj(period=0.01,
-                                                 radius=random.randint(1,10),
-                                                 name='Splitter_Gen'
-                                                )
+        # splitter_gen = SplitterGeneratorCircTraj(period=0.01,
+        #                                          radius=random.randint(1,10),
+        #                                          name='Splitter_Gen'
+        #                                         )
         controller    = Controller(robot_id=self.name, 
                                    name='Controller'
                                    )
@@ -277,7 +284,7 @@ class Robot(CoupledDEVS):
                                      )
 
         self.physics       = self.addSubModel(physics)
-        self.splitter_gen  = self.addSubModel(splitter_gen)
+        # self.splitter_gen  = self.addSubModel(splitter_gen)
         self.controller    = self.addSubModel(controller)
         self.token_handler = self.addSubModel(token_handler)
 
@@ -292,7 +299,8 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.physics.OUT_physics_x, self.OUT_x)
         self.connectPorts(self.physics.OUT_physics_y, self.OUT_y)
         # self.connectPorts(self.IN_vx_vy, self.splitter_gen.in_splitter_msgs)
-        self.connectPorts(self.splitter_gen.out_splitter_in, self.physics.IN_physics_vx_vy)
+        # self.connectPorts(self.splitter_gen.out_splitter_in, self.physics.IN_physics_vx_vy)
+        self.connectPorts(self.controller.out_physics_intact, self.physics.IN_physics_vx_vy)
         self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
         self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
         self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)
@@ -301,19 +309,23 @@ class Robot(CoupledDEVS):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
-        self.current_time += e_g
+        # self.current_time += e_g
 
         micro_id, data = x_b_micro
         # if micro_id == 'Physics'
         try:
-            self.y_up[1]['Physics'][0] = data['x'].copy()
-            self.y_up[1]['Physics'][1] = data['y'].copy()
+            self.y_up[1]['Physics'][1] = data['x'].copy()
+            self.y_up[1]['Physics'][2] = data['y'].copy()
+            self.y_up[1]['Physics'][0] = data['t'].copy()
+            current_time = data['t'].copy()
         except AttributeError:
-            self.y_up[1]['Physics'][0] = data['x']
-            self.y_up[1]['Physics'][1] = data['y']
+            self.y_up[1]['Physics'][1] = data['x']
+            self.y_up[1]['Physics'][2] = data['y']
+            self.y_up[1]['Physics'][0] = data['t']
+            current_time = data['t']
 
         if (self.debug):
-            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(self.current_time,self.name,x_b_micro))
+            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(current_time,self.name,x_b_micro))
 
     def select(self, immChildren):
         """
@@ -362,14 +374,23 @@ class MultiRobotSystem(CoupledDEVS):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
-        self.current_time += e_g
+        # self.current_time += e_g
         micro_id, data = x_b_micro
         try:
             self.micro_states['Physics'][micro_id] = data['Physics'].copy()
+            current_time = data['Physics'][0].copy()
         except AttributeError:
             self.micro_states['Physics'][micro_id] = data['Physics']
+            current_time = data['Physics'][0]
+        print("Coupled name: {}, Global Transition Function, micro_id: {}".format(self.name,micro_id))
         if (self.debug):
-            print("t: X s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}".format(self.name,x_b_micro,self.micro_states['Physics']))
+            print("t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}".format(current_time, self.name,x_b_micro,self.micro_states['Physics']))
+
+        # log new value of micro_states
+        global_state = np.hstack(list(self.micro_states['Physics'].values()))
+        with open('output/data.csv', 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile,delimiter=',')
+            writer.writerows([global_state])
 
     def getContextInformation(self, robot_id_1):
         p_1 = self.micro_states['Physics'][robot_id_1]
@@ -387,7 +408,7 @@ class MultiRobotSystem(CoupledDEVS):
         return immChildren[0]
 
     def distance(self, p_1, p_2):
-        return np.sqrt((p_1[0] - p_2[0])**2 + (p_1[1] - p_2[1])**2)
+        return np.sqrt((p_1[1] - p_2[1])**2 + (p_1[2] - p_2[2])**2)
 
     def connected(self, robot_id_1, robot_id_2):
         if robot_id_1 == robot_id_2:
