@@ -158,7 +158,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
 # Dynamics for Robot i
 #----------------------------
 class RobotDynamics(CoupledDEVS):
-    def __init__(self, name='Dynamics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
+    def __init__(self, name='RobotDynamics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
         """
         Robot's physics submodel composed of two integrators for x and y and a splitter.
         """
@@ -351,10 +351,13 @@ class MultiRobotSystem(CoupledDEVS):
         for robot, config in robots_config.items():
             self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
 
-        self.micro_states = {
-            'Robots': {robot_id: {} for robot_id in self.robots.keys()}
-        }
-        
+        # log new value of micro_states
+        with open('output/summary.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile,delimiter=',')
+            writer.writerow([len(self.robots)])
+
+        self.robots_states = {}
+
         self.router = self.addSubModel(
             Router(agents_ids=list(robots_config.keys()), 
                    name='Router',
@@ -370,7 +373,6 @@ class MultiRobotSystem(CoupledDEVS):
         self.connectPorts(self.router.out_agent_token['Robot_2'], self.robots['Robot_2'].IN_router_token)
         self.connectPorts(self.router.out_agent_token['Robot_3'], self.robots['Robot_3'].IN_router_token)
 
-
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
 
@@ -378,28 +380,34 @@ class MultiRobotSystem(CoupledDEVS):
         # self.current_time += e_g
         micro_id, data = x_b_micro
         try:
-            self.micro_states['Robots'][micro_id]['Pose'] = data['Pose'].copy()
+            self.robots_states[micro_id] = data.copy()
             current_time = data['Time'].copy()
         except AttributeError:
-            self.micro_states['Robots'][micro_id]['Pose'] = data['Pose']
+            self.robots_states[micro_id] = data
             current_time = data['Time']
-        self.micro_states['Robots'][micro_id]['CommRange'] = data['CommRange']
+        
         print("Coupled name: {}, Global Transition Function, micro_id: {}".format(self.name,micro_id))
         if (self.debug):
             print(
                  "t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"
-                 .format(current_time, self.name,x_b_micro,self.micro_states['Robots']))
+                 .format(current_time, self.name,x_b_micro,self.robots_states))
 
         # log new value of micro_states
-        global_state = np.hstack(list(self.micro_states['Robots'].values())) # TODO: solo loggear la pose
+        log = [micro_id, data['Time']]
+        log += data['Pose']
+        log += [
+            neighbor_id
+            for neighbor_id, _ in self.robots_states.items()
+            if self.connected(micro_id, neighbor_id)
+        ]
         with open('output/data.csv', 'a', newline='') as csvfile:
             writer = csv.writer(csvfile,delimiter=',')
-            writer.writerows([global_state])
+            writer.writerow(log)
 
     def getContextInformation(self, transmitter_id):
         return [
             (receiver_id, None)
-            for receiver_id, _ in self.micro_states['Robots'].items()
+            for receiver_id, _ in self.robots_states.items()
             if self.connected(transmitter_id, receiver_id)
         ]
 
@@ -417,11 +425,11 @@ class MultiRobotSystem(CoupledDEVS):
         if transmitter_id == receiver_id:
             return False
 
-        transmitter_pose = self.micro_states['Robots'][transmitter_id]['Pose']
-        receiver_pose = self.micro_states['Robots'][receiver_id]['Pose']
+        transmitter_pose = self.robots_states[transmitter_id]['Pose']
+        receiver_pose = self.robots_states[receiver_id]['Pose']
 
         distance = self.distance(transmitter_pose, receiver_pose)
-        trasmiter_range = self.micro_states['Robots'][transmitter_id]['CommRange']
-        receiver_range = self.micro_states['Robots'][receiver_id]['CommRange']
+        trasmiter_range = self.robots_states[transmitter_id]['CommRange']
+        receiver_range = self.robots_states[receiver_id]['CommRange']
 
         return (distance < trasmiter_range) and (distance < receiver_range)

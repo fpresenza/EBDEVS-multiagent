@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+if os.path.exists('output/summary.csv'):
+	os.remove('output/summary.csv')
+if os.path.exists('output/data.csv'):
+	os.remove('output/data.csv')
+
 # Import code for model simulation:
 from pypdevs.simulator import Simulator
 
@@ -25,6 +31,7 @@ from multirobot_ebdevs import MultiRobotSystem
 
 # Store all results for output to file
 # values = []
+
 
 #    ======================================================================
 
