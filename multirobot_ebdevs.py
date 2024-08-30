@@ -260,7 +260,7 @@ class Robot(CoupledDEVS):
         self.comm_range = comm_range
         self.debug  = debug
 
-        self.y_up = [self.name, {'Pose': [0.0, x0,  y0], 'CommRange': comm_range}]
+        self.y_up = [self.name, {'Time': 0.0, 'Pose': [x0,  y0], 'CommRange': comm_range}]
         self.current_time = 0
 
         physics = RobotDynamics(name="Dynamics",
@@ -316,12 +316,12 @@ class Robot(CoupledDEVS):
         try:
             self.y_up[1]['Pose'][0] = data['x'].copy()
             self.y_up[1]['Pose'][1] = data['y'].copy()
-            self.y_up[1]['Pose'][0] = data['t'].copy()
+            self.y_up[1]['Time'] = data['t'].copy()
             current_time = data['t'].copy()
         except AttributeError:
             self.y_up[1]['Pose'][0] = data['x']
             self.y_up[1]['Pose'][1] = data['y']
-            self.y_up[1]['Pose'][0] = data['t']
+            self.y_up[1]['Time'] = data['t']
             current_time = data['t']
 
         if (self.debug):
@@ -379,10 +379,10 @@ class MultiRobotSystem(CoupledDEVS):
         micro_id, data = x_b_micro
         try:
             self.micro_states['Robots'][micro_id]['Pose'] = data['Pose'].copy()
-            current_time = data['Pose'][0].copy()
+            current_time = data['Time'].copy()
         except AttributeError:
             self.micro_states['Robots'][micro_id]['Pose'] = data['Pose']
-            current_time = data['Pose'][0]
+            current_time = data['Time']
         self.micro_states['Robots'][micro_id]['CommRange'] = data['CommRange']
         print("Coupled name: {}, Global Transition Function, micro_id: {}".format(self.name,micro_id))
         if (self.debug):
@@ -391,7 +391,7 @@ class MultiRobotSystem(CoupledDEVS):
                  .format(current_time, self.name,x_b_micro,self.micro_states['Robots']))
 
         # log new value of micro_states
-        global_state = np.hstack(list(self.micro_states['Robots'].values()))
+        global_state = np.hstack(list(self.micro_states['Robots'].values())) # TODO: solo loggear la pose
         with open('output/data.csv', 'a', newline='') as csvfile:
             writer = csv.writer(csvfile,delimiter=',')
             writer.writerows([global_state])
@@ -411,7 +411,7 @@ class MultiRobotSystem(CoupledDEVS):
         return immChildren[0]
 
     def distance(self, p_1, p_2):
-        return np.sqrt((p_1[1] - p_2[1])**2 + (p_1[2] - p_2[2])**2)
+        return np.sqrt((p_1[0] - p_2[0])**2 + (p_1[1] - p_2[1])**2)
 
     def connected(self, transmitter_id, receiver_id):
         if transmitter_id == receiver_id:
