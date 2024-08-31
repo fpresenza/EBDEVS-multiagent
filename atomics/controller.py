@@ -1,7 +1,6 @@
 import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
-import random
 
 
 class ControllerGeneratorState:
@@ -151,10 +150,9 @@ class Controller(AtomicDEVS):
         )
         self.subframework = {}
 
-        self.period = 0.01
-        self.freq   = 1
-        self.radius = random.randint(1,10)
-        self.omega  = 2*np.pi*self.freq
+        self.freq   = 0.05
+        self.radius = np.random.uniform(1.0, 10.0)
+        self.omega  = np.random.choice([-1, 1]) * 2*np.pi*self.freq
 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -197,7 +195,8 @@ class Controller(AtomicDEVS):
         """
         Internal Transition Function.
         """
-        _, current_time, last_position, ext_action = self.state.get()
+        sigma, current_time, last_position, ext_action = self.state.get()
+        current_time += sigma
         self.action.pop()
         if len(self.action) == 0:
             sigma = self.period

@@ -395,9 +395,10 @@ class MultiRobotSystem(CoupledDEVS):
         # log new value of micro_states
         log = [micro_id, data['Time']]
         log += data['Pose']
+        log += [data['CommRange']]
         log += [
             neighbor_id
-            for neighbor_id, _ in self.robots_states.items()
+            for neighbor_id in self.robots_states.keys()
             if self.connected(micro_id, neighbor_id)
         ]
         with open('output/data.csv', 'a', newline='') as csvfile:
