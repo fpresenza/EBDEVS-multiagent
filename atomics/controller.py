@@ -126,7 +126,7 @@ class ControllerState:
 
 
 class Controller(AtomicDEVS):
-    def __init__(self,robot_id,name=None):
+    def __init__(self,robot_id,name=None,debug=False):
         """Atomic model for the rigidity maintenance controller"""
 
         # Always call parent class' constructor FIRST:
@@ -159,6 +159,8 @@ class Controller(AtomicDEVS):
         #  (by default, value is 0.0):
         self.elapsed = 0.0
 
+        self.debug = debug
+
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
@@ -171,6 +173,9 @@ class Controller(AtomicDEVS):
         self.in_handler_extact  = self.addInPort(name="in_handler_extact")
         
         self.first_control_call = True
+
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
 
     def extTransition(self, inputs):
         """
@@ -189,6 +194,9 @@ class Controller(AtomicDEVS):
             ext_action += inputs[self.in_handler_extact]
             sigma = sigma - self.elapsed # holds last status
 
+        if (self.debug):
+            print("t: {:.2f} s, Atomic name: {}, External Transition Function".format(current_time,self.name))
+
         return ControllerState(sigma, current_time, last_position, ext_action) 
     
     def intTransition(self):
@@ -204,6 +212,10 @@ class Controller(AtomicDEVS):
             ext_action = 0
         else:
             sigma = 0
+
+        if (self.debug):
+            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+
         return ControllerState(sigma,current_time,last_position, ext_action) 
     
     def outputFnc(self):
@@ -242,8 +254,8 @@ class Controller(AtomicDEVS):
         # the list of outputs to be returned
         if position is None: # if Kalman filter has not yet sent an estimation of position
             # return np.array([0.0, 0.0]), {'2': np.array([-4.0, 4.0])}
-            return np.array([x, y]), {}
+            return np.array([[x], [y]]), {}
         else:
             # return np.array([0.0, 0.0]), {}
-            return np.array([x, y]), {}
+            return np.array([[x], [y]]), {}
 
