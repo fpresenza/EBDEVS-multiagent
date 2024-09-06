@@ -171,7 +171,7 @@ class KalmanFilter(AtomicDEVS):
         current_time += self.elapsed
 
         if self.in_control_intact in inputs: # if data arrives through port in_control_intact
-            control_action = inputs[self.in_control_intact]
+            control_action = inputs[self.in_control_intact].reshape(2,1)
             new_position = self.prediction_step(control_action) # events list
             data = [
                 {self.out_control_intpos: new_position},
