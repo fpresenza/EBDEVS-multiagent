@@ -217,8 +217,17 @@ class TokenHandler(AtomicDEVS):
             sigma = 0
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Controller".format(current_time,self.name,self.parent.name,token))
+
         elif self.in_kalman_intpos in inputs:   # if token arrives through port in_kalman_intpos
             # pass # do nothing
+            # token = Token(
+            #     creator=self.parent.name,
+            #     kind='state',
+            #     order=self.state_token_order,
+            #     data=inputs[self.in_kalman_intpos],
+            #     hops_to_target=1,
+            #     hops_travelled=0
+            # )
             self.state_token_order+=1
             sigma = sigma - self.elapsed
             if (self.debug):

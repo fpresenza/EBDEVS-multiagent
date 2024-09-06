@@ -118,7 +118,7 @@ class KalmanFilterState:
 
 
 class KalmanFilter(AtomicDEVS):
-    def __init__(self,robot_id,name=None):
+    def __init__(self,robot_id,name=None,debug=False):
         """Atomic model for the kalman filter"""
 
         # Always call parent class' constructor FIRST:
@@ -139,6 +139,8 @@ class KalmanFilter(AtomicDEVS):
         #  (by default, value is 0.0):
         self.elapsed = 0.0
 
+        self.debug = debug
+
         # kalman filter parameters (hardcoded)
         self.position = np.array([[0.0], [0.0]])
         self.covariance = np.array([[1.0, 0.0], [0.0, 1.0]])
@@ -155,6 +157,12 @@ class KalmanFilter(AtomicDEVS):
         self.in_control_intact  = self.addInPort(name="in_control_intact")
         self.in_handler_extpos    = self.addInPort(name="in_handler_extpos")
 
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+
+    def __lt__(self, other):
+        return self.name < other.name
+    
     def extTransition(self, inputs):
         """
         External Transition Function.
@@ -175,6 +183,9 @@ class KalmanFilter(AtomicDEVS):
             new_position = self.update_step(ext_position, dist) # events list
             data = [{self.out_control_intpos: new_position}]
             sigma = 0 # holds last status
+        
+        if (self.debug):
+            print("t: {:.2f} s, Atomic name: {}, External Transition Function".format(current_time,self.name))
 
         return KalmanFilterState(sigma, current_time, data) 
     
@@ -188,6 +199,10 @@ class KalmanFilter(AtomicDEVS):
             sigma = INFINITY
         else:
             sigma = 0
+
+        if (self.debug):
+            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+            
         return KalmanFilterState(sigma,current_time,data) 
     
     def outputFnc(self):

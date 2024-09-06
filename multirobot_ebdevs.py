@@ -23,6 +23,7 @@ from atomics.misc import *
 from atomics.router import *
 from atomics.controller import Controller
 from atomics.token_handler import TokenHandler
+from atomics.kalman_filter import KalmanFilter
 
 import sys
 import json
@@ -283,11 +284,16 @@ class Robot(CoupledDEVS):
                                      name='Token_Handler',
                                      debug=self.debug
                                      )
+        kalman_filter = KalmanFilter(robot_id=self.name,
+                                     name='Kalman_Filter',
+                                     debug=self.debug
+                                     )
 
         self.physics       = self.addSubModel(physics)
         # self.splitter_gen  = self.addSubModel(splitter_gen)
         self.controller    = self.addSubModel(controller)
         self.token_handler = self.addSubModel(token_handler)
+        self.kalman_filter = self.addSubModel(kalman_filter)
 
         # Declare the coupled model's output ports:
         # self.IN_vx_vy = self.addInPort(name="robot_vx_vy")
@@ -305,6 +311,11 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
         self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
         self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)
+
+        self.connectPorts(self.kalman_filter.out_control_intpos, self.controller.in_kalman_intpos)
+        self.connectPorts(self.kalman_filter.out_handler_intpos, self.token_handler.in_kalman_intpos)
+        # self.connectPorts(self.controller.out_kalman_intact, self.kalman_filter.in_control_intact)
+        self.connectPorts(self.token_handler.out_kalman_extpos, self.kalman_filter.in_handler_extpos)
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
