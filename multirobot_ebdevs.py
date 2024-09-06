@@ -24,15 +24,14 @@ from atomics.router import *
 from atomics.controller import Controller
 from atomics.token_handler import TokenHandler
 
-import sys
-import json
-import random
-import csv
+from utils import (
+    read_json_file,
+    write_json_file,
+    append_csv_file
+)
 
-def read_json_file(filename):
-    with open(filename, 'r') as file:
-        config_dict = json.load(file)
-    return config_dict
+import sys
+import random
 
 #-----------------------------------
 # QSS_Integrator with Y_up: QSS integrator with micro-macro state communication with its parent.
@@ -352,9 +351,8 @@ class MultiRobotSystem(CoupledDEVS):
             self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
 
         # log new value of micro_states
-        with open('output/summary.csv', 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile,delimiter=',')
-            writer.writerow([len(self.robots)])
+        summary = {'n_robots': len(self.robots)}
+        write_json_file('output/summary.csv', summary)
 
         self.robots_states = {}
 
@@ -401,9 +399,7 @@ class MultiRobotSystem(CoupledDEVS):
             for neighbor_id in self.robots_states.keys()
             if self.connected(micro_id, neighbor_id)
         ]
-        with open('output/data.csv', 'a', newline='') as csvfile:
-            writer = csv.writer(csvfile,delimiter=',')
-            writer.writerow(log)
+        append_csv_file('output/data.csv', log)
 
     def getContextInformation(self, transmitter_id):
         return [

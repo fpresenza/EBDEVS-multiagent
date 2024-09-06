@@ -5,11 +5,12 @@
 """
 import numpy as np
 import csv
+import json
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 from uvnpy.network.plot import Animate2
-
+from utils import read_json_file
 
 np.set_printoptions(suppress=True, precision=4)
 
@@ -18,6 +19,7 @@ plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype'] = 42
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 plt.rcParams['font.family'] = 'serif'
+
 
 class DevsAnimate(Animate2):
     def __init__(self, *args, **kwargs):
@@ -33,10 +35,9 @@ class DevsAnimate(Animate2):
 # ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-with open('output/summary.csv', 'r') as file:
-    reader = csv.reader(file)
-    for row in reader:
-        n = int(row[0])
+
+summary = read_json_file('output/summary.csv')
+n = summary['n_robots']
 print('Experiment with {} robots'.format(n))
 
 frames = []
