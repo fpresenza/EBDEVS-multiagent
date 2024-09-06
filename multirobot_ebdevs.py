@@ -351,7 +351,7 @@ class MultiRobotSystem(CoupledDEVS):
             self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
 
         # log new value of micro_states
-        summary = {'n_robots': len(self.robots)}
+        summary = {'robot_ids': list(self.robots.keys())}
         write_json_file('output/summary.csv', summary)
 
         self.robots_states = {}
