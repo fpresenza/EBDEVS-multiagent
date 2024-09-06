@@ -160,7 +160,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
 class RobotDynamics(CoupledDEVS):
     def __init__(self, name='RobotDynamics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
         """
-        Robot's physics submodel composed of two integrators for x and y and a splitter.
+        Robot's dynamic model composed of two integrators for x and y and a splitter.
         """
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
@@ -202,16 +202,16 @@ class RobotDynamics(CoupledDEVS):
         self.integrator_y = self.addSubModel(integrator_y)
 
         # Declare the coupled model's output ports:
-        self.OUT_physics_x    = self.addOutPort(name="OUT_physics_x")
-        self.OUT_physics_y    = self.addOutPort(name="OUT_physics_y")
-        self.IN_physics_vx_vy = self.addInPort( name="IN_physics_vx_vy")
+        self.OUT_dynamics_x    = self.addOutPort(name="OUT_dynamics_x")
+        self.OUT_dynamics_y    = self.addOutPort(name="OUT_dynamics_y")
+        self.IN_dynamics_vx_vy = self.addInPort( name="IN_dynamics_vx_vy")
 
         # Connect coupled model's ports with atomic models' ports
-        self.connectPorts(self.IN_physics_vx_vy, self.splitter.in_splitter_msgs)
+        self.connectPorts(self.IN_dynamics_vx_vy, self.splitter.in_splitter_msgs)
         self.connectPorts(self.splitter.out_splitter_msgs[0], self.integrator_x.IN_dx)
         self.connectPorts(self.splitter.out_splitter_msgs[1], self.integrator_y.IN_dx)
-        self.connectPorts(self.integrator_x.OUT_q, self.OUT_physics_x)
-        self.connectPorts(self.integrator_y.OUT_q, self.OUT_physics_y)
+        self.connectPorts(self.integrator_x.OUT_q, self.OUT_dynamics_x)
+        self.connectPorts(self.integrator_y.OUT_q, self.OUT_dynamics_y)
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
@@ -263,7 +263,7 @@ class Robot(CoupledDEVS):
         self.y_up = [self.name, {'Time': 0.0, 'Pose': [x0,  y0], 'CommRange': comm_range}]
         self.current_time = 0
 
-        physics = RobotDynamics(name="Dynamics",
+        dynamics = RobotDynamics(name="RobotDynamics",
                           dQMin=self.dQMin,
                           dQRel=self.dQRel,
                           x0=self.x0,
@@ -284,7 +284,7 @@ class Robot(CoupledDEVS):
                                      debug=self.debug
                                      )
 
-        self.physics       = self.addSubModel(physics)
+        self.dynamics       = self.addSubModel(dynamics)
         # self.splitter_gen  = self.addSubModel(splitter_gen)
         self.controller    = self.addSubModel(controller)
         self.token_handler = self.addSubModel(token_handler)
@@ -297,11 +297,11 @@ class Robot(CoupledDEVS):
         self.IN_router_token  = self.addInPort(name="in_router")
 
         # Connect coupled model's ports with atomic models' ports
-        self.connectPorts(self.physics.OUT_physics_x, self.OUT_x)
-        self.connectPorts(self.physics.OUT_physics_y, self.OUT_y)
+        self.connectPorts(self.dynamics.OUT_dynamics_x, self.OUT_x)
+        self.connectPorts(self.dynamics.OUT_dynamics_y, self.OUT_y)
         # self.connectPorts(self.IN_vx_vy, self.splitter_gen.in_splitter_msgs)
-        # self.connectPorts(self.splitter_gen.out_splitter_in, self.physics.IN_physics_vx_vy)
-        self.connectPorts(self.controller.out_physics_intact, self.physics.IN_physics_vx_vy)
+        # self.connectPorts(self.splitter_gen.out_splitter_in, self.dynamics.IN_dynamics_vx_vy)
+        self.connectPorts(self.controller.out_dynamics_intact, self.dynamics.IN_dynamics_vx_vy)
         self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
         self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
         self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)

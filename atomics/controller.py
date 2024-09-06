@@ -164,7 +164,7 @@ class Controller(AtomicDEVS):
         #  (usually store returned references in local variables):
         self.out_kalman_intact   = self.addOutPort(name="out_kalman_intact")
         self.out_handler_intact  = self.addOutPort(name="out_handler_intact")
-        self.out_physics_intact = self.addOutPort(name="out_physics_intact")
+        self.out_dynamics_intact = self.addOutPort(name="out_dynamics_intact")
         
         self.in_kalman_intpos   = self.addInPort(name="in_kalman_intpos")
         self.in_handler_extpos  = self.addInPort(name="in_handler_extpos")
@@ -216,7 +216,7 @@ class Controller(AtomicDEVS):
             self.action = [
                 {self.out_kalman_intact: int_action}, 
                 {self.out_handler_intact: ext_action},
-                {self.out_physics_intact: int_action}
+                {self.out_dynamics_intact: int_action}
             ]
             self.first_control_call = False
 
