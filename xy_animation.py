@@ -5,11 +5,12 @@
 """
 import numpy as np
 import csv
+import json
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 from uvnpy.network.plot import Animate2
-
+from utils import read_json_file
 
 np.set_printoptions(suppress=True, precision=4)
 
@@ -18,6 +19,7 @@ plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype'] = 42
 plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 plt.rcParams['font.family'] = 'serif'
+
 
 class DevsAnimate(Animate2):
     def __init__(self, *args, **kwargs):
@@ -33,25 +35,27 @@ class DevsAnimate(Animate2):
 # ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-with open('output/summary.csv', 'r') as file:
-    reader = csv.reader(file)
-    for row in reader:
-        n = int(row[0])
+
+summary = read_json_file('output/summary.csv')
+robot_ids = summary['robot_ids']
+n = len(robot_ids)
 print('Experiment with {} robots'.format(n))
 
 frames = []
 positions = np.zeros((n, 2), dtype=float)
 edges = []
+timesteps = [[] for _ in robot_ids]
 with open('output/data.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
-        robot_id = int(row[0][-1])
+        robot_index = robot_ids.index(row[0])
         time = float(row[1])
-        positions[robot_id] = row[2:4]
+        timesteps[robot_index].append(time)
+        positions[robot_index] = row[2:4]
         neighbors = [int(r[-1]) for r in row[5:]]
 
-        edges = [e for e in edges if robot_id not in e] + \
-            [[robot_id, neighbor] for neighbor in neighbors]
+        edges = [e for e in edges if robot_index not in e] + \
+            [[robot_index, neighbor] for neighbor in neighbors]
         teams = np.array([1, 2, 3, 4])
         
         frames.append([time, positions.copy(), edges, teams])
@@ -64,6 +68,28 @@ nodes = np.arange(n)
 # ------------------------------------------------------------------
 lim = 15.0
 timestep = 0.01
+print([len(ts) for ts in timesteps])
+
+# ------------------------------------------------------------------
+# Plot vs time
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 1, figsize=(10, 8))
+ax[0].set_xlabel('time [$seg$]')
+ax[0].set_ylabel('$x$-position [$m$]')
+ax[0].grid(1)
+ax[0].plot(
+    [f[0] for f in frames], [f[1][:, 0] for f in frames],
+    marker='.',
+    ds='steps-post')
+ax[1].set_xlabel('time [$seg$]')
+ax[1].set_ylabel('$y$-position [$m$]')
+ax[1].grid(1)
+ax[1].plot(
+    [f[0] for f in frames], [f[1][:, 0] for f in frames],
+    marker='.',
+    ds='steps-post')
+fig.savefig('/tmp/position.png', format='png', dpi=360)
+plt.show()
 
 # ------------------------------------------------------------------
 # Animation
@@ -142,4 +168,4 @@ anim.ax.legend(
     fontsize='small',
     handletextpad=1
 )
-anim.run('xy_animation.mp4')
+# anim.run('xy_animation.mp4')
