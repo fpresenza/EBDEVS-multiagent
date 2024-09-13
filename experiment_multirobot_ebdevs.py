@@ -65,7 +65,7 @@ sim = Simulator(m)
 #    A termination time is prefered over a termination condition,
 #    as it is much simpler to use.
 #    e.g. to simulate until simulation time 400.0 is reached
-sim.setTerminationTime(20.0)
+sim.setTerminationTime(2.0)
 
 # B. Set the use of a tracer to show what happened during the simulation run
 #    Both writing to stdout or file is possible:

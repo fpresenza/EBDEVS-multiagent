@@ -33,7 +33,6 @@ from utils import (
 )
 
 import sys
-import random
 
 #-----------------------------------
 # QSS_Integrator with Y_up: QSS integrator with micro-macro state communication with its parent.
@@ -283,10 +282,6 @@ class Robot(CoupledDEVS):
                           gainy=self.gainy,
                           debug=self.debug
                          )
-        # splitter_gen = SplitterGeneratorCircTraj(period=0.01,
-        #                                          radius=random.randint(1,10),
-        #                                          name='Splitter_Gen'
-        #                                         )
         controller    = Controller(robot_id=self.name, 
                                    name='Controller'
                                    )
@@ -406,7 +401,7 @@ class MultiRobotSystem(CoupledDEVS):
             self.robots_states[micro_id] = data
             current_time = data['Time']
         
-        print("Coupled name: {}, Global Transition Function, micro_id: {}".format(self.name,micro_id))
+        # print("Coupled name: {}, Global Transition Function, micro_id: {}".format(self.name,micro_id))
         if (self.debug):
             print(
                  "t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"

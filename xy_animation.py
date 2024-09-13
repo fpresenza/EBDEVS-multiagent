@@ -78,7 +78,7 @@ for step in range(len(data[:-1])):
         [[robot_index, neighbor] for neighbor in neighbors]
 
     if time < float(data[step + 1][1]):
-        teams = np.array([1, 2, 3, 4])
+        teams = np.array([0, 1, 2, 3])
         frames.append([time, positions.copy(), edges, teams])
 
 print('Total number of frames: {}'.format(len(frames)))
@@ -138,12 +138,22 @@ ax.grid(1)
 anim = DevsAnimate(fig, ax, timestep, frames, maxlen=1)
 # cm.coolwarm goes from 0 (blue) to 255 (red)
 anim.set_teams({
+    '$0$': {
+        'id': 0,
+        'tail': False,
+        'style': {
+            # 'color': 'royalblue',
+            'color': 'C0',
+            'marker': 'o',
+            'markersize': 10
+        }
+    },
     '$1$': {
         'id': 1,
         'tail': False,
         'style': {
             # 'color': 'royalblue',
-            'color': 'C0',
+            'color': 'C1',
             'marker': 'o',
             'markersize': 10
         }
@@ -153,7 +163,7 @@ anim.set_teams({
         'tail': False,
         'style': {
             # 'color': 'royalblue',
-            'color': 'C1',
+            'color': 'C2',
             'marker': 'o',
             'markersize': 10
         }
@@ -164,16 +174,6 @@ anim.set_teams({
         'style': {
             # 'color': 'royalblue',
             'color': 'C3',
-            'marker': 'o',
-            'markersize': 10
-        }
-    },
-    '$4$': {
-        'id': 4,
-        'tail': False,
-        'style': {
-            # 'color': 'royalblue',
-            'color': 'C4',
             'marker': 'o',
             'markersize': 10
         }
