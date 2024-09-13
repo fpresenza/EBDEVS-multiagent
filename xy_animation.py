@@ -8,6 +8,7 @@ import csv
 import json
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import argparse
 
 from uvnpy.network.plot import Animate2
 from utils import read_json_file
@@ -33,9 +34,23 @@ class DevsAnimate(Animate2):
 
 
 # ------------------------------------------------------------------
+# Parse args
+# ------------------------------------------------------------------
+parser = argparse.ArgumentParser(description='')
+parser.add_argument(
+    '-s', '--skip',
+    default=10, type=int, help='skip frames'
+)
+parser.add_argument(
+    '-x', '--speed',
+    default=1, type=int, help='simulation speed multiplier'
+)
+arg = parser.parse_args()
+
+
+# ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-
 summary = read_json_file('output/summary.csv')
 robot_ids = summary['robot_ids']
 n = len(robot_ids)
@@ -67,7 +82,7 @@ for step in range(len(data[:-1])):
         frames.append([time, positions.copy(), edges, teams])
 
 print('Total number of frames: {}'.format(len(frames)))
-frames = frames[::10]
+frames = frames[::arg.skip]
 print('Reduced number of frames: {}'.format(len(frames)))
 timestep = np.diff([frame[0] for frame in frames])
 print('Average time between frames  Q_1={:.5f} sec, Q_2={:.5f} sec, Q_3={:.5f} sec'.format(
@@ -77,7 +92,7 @@ print('Average time between frames  Q_1={:.5f} sec, Q_2={:.5f} sec, Q_3={:.5f} s
 ))
 
 
-timestep = np.quantile(timestep, 0.50)
+timestep = np.quantile(timestep, 0.50) / arg.speed
 print('Animation time between frames: {:.5f} sec'.format(timestep))
 print('Animation total duration: {:.5f} sec'.format(len(frames) * timestep))
 
