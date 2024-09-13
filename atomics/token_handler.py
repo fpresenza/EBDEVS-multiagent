@@ -198,7 +198,6 @@ class TokenHandler(AtomicDEVS):
                 print("t: {} s, Atomic name: {}, External Transition Function, token: {} from Router".format(current_time,self.name,token))
 
         elif self.in_controller_intact in inputs: # if token arrives through port in_controller_intact
-            # pass # do nothing
             token = Token(
                 creator=self.parent.name,
                 kind=0,
@@ -209,23 +208,24 @@ class TokenHandler(AtomicDEVS):
             )
             data.append({self.out_router_token: token})
             self.action_token_order+=1
-            # sigma = sigma - self.elapsed
+
             sigma = 0
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Controller".format(current_time,self.name,self.parent.name,token))
 
         elif self.in_kalman_intpos in inputs:   # if token arrives through port in_kalman_intpos
-            # pass # do nothing
-            # token = Token(
-            #     creator=self.parent.name,
-            #     kind=1,
-            #     order=self.state_token_order,
-            #     data=inputs[self.in_kalman_intpos],
-            #     hops_to_target=self.state_extent,
-            #     hops_travelled=0
-            # )
+            token = Token(
+                creator=self.parent.name,
+                kind=1,
+                order=self.state_token_order,
+                data=inputs[self.in_kalman_intpos],
+                hops_to_target=self.state_extent,
+                hops_travelled=0
+            )
+            data.append({self.out_router_token: token})
             self.state_token_order+=1
-            sigma = sigma - self.elapsed
+
+            sigma = 0
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Kalman".format(current_time,self.name,self.parent.name,token))
 
