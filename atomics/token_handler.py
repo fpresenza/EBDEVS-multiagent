@@ -7,16 +7,12 @@ from pypdevs.infinity import INFINITY
 #    'Token',
 #    'TokenHandler'
 #]
-TOKEN_KINDS = {
-    'action': 0,
-    'state' : 1, 
-}
 
 
 @dataclass
 class Token(object):
     creator: str                # The robot that created it
-    kind: str                   # Whether it is action or state
+    kind: int                   # 0 if action, 1 if state
     order: int                  # A counter to differentiate tokens
     data: object                # The data it carries
     hops_to_target: int         # The number of hops it must travel
@@ -51,10 +47,10 @@ class TokenGenerator(AtomicDEVS):
         AtomicDEVS.__init__(self, name)
 
         # Parameters
-        token_0 = Token(creator='2',kind='action',order=127,data={'3': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=1)
-        token_1 = Token(creator='1',kind='action',order=127,data={'2': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=2)
-        token_2 = Token(creator='1',kind='action',order=128,data={'2': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=2)
-        token_3 = Token(creator='3',kind='state' ,order=132,data={'1': np.array([3.0, 4.0])},hops_to_target=4,hops_travelled=2)
+        token_0 = Token(creator='2',kind=0,order=127,data={'3': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=1)
+        token_1 = Token(creator='1',kind=0,order=127,data={'2': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=2)
+        token_2 = Token(creator='1',kind=0,order=128,data={'2': np.array([1.0, 2.0])},hops_to_target=4,hops_travelled=2)
+        token_3 = Token(creator='3',kind=1,order=132,data={'1': np.array([3.0, 4.0])},hops_to_target=4,hops_travelled=2)
         self.tokens = [token_0, token_1, token_2, token_3]
         self.N = len(self.tokens)
         self.period = period
@@ -147,13 +143,13 @@ class TokenHandler(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
-        self.extent = INFINITY      # The robot's subgraph extent
+        self.action_extent = 1      # The robot's action extent
+        self.state_extent = 1       # The robot's state extent
         # self.status = []          # TODO
         self.debug = debug
 
         # Dictionaries as records of tokens received
-        # {'action': {creator: order}, 'state': {creator: order}}
-        self.received = {'action': {}, 'state': {}}
+        self.received = {0: {}, 1: {}}
         self.action_token_order = 0
         self.state_token_order = 0
 
@@ -192,44 +188,44 @@ class TokenHandler(AtomicDEVS):
 
         if self.in_router_token in inputs: # if token arrives through port in_router_token
             token = inputs[self.in_router_token]
-            ret = self.handle_received_token(token) # events list
-            if (ret == []): # discard, the token received was sent by this same robot
+            data_received = self.handle_received_token(token) # events list
+            if (data_received == []): # pass, nothing to send
                 sigma = sigma - self.elapsed # holds last status
             else:
-                data += ret # events list
+                data += data_received # events list
                 sigma = 0
             if (self.debug):
                 print("t: {} s, Atomic name: {}, External Transition Function, token: {} from Router".format(current_time,self.name,token))
 
         elif self.in_controller_intact in inputs: # if token arrives through port in_controller_intact
-            # pass # do nothing
             token = Token(
                 creator=self.parent.name,
-                kind='action',
+                kind=0,
                 order=self.action_token_order,
                 data=inputs[self.in_controller_intact],
-                hops_to_target=1,
+                hops_to_target=self.action_extent,
                 hops_travelled=0
             )
             data.append({self.out_router_token: token})
             self.action_token_order+=1
-            # sigma = sigma - self.elapsed
+
             sigma = 0
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Controller".format(current_time,self.name,self.parent.name,token))
 
         elif self.in_kalman_intpos in inputs:   # if token arrives through port in_kalman_intpos
-            # pass # do nothing
-            # token = Token(
-            #     creator=self.parent.name,
-            #     kind='state',
-            #     order=self.state_token_order,
-            #     data=inputs[self.in_kalman_intpos],
-            #     hops_to_target=1,
-            #     hops_travelled=0
-            # )
+            token = Token(
+                creator=self.parent.name,
+                kind=1,
+                order=self.state_token_order,
+                data=inputs[self.in_kalman_intpos],
+                hops_to_target=self.state_extent,
+                hops_travelled=0
+            )
+            data.append({self.out_router_token: token})
             self.state_token_order+=1
-            sigma = sigma - self.elapsed
+
+            sigma = 0
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Kalman".format(current_time,self.name,self.parent.name,token))
 
@@ -288,17 +284,17 @@ class TokenHandler(AtomicDEVS):
                 outputs.append({self.out_router_token: token})
 
             try:
-                # check if already received from creator
+                # gets order from received dictionary
                 order = self.received[token.kind][token.creator]
             except KeyError:
-                # append to list of tokens received
+                # first time received
                 order = -1
 
             # check if token is newer than last received
             if token.order > order:
                 self.received[token.kind][token.creator] = token.order
                 # check if token is of kind action
-                if TOKEN_KINDS[token.kind] == 0:
+                if token.kind == 0:
                     try:
                         # check if there is data for this robot
                         data = (token.creator, token.data[self.robot_id])
@@ -307,9 +303,9 @@ class TokenHandler(AtomicDEVS):
                     except KeyError:
                         pass
                 # check if token is of kind state
-                elif TOKEN_KINDS[token.kind] == 1:
-                    # check if token creator is within extent
-                    if token.hops_travelled <= self.extent:
+                elif token.kind == 1:
+                    # check if token creator is within action extent
+                    if token.hops_travelled <= self.action_extent:
                         # send data to controller
                         data = (token.creator, token.data)
                         outputs.append({self.out_controller_extpos: data})
