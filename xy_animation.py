@@ -102,14 +102,14 @@ print('Animation total duration: {:.5f} sec'.format(len(frames) * timestep))
 fig, ax = plt.subplots(2, 1, figsize=(10, 8))
 ax[0].set_xlabel('time [$sec$]')
 ax[0].set_ylabel('$x$-position [$m$]')
-ax[0].grid(1)
+ax[0].grid()
 ax[0].plot(
     [f[0] for f in frames], [f[1][:, 0] for f in frames],
     # marker='.',
     ds='steps-post')
 ax[1].set_xlabel('time [$sec$]')
 ax[1].set_ylabel('$y$-position [$m$]')
-ax[1].grid(1)
+ax[1].grid()
 ax[1].plot(
     [f[0] for f in frames], [f[1][:, 1] for f in frames],
     # marker='.',
@@ -133,7 +133,7 @@ ax.set_ylabel(r'$y$ [m]', fontsize='small', labelpad=0.6)
 lim = 15.0
 ax.set_xlim(-lim, lim)
 ax.set_ylim(-lim, lim)
-ax.grid(1)
+ax.grid(zorder=0)
 
 anim = DevsAnimate(fig, ax, timestep, frames, maxlen=1)
 # cm.coolwarm goes from 0 (blue) to 255 (red)
@@ -142,44 +142,44 @@ anim.set_teams({
         'id': 0,
         'tail': False,
         'style': {
-            # 'color': 'royalblue',
             'color': 'C0',
             'marker': 'o',
-            'markersize': 10
+            'markersize': 10,
+            'zorder': 20
         }
     },
     '$1$': {
         'id': 1,
         'tail': False,
         'style': {
-            # 'color': 'royalblue',
             'color': 'C1',
             'marker': 'o',
-            'markersize': 10
+            'markersize': 10,
+            'zorder': 20
         }
     },
     '$2$': {
         'id': 2,
         'tail': False,
         'style': {
-            # 'color': 'royalblue',
             'color': 'C2',
             'marker': 'o',
-            'markersize': 10
+            'markersize': 10,
+            'zorder': 20
         }
     },
     '$3$': {
         'id': 3,
         'tail': False,
         'style': {
-            # 'color': 'royalblue',
             'color': 'C3',
             'marker': 'o',
-            'markersize': 10
+            'markersize': 10,
+            'zorder': 20
         }
     }
 })
-anim.set_edgestyle(color='k', lw=0.5, zorder=0)
+anim.set_edgestyle(color='k', lw=0.5, zorder=10)
 
 circles = []
 for p in frames[0][1]:
