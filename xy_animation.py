@@ -39,11 +39,11 @@ class DevsAnimate(Animate2):
 parser = argparse.ArgumentParser(description='')
 parser.add_argument(
     '-s', '--skip',
-    default=10, type=int, help='skip frames'
+    default=1, type=int, help='skip frames'
 )
 parser.add_argument(
     '-x', '--speed',
-    default=1, type=int, help='simulation speed multiplier'
+    default=1.0, type=float, help='simulation speed multiplier'
 )
 arg = parser.parse_args()
 
@@ -51,7 +51,7 @@ arg = parser.parse_args()
 # ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-summary = read_json_file('output/summary.csv')
+summary = read_json_file('output/summary.json')
 robot_ids = summary['robot_ids']
 n = len(robot_ids)
 print('Experiment with {} robots'.format(n))
@@ -91,8 +91,9 @@ print('Average time between frames  Q_1={:.5f} sec, Q_2={:.5f} sec, Q_3={:.5f} s
     np.quantile(timestep, 0.75),
 ))
 
-
 timestep = np.quantile(timestep, 0.50) / arg.speed
+if timestep < 0.001:
+    raise ValueError('Animation timestep is too small, increase skip.')
 print('Animation time between frames: {:.5f} sec'.format(timestep))
 print('Animation total duration: {:.5f} sec'.format(len(frames) * timestep))
 
@@ -130,7 +131,7 @@ ax.set_aspect('equal')
 # ax.grid(1, lw=0.4)
 ax.set_xlabel(r'$x$ [m]', fontsize='small', labelpad=0.6)
 ax.set_ylabel(r'$y$ [m]', fontsize='small', labelpad=0.6)
-lim = 15.0
+lim = 25.0
 ax.set_xlim(-lim, lim)
 ax.set_ylim(-lim, lim)
 ax.grid(zorder=0)
