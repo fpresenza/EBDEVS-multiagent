@@ -208,7 +208,6 @@ class TokenHandler(AtomicDEVS):
             )
             data.append({self.out_router_token: token})
             self.action_token_order+=1
-            print('{}: controller is sending {} to token handler'.format(self.parent.name, inputs[self.in_controller_intact]))
 
             sigma = 0
             if (self.debug):

@@ -189,8 +189,6 @@ class Router(AtomicDEVS):
         if len(receivers) > 0:
             data += [{self.out_agent_token[agent]: token} for agent, _ in receivers]
             sigma = 0 # holds last status
-        else:
-            sigma = INFINITY
 
         if (self.debug):
                 print("t: {} s, Atomic name: {}, External Transition Function, transmitter: {} -> receivers: {}".format(current_time,self.name,transmitter,receivers))
