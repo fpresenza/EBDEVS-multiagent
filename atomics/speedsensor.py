@@ -73,7 +73,7 @@ class SpeedSensor(AtomicDEVS):
         #if self.in_commanded_speed in inputs: # if data arrives through port in_control_intact
         v = inputs[self.in_commanded_speed].reshape(2,1)
         noise = np.random.normal(loc=self.bias,scale=self.noisestd,size=(2,1))
-        vmeasured = self.trans.dot(v + noise)
+        vmeasured = self.trans.dot(v) + noise
         data = [{self.out_measured_speed: vmeasured}]
         sigma = 0 # holds last status
         
