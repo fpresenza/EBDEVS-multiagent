@@ -369,7 +369,7 @@ class MultiRobotSystem(CoupledDEVS):
 
         # log new value of micro_states
         summary = {'robot_ids': list(self.robots.keys())}
-        write_json_file('output/summary.csv', summary)
+        write_json_file('output/summary.json', summary)
 
         self.robots_states = {}
 
