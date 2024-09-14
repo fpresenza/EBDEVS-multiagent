@@ -249,10 +249,8 @@ class Controller(AtomicDEVS):
     def control_action(self, position, ext_action):
         """Compute control action"""
         _, current_time, _, _ = self.state.get()
-        # x = -self.radius*self.omega*np.sin(self.omega*current_time)
-        x = 0.0
-        # y =  self.radius*self.omega*np.cos(self.omega*current_time)
-        y = 0.0
+        x = -self.radius*self.omega*np.sin(self.omega*current_time)
+        y =  self.radius*self.omega*np.cos(self.omega*current_time)
         # the list of outputs to be returned
         if position is None: # if Kalman filter has not yet sent an estimation of position
             # return np.array([0.0, 0.0]), {'2': np.array([-4.0, 4.0])}
