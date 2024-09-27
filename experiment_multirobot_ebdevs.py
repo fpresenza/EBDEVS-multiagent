@@ -19,6 +19,8 @@ if os.path.exists('output/summary.csv'):
 if os.path.exists('output/data.csv'):
 	os.remove('output/data.csv')
 
+import argparse
+
 # Import code for model simulation:
 from pypdevs.simulator import Simulator
 
@@ -31,6 +33,16 @@ from multirobot_ebdevs import MultiRobotSystem
 
 # Store all results for output to file
 # values = []
+
+# ------------------------------------------------------------------
+# Parse args
+# ------------------------------------------------------------------
+parser = argparse.ArgumentParser(description='')
+parser.add_argument(
+    '-l', '--length',
+    default=1.0, type=float, help='simulation length in seconds'
+)
+arg = parser.parse_args()
 
 
 #    ======================================================================
@@ -65,7 +77,7 @@ sim = Simulator(m)
 #    A termination time is prefered over a termination condition,
 #    as it is much simpler to use.
 #    e.g. to simulate until simulation time 400.0 is reached
-sim.setTerminationTime(20.0)
+sim.setTerminationTime(arg.length)
 
 # B. Set the use of a tracer to show what happened during the simulation run
 #    Both writing to stdout or file is possible:

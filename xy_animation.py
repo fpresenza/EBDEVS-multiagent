@@ -39,11 +39,11 @@ class DevsAnimate(Animate2):
 parser = argparse.ArgumentParser(description='')
 parser.add_argument(
     '-s', '--skip',
-    default=10, type=int, help='skip frames'
+    default=1, type=int, help='skip frames'
 )
 parser.add_argument(
     '-x', '--speed',
-    default=1, type=int, help='simulation speed multiplier'
+    default=1.0, type=float, help='simulation speed multiplier'
 )
 arg = parser.parse_args()
 
@@ -51,7 +51,7 @@ arg = parser.parse_args()
 # ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-summary = read_json_file('output/summary.csv')
+summary = read_json_file('output/summary.json')
 robot_ids = summary['robot_ids']
 n = len(robot_ids)
 print('Experiment with {} robots'.format(n))
@@ -78,7 +78,7 @@ for step in range(len(data[:-1])):
         [[robot_index, neighbor] for neighbor in neighbors]
 
     if time < float(data[step + 1][1]):
-        teams = np.array([1, 2, 3, 4])
+        teams = np.array([0, 1, 2, 3])
         frames.append([time, positions.copy(), edges, teams])
 
 print('Total number of frames: {}'.format(len(frames)))
@@ -91,8 +91,9 @@ print('Average time between frames  Q_1={:.5f} sec, Q_2={:.5f} sec, Q_3={:.5f} s
     np.quantile(timestep, 0.75),
 ))
 
-
 timestep = np.quantile(timestep, 0.50) / arg.speed
+if timestep < 0.001:
+    raise ValueError('Animation timestep is too small, increase skip.')
 print('Animation time between frames: {:.5f} sec'.format(timestep))
 print('Animation total duration: {:.5f} sec'.format(len(frames) * timestep))
 
@@ -102,14 +103,14 @@ print('Animation total duration: {:.5f} sec'.format(len(frames) * timestep))
 fig, ax = plt.subplots(2, 1, figsize=(10, 8))
 ax[0].set_xlabel('time [$sec$]')
 ax[0].set_ylabel('$x$-position [$m$]')
-ax[0].grid(1)
+ax[0].grid()
 ax[0].plot(
     [f[0] for f in frames], [f[1][:, 0] for f in frames],
     # marker='.',
     ds='steps-post')
 ax[1].set_xlabel('time [$sec$]')
 ax[1].set_ylabel('$y$-position [$m$]')
-ax[1].grid(1)
+ax[1].grid()
 ax[1].plot(
     [f[0] for f in frames], [f[1][:, 1] for f in frames],
     # marker='.',
@@ -130,56 +131,56 @@ ax.set_aspect('equal')
 # ax.grid(1, lw=0.4)
 ax.set_xlabel(r'$x$ [m]', fontsize='small', labelpad=0.6)
 ax.set_ylabel(r'$y$ [m]', fontsize='small', labelpad=0.6)
-lim = 15.0
+lim = 25.0
 ax.set_xlim(-lim, lim)
 ax.set_ylim(-lim, lim)
-ax.grid(1)
+ax.grid(zorder=0)
 
 anim = DevsAnimate(fig, ax, timestep, frames, maxlen=1)
 # cm.coolwarm goes from 0 (blue) to 255 (red)
 anim.set_teams({
+    '$0$': {
+        'id': 0,
+        'tail': False,
+        'style': {
+            'color': 'C0',
+            'marker': 'o',
+            'markersize': 10,
+            'zorder': 20
+        }
+    },
     '$1$': {
         'id': 1,
         'tail': False,
         'style': {
-            # 'color': 'royalblue',
-            'color': 'C0',
+            'color': 'C1',
             'marker': 'o',
-            'markersize': 10
+            'markersize': 10,
+            'zorder': 20
         }
     },
     '$2$': {
         'id': 2,
         'tail': False,
         'style': {
-            # 'color': 'royalblue',
-            'color': 'C1',
+            'color': 'C2',
             'marker': 'o',
-            'markersize': 10
+            'markersize': 10,
+            'zorder': 20
         }
     },
     '$3$': {
         'id': 3,
         'tail': False,
         'style': {
-            # 'color': 'royalblue',
             'color': 'C3',
             'marker': 'o',
-            'markersize': 10
-        }
-    },
-    '$4$': {
-        'id': 4,
-        'tail': False,
-        'style': {
-            # 'color': 'royalblue',
-            'color': 'C4',
-            'marker': 'o',
-            'markersize': 10
+            'markersize': 10,
+            'zorder': 20
         }
     }
 })
-anim.set_edgestyle(color='k', lw=0.5, zorder=0)
+anim.set_edgestyle(color='k', lw=0.5, zorder=10)
 
 circles = []
 for p in frames[0][1]:

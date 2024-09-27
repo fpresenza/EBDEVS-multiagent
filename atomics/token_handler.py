@@ -197,7 +197,7 @@ class TokenHandler(AtomicDEVS):
             if (self.debug):
                 print("t: {} s, Atomic name: {}, External Transition Function, token: {} from Router".format(current_time,self.name,token))
 
-        elif self.in_controller_intact in inputs: # if token arrives through port in_controller_intact
+        elif self.in_controller_intact in inputs: # if data arrives through port in_controller_intact
             token = Token(
                 creator=self.parent.name,
                 kind=0,
@@ -213,7 +213,7 @@ class TokenHandler(AtomicDEVS):
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Controller".format(current_time,self.name,self.parent.name,token))
 
-        elif self.in_kalman_intpos in inputs:   # if token arrives through port in_kalman_intpos
+        elif self.in_kalman_intpos in inputs:   # if data arrives through port in_kalman_intpos
             token = Token(
                 creator=self.parent.name,
                 kind=1,

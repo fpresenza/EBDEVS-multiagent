@@ -172,7 +172,7 @@ class KalmanFilter(AtomicDEVS):
 
         if self.in_control_intact in inputs: # if data arrives through port in_control_intact
             control_action = inputs[self.in_control_intact].reshape(2,1)
-            new_position = self.prediction_step(control_action) # events list
+            new_position = self.dynamic_step(control_action) # events list
             data = [
                 {self.out_control_intpos: new_position},
                 {self.out_handler_intpos: new_position}
@@ -180,7 +180,7 @@ class KalmanFilter(AtomicDEVS):
             sigma = 0 # holds last status
         elif self.in_handler_extpos in inputs: # if token arrives through port in_in_handler_extpos
             ext_position, dist = inputs[self.in_handler_extpos]
-            new_position = self.update_step(ext_position, dist) # events list
+            new_position = self.range_step(ext_position, dist) # events list
             data = [{self.out_control_intpos: new_position}]
             sigma = 0 # holds last status
         
@@ -221,14 +221,14 @@ class KalmanFilter(AtomicDEVS):
         sigma, _, _ = self.state.get()
         return sigma
 
-    def prediction_step(self, control_action):
+    def dynamic_step(self, control_action):
         """Prediction step based on control actions"""
         # the list of outputs to be returned
         self.position += control_action * self.elapsed      # debe ser el tiempo entre acciones de control (chequear)
         self.covariance += self.dynamic_process_covariance * self.elapsed**2
         return self.position.copy()
 
-    def update_step(self, ext_position, dist):
+    def range_step(self, ext_position, dist):
         """Update step based on distance measurements with neighbors
 
         args:
