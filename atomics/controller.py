@@ -126,7 +126,7 @@ class ControllerState:
 
 
 class Controller(AtomicDEVS):
-    def __init__(self,robot_id,name=None,debug=False):
+    def __init__(self,robot_id,name=None,period=0.1,debug=False):
         """Atomic model for the rigidity maintenance controller"""
 
         # Always call parent class' constructor FIRST:
@@ -134,7 +134,7 @@ class Controller(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
-        self.period = 0.1
+        self.period = period
 
         # STATE:
         #  Define 'state' attribute (initial sate):
