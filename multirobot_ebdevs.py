@@ -199,9 +199,9 @@ class RobotDynamics(CoupledDEVS):
                                          )
         speed_sensor = SpeedSensor(name="vmeas",
                                    noisestd=0.0,
-                                   bias=np.ones((2,1)),
+                                   bias=np.zeros((2,1)),
                                    transf=np.eye(2),
-                                   debug=True
+                                   debug=self.debug
                                    )
         if (enable_GPS):
             gps_sensor = GPSSensor(name="GPS",
@@ -309,6 +309,8 @@ class Robot(CoupledDEVS):
                                      debug=self.debug
                                      )
         kalman_filter = KalmanFilter(robot_id=self.name,
+                                     x0=np.random.normal(loc=self.x0, scale=0.0),
+                                     y0=np.random.normal(loc=self.y0, scale=0.0),
                                      name='Kalman_Filter',
                                      debug=self.debug
                                      )
@@ -441,10 +443,13 @@ class MultiRobotSystem(CoupledDEVS):
         return [
             (
                 receiver_id, 
-                self.distance(
-                    transmitter_pose, 
-                    self.robots_states[receiver_id]['Pose']
-                )
+                np.random.normal(
+                    loc=self.distance(
+                        transmitter_pose, 
+                        self.robots_states[receiver_id]['Pose']
+                    ),
+                    scale=0.0    
+                ) 
             )
             for receiver_id in self.robots_states.keys()
             if self.connected(transmitter_id, receiver_id)

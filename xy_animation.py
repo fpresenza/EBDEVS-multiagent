@@ -11,7 +11,7 @@ import matplotlib.cm as cm
 import argparse
 
 from uvnpy.network.plot import Animate2
-from utils import read_json_file
+from utils import read_json_file, find_latest_timestamp
 
 np.set_printoptions(suppress=True, precision=4)
 
@@ -51,16 +51,18 @@ arg = parser.parse_args()
 # ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-summary = read_json_file('output/summary.json')
-robot_ids = summary['robot_ids']
+experiment_directory = 'output/' + find_latest_timestamp('output/')
+robots_config = read_json_file(experiment_directory + 'robots.json')
+robot_ids = list(robots_config)
 n = len(robot_ids)
-print('Experiment with {} robots'.format(n))
+print('Experiment located in: {}'.format(experiment_directory))
+print('Number of robots: {}'.format(n))
 
 # ------------------------------------------------------------------
 # Create Frames
 # ------------------------------------------------------------------
 data = []
-with open('output/data.csv', 'r') as file:
+with open(experiment_directory + 'data.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         data.append(row)
