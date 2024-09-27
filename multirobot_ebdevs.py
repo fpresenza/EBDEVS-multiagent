@@ -25,6 +25,7 @@ from atomics.controller import Controller
 from atomics.token_handler import TokenHandler
 from atomics.kalman_filter import KalmanFilter
 from atomics.speedsensor import SpeedSensor
+from atomics.gpssensor import GPSSensor
 
 from utils import (
     read_json_file,
@@ -200,7 +201,13 @@ class RobotDynamics(CoupledDEVS):
         speed_sensor = SpeedSensor(name="vmeas",
                                    noisestd=0.0,
                                    bias=np.ones((2,1)),
-                                   trans=np.eye(2),
+                                   transf=np.eye(2),
+                                   debug=True
+                                   )
+        gps_sensor = GPSSensor(name="GPS",
+                                   noisestd=0.0,
+                                   bias=np.ones((2,1)),
+                                   period=1,
                                    debug=True
                                    )
         self.splitter     = self.addSubModel(splitter)
@@ -283,7 +290,9 @@ class Robot(CoupledDEVS):
                           debug=self.debug
                          )
         controller    = Controller(robot_id=self.name, 
-                                   name='Controller'
+                                   name='Controller',
+                                   period=0.1,
+                                   debug=self.debug
                                    )
         token_handler = TokenHandler(robot_id=self.name,
                                      name='Token_Handler',
