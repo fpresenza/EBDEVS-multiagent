@@ -23,7 +23,7 @@ class SpeedSensorState:
 
 
 class SpeedSensor(AtomicDEVS):
-    def __init__(self,name=None,noisestd=0.0,bias=np.zeros((2,1)),trans=np.eye(2),debug=False):
+    def __init__(self,name=None,noisestd=0.0,bias=np.zeros((2,1)),transf=np.eye(2),debug=False):
         """Atomic model for the speed sensor"""
 
         # Always call parent class' constructor FIRST:
@@ -46,7 +46,7 @@ class SpeedSensor(AtomicDEVS):
 
         self.noisestd = noisestd
         self.bias     = bias
-        self.trans    = trans
+        self.transf   = transf
 
         self.debug = debug
 
@@ -73,7 +73,7 @@ class SpeedSensor(AtomicDEVS):
         #if self.in_commanded_speed in inputs: # if data arrives through port in_control_intact
         v = inputs[self.in_commanded_speed].reshape(2,1)
         noise = np.random.normal(loc=self.bias,scale=self.noisestd,size=(2,1))
-        vmeasured = self.trans.dot(v) + noise
+        vmeasured = self.transf.dot(v) + noise
         data = [{self.out_measured_speed: vmeasured}]
         sigma = 0 # holds last status
         
