@@ -311,6 +311,7 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.dynamics.OUT_dynamics_y, self.OUT_y)
         # self.connectPorts(self.IN_vx_vy, self.splitter_gen.in_splitter_msgs)
         # self.connectPorts(self.splitter_gen.out_splitter_in, self.dynamics.IN_dynamics_vx_vy)
+        
         self.connectPorts(self.controller.out_dynamics_intact, self.dynamics.IN_dynamics_vx_vy)
         self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
         self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
@@ -319,7 +320,8 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.kalman_filter.out_control_intpos, self.controller.in_kalman_intpos)
         self.connectPorts(self.kalman_filter.out_handler_intpos, self.token_handler.in_kalman_intpos)
         # self.connectPorts(self.controller.out_kalman_intact, self.kalman_filter.in_control_intact)
-        self.connectPorts(self.token_handler.out_kalman_extpos, self.kalman_filter.in_handler_extpos)
+        self.connectPorts(self.token_handler.out_kalman_extpos, self.kalman_filter.in_handler_extpos) 
+        self.connectPorts(self.dynamics.OUT_measured_v, self.kalman_filter.in_control_intact)
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
