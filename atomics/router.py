@@ -187,7 +187,10 @@ class Router(AtomicDEVS):
         transmitter = self.in_port_mapping[port.name]
         receivers = self.parent.getContextInformation(transmitter)
         if len(receivers) > 0:
-            data += [{self.out_agent_token[agent]: token} for agent, _ in receivers]
+            data += [
+                {self.out_agent_token[receiver_id]: (token, distance)} 
+                for receiver_id, distance in receivers
+            ]
             sigma = 0 # holds last status
 
         if (self.debug):

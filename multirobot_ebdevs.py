@@ -29,7 +29,6 @@ from atomics.gpssensor import GPSSensor
 
 from utils import (
     read_json_file,
-    write_json_file,
     append_csv_file
 )
 
@@ -199,8 +198,8 @@ class RobotDynamics(CoupledDEVS):
                                          debug=self.debug
                                          )
         speed_sensor = SpeedSensor(name="vmeas",
-                                   noisestd=0.0,
-                                   bias=np.ones((2,1)),
+                                   noisestd=0.1,
+                                   bias=np.zeros((2,1)),
                                    transf=np.eye(2),
                                    debug=True
                                    )
@@ -362,13 +361,14 @@ class Robot(CoupledDEVS):
         return immChildren[0]
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', debug=False):
+    def __init__(self, name='MultiRobotSystem', logpath='./', debug=False):
         """
         Multi robot system composed of N robots.
         """
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
 
+        self.logpath = logpath
         self.debug = debug
 
         self.current_time = 0 # TODO: time cannot be managed as in the other coupled/atomic models
@@ -427,12 +427,19 @@ class MultiRobotSystem(CoupledDEVS):
             for neighbor_id in self.robots_states.keys()
             if self.connected(micro_id, neighbor_id)
         ]
-        append_csv_file('output/data.csv', log)
+        append_csv_file(self.logpath + 'data.csv', log)
 
     def getContextInformation(self, transmitter_id):
+        transmitter_pose = self.robots_states[transmitter_id]['Pose']
         return [
-            (receiver_id, None)
-            for receiver_id, _ in self.robots_states.items()
+            (
+                receiver_id, 
+                self.distance(
+                    transmitter_pose, 
+                    self.robots_states[receiver_id]['Pose']
+                )
+            )
+            for receiver_id in self.robots_states.keys()
             if self.connected(transmitter_id, receiver_id)
         ]
 

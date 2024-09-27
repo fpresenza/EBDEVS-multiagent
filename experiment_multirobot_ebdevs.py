@@ -14,11 +14,8 @@
 # limitations under the License.
 
 import os
-if os.path.exists('output/summary.csv'):
-	os.remove('output/summary.csv')
-if os.path.exists('output/data.csv'):
-	os.remove('output/data.csv')
-
+import datetime
+import shutil
 import argparse
 
 # Import code for model simulation:
@@ -45,13 +42,21 @@ parser.add_argument(
 arg = parser.parse_args()
 
 
+# ------------------------------------------------------------------
+# Create folder with timestamp
+# ------------------------------------------------------------------
+timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+logpath = 'output/' + timestamp + '/'
+os.makedirs(logpath)
+shutil.copy('robots.json', logpath + 'robots.json')
+
 #    ======================================================================
 
 # 1. Instantiate the (Coupled or Atomic) DEVS at the root of the 
 #  hierarchical model. This effectively instantiates the whole model 
 #  thanks to the recursion in the DEVS model constructors (__init__).
 #
-m = MultiRobotSystem(name="MultiRobotSystem", debug=False)
+m = MultiRobotSystem(name="MultiRobotSystem", logpath=logpath, debug=False)
 
 #    ======================================================================
 
@@ -82,7 +87,7 @@ sim.setTerminationTime(arg.length)
 # B. Set the use of a tracer to show what happened during the simulation run
 #    Both writing to stdout or file is possible:
 #    pass None for stdout, or a filename for writing to that file
-sim.setVerbose("output/simu_out.out")
+sim.setVerbose(logpath + "simu_out.out")
 
 # C. Use Classic DEVS instead of Parallel DEVS
 #    If your model uses Classic DEVS, this configuration MUST be set as
