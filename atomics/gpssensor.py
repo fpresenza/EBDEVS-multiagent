@@ -71,12 +71,12 @@ class GPSSensor(AtomicDEVS):
 
         if self.in_x_pos in inputs: # if data arrives through port in_x_pos
             x = inputs[self.in_x_pos]
-            data[0] = x + np.random.normal(loc=self.bias,scale=self.noisestd)
+            data[0] = self.evalpoly(x) + np.random.normal(loc=float(self.bias[0]),scale=self.noisestd)
             sigma = sigma - self.elapsed # holds last status
 
         if self.in_y_pos in inputs: # if data arrives through port in_y_pos
             y = inputs[self.in_y_pos]
-            data[1] = y + np.random.normal(loc=self.bias,scale=self.noisestd)
+            data[1] = self.evalpoly(y) + np.random.normal(loc=float(self.bias[1]),scale=self.noisestd)
             sigma = sigma - self.elapsed # holds last status
         
         if (self.debug):
@@ -92,6 +92,8 @@ class GPSSensor(AtomicDEVS):
         current_time += sigma
         sigma = self.period
 
+        print("t: {:.2f} s, Atomic name: {}, data: {}, Internal Transition Function".format(current_time,self.name,data))
+
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
             
@@ -102,10 +104,8 @@ class GPSSensor(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-
-        posmeasured = data
-        
-        return {self.out_meas_pos: posmeasured}
+        outval = {self.out_meas_pos: data}
+        return outval
 
     def timeAdvance(self):
         """
@@ -115,3 +115,6 @@ class GPSSensor(AtomicDEVS):
         # based (typically) on current State.
         sigma, _, _ = self.state.get()
         return sigma
+    
+    def evalpoly(self,p):
+        return p[0]+p[1]*0 # eval poly in zero time

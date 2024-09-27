@@ -158,7 +158,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
 # Dynamics for Robot i
 #----------------------------
 class RobotDynamics(CoupledDEVS):
-    def __init__(self, name='RobotDynamics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, debug=False):
+    def __init__(self, name='RobotDynamics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, enable_GPS='False', debug=False):
         """
         Robot's dynamic model composed of two integrators for x and y and a splitter.
         """
@@ -198,12 +198,13 @@ class RobotDynamics(CoupledDEVS):
                                          debug=self.debug
                                          )
         speed_sensor = SpeedSensor(name="vmeas",
-                                   noisestd=0.1,
-                                   bias=np.zeros((2,1)),
+                                   noisestd=0.0,
+                                   bias=np.ones((2,1)),
                                    transf=np.eye(2),
                                    debug=True
                                    )
-        gps_sensor = GPSSensor(name="GPS",
+        if (enable_GPS):
+            gps_sensor = GPSSensor(name="GPS",
                                    noisestd=0.0,
                                    bias=np.ones((2,1)),
                                    period=1,
@@ -213,12 +214,16 @@ class RobotDynamics(CoupledDEVS):
         self.integrator_x = self.addSubModel(integrator_x)
         self.integrator_y = self.addSubModel(integrator_y)
         self.speed_sensor = self.addSubModel(speed_sensor)
+        if (enable_GPS):
+            self.gps_sensor = self.addSubModel(gps_sensor)
 
         # Declare the coupled model's output ports:
         self.OUT_dynamics_x    = self.addOutPort(name="OUT_dynamics_x")
         self.OUT_dynamics_y    = self.addOutPort(name="OUT_dynamics_y")
         self.OUT_measured_v    = self.addOutPort(name="OUT_measured_v")
         self.IN_dynamics_vx_vy = self.addInPort( name="IN_dynamics_vx_vy")
+        if (enable_GPS):
+            self.OUT_measured_pos    = self.addOutPort(name="OUT_measured_pos")
 
         # Connect coupled model's ports with atomic models' ports
         self.connectPorts(self.IN_dynamics_vx_vy, self.splitter.in_splitter_msgs)
@@ -228,6 +233,10 @@ class RobotDynamics(CoupledDEVS):
         self.connectPorts(self.integrator_y.OUT_q, self.OUT_dynamics_y)
         self.connectPorts(self.IN_dynamics_vx_vy, self.speed_sensor.in_commanded_speed)
         self.connectPorts(self.speed_sensor.out_measured_speed, self.OUT_measured_v)
+        if (enable_GPS):
+            self.connectPorts(self.integrator_x.OUT_q, self.gps_sensor.in_x_pos)
+            self.connectPorts(self.integrator_y.OUT_q, self.gps_sensor.in_y_pos)
+            self.connectPorts(self.gps_sensor.out_meas_pos, self.OUT_measured_pos)
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
@@ -259,7 +268,7 @@ class RobotDynamics(CoupledDEVS):
 # Robot i
 #----------------------------
 class Robot(CoupledDEVS):
-    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, comm_range=np.inf, debug=False):
+    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, comm_range=np.inf, enable_GPS=False, debug=False):
         """
         A robot model composed of the robot's pysics.
         """
@@ -275,6 +284,7 @@ class Robot(CoupledDEVS):
         self.gainy  = gainy
         self.comm_range = comm_range
         self.debug  = debug
+        self.enable_GPS = enable_GPS
 
         self.y_up = [self.name, {'Time': 0.0, 'Pose': [x0,  y0], 'CommRange': comm_range}]
         self.current_time = 0
@@ -286,6 +296,7 @@ class Robot(CoupledDEVS):
                           y0=self.y0,
                           gainx=self.gainx,
                           gainy=self.gainy,
+                          enable_GPS=self.enable_GPS,
                           debug=self.debug
                          )
         controller    = Controller(robot_id=self.name, 
@@ -377,10 +388,6 @@ class MultiRobotSystem(CoupledDEVS):
         robots_config = read_json_file('robots.json')
         for robot, config in robots_config.items():
             self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
-
-        # log new value of micro_states
-        summary = {'robot_ids': list(self.robots.keys())}
-        write_json_file('output/summary.json', summary)
 
         self.robots_states = {}
 

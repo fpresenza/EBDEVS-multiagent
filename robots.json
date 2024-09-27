@@ -8,7 +8,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 6.0,
-        "enable_GPS": False
+	    "enable_GPS": false
     },
     "Robot_1": {
         "name" : "Robot_1",
@@ -19,7 +19,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 6.0,
-        "enable_GPS": False
+	    "enable_GPS": false
     },
     "Robot_2": {
         "name" : "Robot_2",
@@ -30,7 +30,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 6.0,
-        "enable_GPS": False
+	    "enable_GPS": false
     },
     "Robot_3": {
         "name" : "Robot_3",
@@ -41,6 +41,6 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 6.0,
-        "enable_GPS": False
+        "enable_GPS": true
     }
 }
