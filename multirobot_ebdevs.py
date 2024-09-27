@@ -28,7 +28,6 @@ from atomics.speedsensor import SpeedSensor
 
 from utils import (
     read_json_file,
-    write_json_file,
     append_csv_file
 )
 
@@ -351,13 +350,14 @@ class Robot(CoupledDEVS):
         return immChildren[0]
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', debug=False):
+    def __init__(self, name='MultiRobotSystem', logpath='./', debug=False):
         """
         Multi robot system composed of N robots.
         """
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
 
+        self.logpath = logpath
         self.debug = debug
 
         self.current_time = 0 # TODO: time cannot be managed as in the other coupled/atomic models
@@ -366,10 +366,6 @@ class MultiRobotSystem(CoupledDEVS):
         robots_config = read_json_file('robots.json')
         for robot, config in robots_config.items():
             self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
-
-        # log new value of micro_states
-        summary = {'robot_ids': list(self.robots.keys())}
-        write_json_file('output/summary.json', summary)
 
         self.robots_states = {}
 
@@ -416,7 +412,7 @@ class MultiRobotSystem(CoupledDEVS):
             for neighbor_id in self.robots_states.keys()
             if self.connected(micro_id, neighbor_id)
         ]
-        append_csv_file('output/data.csv', log)
+        append_csv_file(self.logpath + 'data.csv', log)
 
     def getContextInformation(self, transmitter_id):
         return [
