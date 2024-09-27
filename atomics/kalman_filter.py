@@ -118,7 +118,7 @@ class KalmanFilterState:
 
 
 class KalmanFilter(AtomicDEVS):
-    def __init__(self,robot_id,name=None,debug=False):
+    def __init__(self, robot_id, x0, y0, name=None, debug=False):
         """Atomic model for the kalman filter"""
 
         # Always call parent class' constructor FIRST:
@@ -142,7 +142,7 @@ class KalmanFilter(AtomicDEVS):
         self.debug = debug
 
         # kalman filter parameters (hardcoded)
-        self.position = np.array([[0.0], [0.0]])
+        self.position = np.array([[x0], [y0]])
         self.covariance = np.array([[1.0, 0.0], [0.0, 1.0]])
         self.dynamic_process_covariance = np.array([[0.5, 0.0], [0.0, 0.5]])
         self.distance_measurement_covariance = np.array([[1.5]])
@@ -152,10 +152,10 @@ class KalmanFilter(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.out_control_intpos = self.addOutPort(name="out_control_intpos")
-        self.out_handler_intpos   = self.addOutPort(name="out_handler_intpos")
+        self.out_handler_intpos = self.addOutPort(name="out_handler_intpos")
         #
-        self.in_control_intact  = self.addInPort(name="in_control_intact")
-        self.in_handler_extpos    = self.addInPort(name="in_handler_extpos")
+        self.in_control_intact = self.addInPort(name="in_control_intact")
+        self.in_handler_extpos = self.addInPort(name="in_handler_extpos")
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))

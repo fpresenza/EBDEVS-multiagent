@@ -197,10 +197,10 @@ class RobotDynamics(CoupledDEVS):
                                          debug=self.debug
                                          )
         speed_sensor = SpeedSensor(name="vmeas",
-                                   noisestd=0.1,
+                                   noisestd=0.0,
                                    bias=np.zeros((2,1)),
                                    trans=np.eye(2),
-                                   debug=True
+                                   debug=self.debug
                                    )
         self.splitter     = self.addSubModel(splitter)
         self.integrator_x = self.addSubModel(integrator_x)
@@ -289,6 +289,8 @@ class Robot(CoupledDEVS):
                                      debug=self.debug
                                      )
         kalman_filter = KalmanFilter(robot_id=self.name,
+                                     x0=np.random.normal(loc=self.x0, scale=0.0),
+                                     y0=np.random.normal(loc=self.y0, scale=0.0),
                                      name='Kalman_Filter',
                                      debug=self.debug
                                      )
@@ -421,10 +423,13 @@ class MultiRobotSystem(CoupledDEVS):
         return [
             (
                 receiver_id, 
-                self.distance(
-                    transmitter_pose, 
-                    self.robots_states[receiver_id]['Pose']
-                )
+                np.random.normal(
+                    loc=self.distance(
+                        transmitter_pose, 
+                        self.robots_states[receiver_id]['Pose']
+                    ),
+                    scale=0.0    
+                ) 
             )
             for receiver_id in self.robots_states.keys()
             if self.connected(transmitter_id, receiver_id)
