@@ -178,9 +178,9 @@ class KalmanFilter(AtomicDEVS):
                 {self.out_handler_intpos: new_position}
             ]
             sigma = 0 # holds last status
-        elif self.in_handler_extpos in inputs: # if token arrives through port in_in_handler_extpos
-            ext_position, dist = inputs[self.in_handler_extpos]
-            new_position = self.range_step(ext_position, dist) # events list
+        elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
+            robot_id, ext_position, distance = inputs[self.in_handler_extpos]
+            new_position = self.range_step(ext_position, distance) # events list
             data = [{self.out_control_intpos: new_position}]
             sigma = 0 # holds last status
         

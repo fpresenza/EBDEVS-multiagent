@@ -197,8 +197,8 @@ class RobotDynamics(CoupledDEVS):
                                          debug=self.debug
                                          )
         speed_sensor = SpeedSensor(name="vmeas",
-                                   noisestd=0.0,
-                                   bias=np.ones((2,1)),
+                                   noisestd=0.1,
+                                   bias=np.zeros((2,1)),
                                    trans=np.eye(2),
                                    debug=True
                                    )
@@ -415,9 +415,16 @@ class MultiRobotSystem(CoupledDEVS):
         append_csv_file(self.logpath + 'data.csv', log)
 
     def getContextInformation(self, transmitter_id):
+        transmitter_pose = self.robots_states[transmitter_id]['Pose']
         return [
-            (receiver_id, None)
-            for receiver_id, _ in self.robots_states.items()
+            (
+                receiver_id, 
+                self.distance(
+                    transmitter_pose, 
+                    self.robots_states[receiver_id]['Pose']
+                )
+            )
+            for receiver_id in self.robots_states.keys()
             if self.connected(transmitter_id, receiver_id)
         ]
 

@@ -187,8 +187,8 @@ class TokenHandler(AtomicDEVS):
         current_time += self.elapsed
 
         if self.in_router_token in inputs: # if token arrives through port in_router_token
-            token = inputs[self.in_router_token]
-            data_received = self.handle_received_token(token) # events list
+            token, distance = inputs[self.in_router_token]
+            data_received = self.handle_received_token(token, distance) # events list
             if (data_received == []): # pass, nothing to send
                 sigma = sigma - self.elapsed # holds last status
             else:
@@ -267,7 +267,7 @@ class TokenHandler(AtomicDEVS):
     def __lt__(self, other):
         return self.name < other.name
 
-    def handle_received_token(self, token):
+    def handle_received_token(self, token, distance):
         """Decide what to do with the received token"""
         # the list of outputs to be returned
         outputs = []
@@ -311,6 +311,7 @@ class TokenHandler(AtomicDEVS):
                         outputs.append({self.out_controller_extpos: data})
                         if token.hops_travelled == 1:
                             # send data to positioning system
+                            data += (distance,)
                             outputs.append({self.out_kalman_extpos: data})
 
         return outputs
