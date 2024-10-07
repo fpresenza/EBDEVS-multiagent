@@ -18,65 +18,7 @@ import sys
 # Import code for DEVS model representation:
 from pypdevs.DEVS import *
 from pypdevs.infinity import INFINITY
-
-#######################################
-## QSS utils
-#######################################
-
-#######################################
-# coef: array or list of coefficients
-# order: int
-#######################################
-def minposroot(coeff, order):
-    if (order==1):
-        return minposroot_1(coeff)
-    elif (order==2):
-        return minposroot_2(coeff)
-    elif (order==3):
-        return minposroot_3(coeff)
-    else:
-        raise ValueError('Supplied QSS order (order={}) not implemented'.format(order))
-
-def minposroot_1(coeff):
-    if(coeff[1] == 0): # constant polynomial
-        mpr = INFINITY
-    else:
-        mpr = -coeff[0]/coeff[1] # if x(t) = coeff[0] + coeff[1] * t => 0 = coeff[0] + coeff[1] * t0 => t0 = -coeff[0]/coeff[1]
-        
-    if(mpr < 0 or mpr >= INFINITY):
-        mpr = INFINITY
-
-    return mpr
-
-def minposroot_2(coeff):
-    mpr = INFINITY
-    return mpr
-
-def minposroot_3(coeff):
-    mpr = INFINITY
-    return mpr
-
-def advance_time(p, dt, order):
-    # p: polynomial (list)
-    # dt: elapsed time (float)
-    # order: polynomial order (int)
-    if(order==1):
-        p[0] = p[0] + dt * p[1]
-        p = [p[0],p[1]]
-    elif (order==2):
-        p[0] = p[0] + dt * p[1] + dt * dt * p[2]
-        p[1] = p[1] +  2 * p[2] * dt
-        p = [p[0],p[1],p[2]]
-    elif (order==3):
-        p[0] = p[0] + dt * p[1] + dt * dt * p[2] + dt * dt * dt * p[3]
-        p[1] = p[1] +  2 * p[2] * dt + 3 * p[3] * dt * dt
-        p[2] = p[2] +  3 * p[3] * dt
-        p = [p[0],p[1],p[2],p[3]]
-    else:
-        raise ValueError('Supplied QSS order (order={}) not implemented'.format(order))
-    return p
-
-##################################
+from atomics.qsstools import *
 
 class QSSState:
     """
@@ -151,9 +93,10 @@ class QSSIntegrator(AtomicDEVS):
         q, xprev, sigma, current_time = self.state.get()
 
         current_time += sigma
-        # x = advance_time(xprev,sigma,1) # p: x, dt: sigma, order: 1
-        x = [xprev[0] + sigma * xprev[1], xprev[1]]
-        q = x[0];
+        # TODO: replace by x = advance_time(xprev,sigma,1) # p: x, dt: sigma, order: 1
+        # x = [xprev[0] + sigma * xprev[1], xprev[1]]
+        x = advance_time(xprev, sigma, 1) # p: x, dt: sigma, order: 1
+        q = x[0]
 
         self.dQ = max(self.dQRel * abs(x[0]), self.dQMin)
 
