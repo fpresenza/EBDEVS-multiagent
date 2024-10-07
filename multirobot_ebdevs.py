@@ -24,7 +24,7 @@ from atomics.router import *
 from atomics.controller import Controller
 from atomics.token_handler import TokenHandler
 from atomics.kalman_filter import KalmanFilter
-from atomics.speedsensor import SpeedSensor
+from atomics.speedsensor import SpeedSensor, SpeedSensorDiff
 from atomics.gpssensor import GPSSensor
 
 from utils import (
@@ -197,7 +197,13 @@ class RobotDynamics(CoupledDEVS):
                                          x0=self.y0, 
                                          debug=self.debug
                                          )
-        speed_sensor = SpeedSensor(name="vmeas",
+        # speed_sensor = SpeedSensor(name="vmeas",
+        #                            noisestd=0.0,
+        #                            bias=np.zeros((2,1)),
+        #                            transf=np.eye(2),
+        #                            debug=self.debug
+        #                            )
+        speed_sensor = SpeedSensorDiff(name="vmeas",
                                    noisestd=0.0,
                                    bias=np.zeros((2,1)),
                                    transf=np.eye(2),
@@ -231,7 +237,12 @@ class RobotDynamics(CoupledDEVS):
         self.connectPorts(self.splitter.out_splitter_msgs[1], self.integrator_y.IN_dx)
         self.connectPorts(self.integrator_x.OUT_q, self.OUT_dynamics_x)
         self.connectPorts(self.integrator_y.OUT_q, self.OUT_dynamics_y)
-        self.connectPorts(self.IN_dynamics_vx_vy, self.speed_sensor.in_commanded_speed)
+        ## SpeedSensor
+        # self.connectPorts(self.IN_dynamics_vx_vy, self.speed_sensor.in_commanded_speed)
+        # self.connectPorts(self.speed_sensor.out_measured_speed, self.OUT_measured_v)
+        ## SpeedSensorDiff
+        self.connectPorts(self.integrator_x.OUT_q, self.speed_sensor.in_position_x)
+        self.connectPorts(self.integrator_y.OUT_q, self.speed_sensor.in_position_y)
         self.connectPorts(self.speed_sensor.out_measured_speed, self.OUT_measured_v)
         if (enable_GPS):
             self.connectPorts(self.integrator_x.OUT_q, self.gps_sensor.in_x_pos)

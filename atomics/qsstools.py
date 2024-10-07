@@ -163,7 +163,7 @@ def minposroot(coeff, order):
 # 	return mpr
 
 # Change of temporal variable from p(t) to p(t-dt)
-def advance_time(p, dt, order):
+def advance_time(p, dt, order=None):
 	# p: polynomial (list)
 	# dt: elapsed time (float)
 	# order: polynomial order (int)
