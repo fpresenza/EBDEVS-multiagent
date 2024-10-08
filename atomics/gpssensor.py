@@ -92,7 +92,8 @@ class GPSSensor(AtomicDEVS):
         current_time += sigma
         sigma = self.period
 
-        print("t: {:.2f} s, Atomic name: {}, data: {}, Internal Transition Function".format(current_time,self.name,data))
+        if (self.debug):
+            print("t: {:.2f} s, Atomic name: {}, data: {}, Internal Transition Function".format(current_time,self.name,data))
 
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
