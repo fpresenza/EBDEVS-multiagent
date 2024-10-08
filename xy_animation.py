@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
 
-from uvnpy.network.plot import Animate2
+from plotting import Animate
 from utils import read_json_file, find_latest_timestamp
 
 np.set_printoptions(suppress=True, precision=4)
@@ -22,7 +22,7 @@ plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 plt.rcParams['font.family'] = 'serif'
 
 
-class DevsAnimate(Animate2):
+class DevsAnimate(Animate):
     def __init__(self, *args, **kwargs):
         super(DevsAnimate, self).__init__(*args, **kwargs)
 
