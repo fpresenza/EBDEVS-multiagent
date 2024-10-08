@@ -197,24 +197,24 @@ class RobotDynamics(CoupledDEVS):
                                          x0=self.y0, 
                                          debug=self.debug
                                          )
-        # speed_sensor = SpeedSensor(name="vmeas",
+        speed_sensor = SpeedSensor(name="vmeas",
+                                   noisestd=0.5,
+                                   bias=np.zeros((2,1)),
+                                   transf=np.eye(2),
+                                   debug=self.debug
+                                   )
+        # speed_sensor = SpeedSensorDiff(name="vmeas",
         #                            noisestd=0.0,
         #                            bias=np.zeros((2,1)),
         #                            transf=np.eye(2),
         #                            debug=self.debug
         #                            )
-        speed_sensor = SpeedSensorDiff(name="vmeas",
-                                   noisestd=0.0,
-                                   bias=np.zeros((2,1)),
-                                   transf=np.eye(2),
-                                   debug=self.debug
-                                   )
         if (enable_GPS):
             gps_sensor = GPSSensor(name="GPS",
                                    noisestd=0.0,
                                    bias=np.ones((2,1)),
                                    period=1,
-                                   debug=True
+                                   debug=self.debug
                                    )
         self.splitter     = self.addSubModel(splitter)
         self.integrator_x = self.addSubModel(integrator_x)
@@ -238,12 +238,12 @@ class RobotDynamics(CoupledDEVS):
         self.connectPorts(self.integrator_x.OUT_q, self.OUT_dynamics_x)
         self.connectPorts(self.integrator_y.OUT_q, self.OUT_dynamics_y)
         ## SpeedSensor
-        # self.connectPorts(self.IN_dynamics_vx_vy, self.speed_sensor.in_commanded_speed)
-        # self.connectPorts(self.speed_sensor.out_measured_speed, self.OUT_measured_v)
-        ## SpeedSensorDiff
-        self.connectPorts(self.integrator_x.OUT_q, self.speed_sensor.in_position_x)
-        self.connectPorts(self.integrator_y.OUT_q, self.speed_sensor.in_position_y)
+        self.connectPorts(self.IN_dynamics_vx_vy, self.speed_sensor.in_commanded_speed)
         self.connectPorts(self.speed_sensor.out_measured_speed, self.OUT_measured_v)
+        ## SpeedSensorDiff
+        # self.connectPorts(self.integrator_x.OUT_q, self.speed_sensor.in_position_x)
+        # self.connectPorts(self.integrator_y.OUT_q, self.speed_sensor.in_position_y)
+        # self.connectPorts(self.speed_sensor.out_measured_speed, self.OUT_measured_v)
         if (enable_GPS):
             self.connectPorts(self.integrator_x.OUT_q, self.gps_sensor.in_x_pos)
             self.connectPorts(self.integrator_y.OUT_q, self.gps_sensor.in_y_pos)
@@ -279,7 +279,19 @@ class RobotDynamics(CoupledDEVS):
 # Robot i
 #----------------------------
 class Robot(CoupledDEVS):
-    def __init__(self, name='Robot', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, comm_range=np.inf, enable_GPS=False, debug=False):
+    def __init__(
+            self, 
+            name='Robot', 
+            dQMin=1e-6, 
+            dQRel=1e-3, 
+            x0=0.0, 
+            y0=0.0, 
+            gainx=1, 
+            gainy=1, 
+            comm_range=np.inf, 
+            enable_GPS=False,
+            logpath='./',
+            debug=False):
         """
         A robot model composed of the robot's pysics.
         """
@@ -296,6 +308,7 @@ class Robot(CoupledDEVS):
         self.comm_range = comm_range
         self.debug  = debug
         self.enable_GPS = enable_GPS
+        self.logpath = logpath
 
         self.y_up = [self.name, {'Time': 0.0, 'Pose': [x0,  y0], 'CommRange': comm_range}]
         self.current_time = 0
@@ -320,13 +333,14 @@ class Robot(CoupledDEVS):
                                      debug=self.debug
                                      )
         kalman_filter = KalmanFilter(robot_id=self.name,
-                                     x0=np.random.normal(loc=self.x0, scale=0.0),
-                                     y0=np.random.normal(loc=self.y0, scale=0.0),
+                                     x0=np.random.normal(loc=self.x0, scale=1.0),
+                                     y0=np.random.normal(loc=self.y0, scale=1.0),
                                      name='Kalman_Filter',
+                                     logpath=self.logpath,
                                      debug=self.debug
                                      )
 
-        self.dynamics       = self.addSubModel(dynamics)
+        self.dynamics      = self.addSubModel(dynamics)
         # self.splitter_gen  = self.addSubModel(splitter_gen)
         self.controller    = self.addSubModel(controller)
         self.token_handler = self.addSubModel(token_handler)
@@ -400,7 +414,9 @@ class MultiRobotSystem(CoupledDEVS):
         self.robots = {}
         robots_config = read_json_file('robots.json')
         for robot, config in robots_config.items():
-            self.robots[robot] = self.addSubModel(Robot(**config, debug=self.debug))
+            self.robots[robot] = self.addSubModel(
+                Robot(**config, logpath=self.logpath, debug=self.debug)
+            )
 
         self.robots_states = {}
 
@@ -447,7 +463,7 @@ class MultiRobotSystem(CoupledDEVS):
             for neighbor_id in self.robots_states.keys()
             if self.connected(micro_id, neighbor_id)
         ]
-        append_csv_file(self.logpath + 'data.csv', log)
+        append_csv_file(self.logpath + 'global.csv', log)
 
     def getContextInformation(self, transmitter_id):
         transmitter_pose = self.robots_states[transmitter_id]['Pose']
@@ -459,7 +475,7 @@ class MultiRobotSystem(CoupledDEVS):
                         transmitter_pose, 
                         self.robots_states[receiver_id]['Pose']
                     ),
-                    scale=0.0    
+                    scale=2.0    
                 ) 
             )
             for receiver_id in self.robots_states.keys()

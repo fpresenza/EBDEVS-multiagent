@@ -62,7 +62,7 @@ print('Number of robots: {}'.format(n))
 # Create Frames
 # ------------------------------------------------------------------
 data = []
-with open(experiment_directory + 'data.csv', 'r') as file:
+with open(experiment_directory + 'global.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         data.append(row)
@@ -98,26 +98,6 @@ if timestep < 0.001:
     raise ValueError('Animation timestep is too small, increase skip.')
 print('Animation time between frames: {:.5f} sec'.format(timestep))
 print('Animation total duration: {:.5f} sec'.format(len(frames) * timestep))
-
-# ------------------------------------------------------------------
-# Plot vs time
-# ------------------------------------------------------------------
-fig, ax = plt.subplots(2, 1, figsize=(10, 8))
-ax[0].set_xlabel('time [$sec$]')
-ax[0].set_ylabel('$x$-position [$m$]')
-ax[0].grid()
-ax[0].plot(
-    [f[0] for f in frames], [f[1][:, 0] for f in frames],
-    # marker='.',
-    ds='steps-post')
-ax[1].set_xlabel('time [$sec$]')
-ax[1].set_ylabel('$y$-position [$m$]')
-ax[1].grid()
-ax[1].plot(
-    [f[0] for f in frames], [f[1][:, 1] for f in frames],
-    # marker='.',
-    ds='steps-post')
-fig.savefig('position.png', format='png', dpi=360)
 
 # ------------------------------------------------------------------
 # Animation
