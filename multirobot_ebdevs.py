@@ -204,6 +204,7 @@ class RobotDynamics(CoupledDEVS):
         #                            debug=self.debug
         #                            )
         speed_sensor = SpeedSensorDiff(name="vmeas",
+                                   period=0.1,
                                    noisestd=0.0,
                                    bias=np.zeros((2,1)),
                                    transf=np.eye(2),
@@ -214,7 +215,7 @@ class RobotDynamics(CoupledDEVS):
                                    noisestd=0.0,
                                    bias=np.ones((2,1)),
                                    period=1,
-                                   debug=True
+                                   debug=self.debug
                                    )
         self.splitter     = self.addSubModel(splitter)
         self.integrator_x = self.addSubModel(integrator_x)

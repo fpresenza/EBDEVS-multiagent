@@ -115,7 +115,7 @@ class SpeedSensor(AtomicDEVS):
     
 
 class SpeedSensorDiff(AtomicDEVS):
-    def __init__(self,name=None,noisestd=0.0,bias=np.zeros((2,1)),transf=np.eye(2),debug=False):
+    def __init__(self,name=None,period=0.1,noisestd=0.0,bias=np.zeros((2,1)),transf=np.eye(2),debug=False):
         """Atomic model for the speed sensor"""
 
         # Always call parent class' constructor FIRST:
@@ -128,14 +128,19 @@ class SpeedSensorDiff(AtomicDEVS):
         # STATE:
         #  Define 'state' attribute (initial sate):
         _time0  = 0.0
-        _sigma0 = INFINITY # waits till firts token
-        _data0  = {'xprev': 0.0, 'yprev': 0.0, 'x': [0.0, 0.0], 'y':[0.0, 0.0]}
+        _sigma0 = period # waits till firts token
+        _x0 = np.array([0.0, 0.0],dtype=float)
+        _y0 = np.array([0.0, 0.0],dtype=float)
+        _xprev = np.array([0.0],dtype=float)
+        _yprev = np.array([0.0],dtype=float)
+        _data0  = {'xprev': _xprev, 'yprev': _yprev, 'x': _x0, 'y': _y0}
         self.state = SpeedSensorState(_sigma0,_time0,_data0) 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
         self.elapsed = 0.0
 
+        self.period   = period
         self.noisestd = noisestd
         self.bias     = bias
         self.transf   = transf
@@ -190,8 +195,8 @@ class SpeedSensorDiff(AtomicDEVS):
         current_time += sigma
 
         # update the xprev and yprev items
-        xact  = evaluate_poly(data['x'],sigma)
-        yact  = evaluate_poly(data['y'],sigma) 
+        xact  = evaluate_poly(data['x'], sigma, 1, debug=True)
+        yact  = evaluate_poly(data['y'], sigma, 1, debug=True) 
         data['xprev'] = xact
         data['yprev'] = yact
 
@@ -210,15 +215,18 @@ class SpeedSensorDiff(AtomicDEVS):
 
         # robot speeds (vx and vy) are represented by scalars, thus
         # the speed calculation is done by evaluating the polynomials.
-        xact  = self.evaluate_poly(data['x'], sigma)
-        yact  = self.evaluate_poly(data['y'], sigma) 
+        xact  = evaluate_poly(data['x'], sigma, 1, debug=True)
+        yact  = evaluate_poly(data['y'], sigma, 1, debug=True) 
         xprev = data['xprev']
         yprev = data['yprev']
-        vx = (xact - xprev) / sigma
-        vy = (yact - yprev) / sigma
-        v = [vx, vy]
+        vx = (xact - xprev) / self.period
+        vy = (yact - yprev) / self.period
+        v = np.array([[float(vx)], [float(vy)]])
         noise = np.random.normal(loc=self.bias,scale=self.noisestd,size=(2,1))
         vmeasured = self.transf.dot(v) + noise
+
+        print("t: {:.2f} s, Parent name: {}, Atomic name: {}, Output Function, vmeasured: {}".format(current_time,self.parent.parent.name,self.name,vmeasured))
+        
         return {self.out_measured_speed: vmeasured}
 
     def timeAdvance(self):
