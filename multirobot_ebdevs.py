@@ -197,18 +197,19 @@ class RobotDynamics(CoupledDEVS):
                                          x0=self.y0, 
                                          debug=self.debug
                                          )
-        speed_sensor = SpeedSensor(name="vmeas",
-                                   noisestd=0.5,
+#        speed_sensor = SpeedSensor(name="vmeas",
+#                                   noisestd=0.5,
+#                                   bias=np.zeros((2,1)),
+#                                   transf=np.eye(2),
+#                                   debug=self.debug
+#                                   )
+        speed_sensor = SpeedSensorDiff(name="vmeas",
+                                   period=0.1,
+                                   noisestd=0.0,
                                    bias=np.zeros((2,1)),
                                    transf=np.eye(2),
                                    debug=self.debug
                                    )
-        # speed_sensor = SpeedSensorDiff(name="vmeas",
-        #                            noisestd=0.0,
-        #                            bias=np.zeros((2,1)),
-        #                            transf=np.eye(2),
-        #                            debug=self.debug
-        #                            )
         if (enable_GPS):
             gps_sensor = GPSSensor(name="GPS",
                                    noisestd=0.0,

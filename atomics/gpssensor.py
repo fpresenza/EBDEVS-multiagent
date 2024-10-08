@@ -57,7 +57,7 @@ class GPSSensor(AtomicDEVS):
         self.in_y_pos = self.addInPort(name="in_y_pos")
 
         if (self.debug):
-            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+            print("t: 0 s, Parent name: {}, Atomic name: {}, Init Function".format(self.parent.parent.name,self.name))
 
     def __lt__(self, other):
         return self.name < other.name
@@ -92,11 +92,9 @@ class GPSSensor(AtomicDEVS):
         current_time += sigma
         sigma = self.period
 
-        if (self.debug):
-            print("t: {:.2f} s, Atomic name: {}, data: {}, Internal Transition Function".format(current_time,self.name,data))
 
         if (self.debug):
-            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+            print("t: {:.2f} s, Parent name: {}, Atomic name: {}, Internal Transition Function".format(current_time,self.parent.parent.name,self.name))
             
         return GPSSensorState(sigma,current_time,data) 
     
