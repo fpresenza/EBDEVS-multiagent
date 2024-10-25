@@ -188,8 +188,8 @@ class Router(AtomicDEVS):
         receivers = self.parent.getContextInformation(transmitter)
         if len(receivers) > 0:
             data += [
-                {self.out_agent_token[receiver_id]: (token, distance)} 
-                for receiver_id, distance in receivers
+                {self.out_agent_token[receiver_id]: (token, distance_meas)} 
+                for receiver_id, distance_meas in receivers
             ]
             sigma = 0 # holds last status
 
@@ -207,7 +207,7 @@ class Router(AtomicDEVS):
         if len(data) == 0:
             sigma = INFINITY
         else:
-            sigma = 0
+            sigma = 0.0
 
         if (self.debug):
             print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
