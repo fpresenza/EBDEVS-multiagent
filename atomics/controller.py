@@ -2,6 +2,8 @@ import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
+# do not reset random seed
+np.random.seed(0)
 
 class ControllerGeneratorState:
     """
