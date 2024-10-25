@@ -187,8 +187,8 @@ class TokenHandler(AtomicDEVS):
         current_time += self.elapsed
 
         if self.in_router_token in inputs: # if token arrives through port in_router_token
-            token, distance = inputs[self.in_router_token]
-            data_received = self.handle_received_token(token, distance) # events list
+            token, distance_meas = inputs[self.in_router_token]
+            data_received = self.handle_received_token(token, distance_meas) # events list
             if (data_received == []): # pass, nothing to send
                 sigma = sigma - self.elapsed # holds last status
             else:
