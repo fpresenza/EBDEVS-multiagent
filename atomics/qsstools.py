@@ -180,16 +180,16 @@ def advance_time(p, dt, order=None):
 
 	if(order == 1):
 		p[0] = p[0] + dt * p[1]
-		p = [p[0], p[1]]
+		# p = [p[0], p[1]]
 	elif (order == 2):
 		p[0] = p[0] + dt * p[1] + dt * dt * p[2]
 		p[1] = p[1] +  2 * p[2] * dt
-		p = [p[0], p[1], p[2]]
+		# p = [p[0], p[1], p[2]]
 	elif (order == 3):
 		p[0] = p[0] + dt * p[1] + dt * dt * p[2] + dt * dt * dt * p[3]
 		p[1] = p[1] +  2 * p[2] * dt + 3 * p[3] * dt * dt
 		p[2] = p[2] +  3 * p[3] * dt
-		p = [p[0], p[1], p[2], p[3]]
+		# p = [p[0], p[1], p[2], p[3]]
 	elif (order == 4):
 		p[0] = p[0] + dt * p[1] + dt * dt * p[2] + dt * dt * dt * p[3] + dt * dt * dt * dt * p[4]
 		p[1] = p[1] + 2 * p[2] * dt + 3 * p[3] * dt * dt + 4 * p[4] * dt * dt * dt

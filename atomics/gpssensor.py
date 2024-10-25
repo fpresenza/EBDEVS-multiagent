@@ -1,6 +1,7 @@
 import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
+from atomics.qsstools import *
 
 class GPSSensorState:
     """
@@ -23,7 +24,12 @@ class GPSSensorState:
 
 
 class GPSSensor(AtomicDEVS):
-    def __init__(self,name=None,noisestd=0.0,bias=np.zeros((2,1)),period=1,debug=False):
+    def __init__(self,name=None,
+                 noisecov=np.zeros((2,2)),
+                 bias=np.zeros((2,1)),
+                 period=1,
+                 debug=False
+                ):
         """Atomic model for the speed sensor"""
 
         # Always call parent class' constructor FIRST:
@@ -35,7 +41,7 @@ class GPSSensor(AtomicDEVS):
         #  Define 'state' attribute (initial sate):
         _time0  = 0.0
         _sigma0 = period # waits till firts token
-        _data0  = [0.0,0.0]
+        _data0  = {'x': [0.0]*10, 'y': [0.0]*10}
         self.state = GPSSensorState(_sigma0,_time0,_data0) 
 
         # ELAPSED TIME:
@@ -43,7 +49,7 @@ class GPSSensor(AtomicDEVS):
         #  (by default, value is 0.0):
         self.elapsed = 0.0
 
-        self.noisestd = noisestd
+        self.noisecov = noisecov
         self.bias     = bias
         self.period   = period
         self.debug    = debug
@@ -71,12 +77,14 @@ class GPSSensor(AtomicDEVS):
 
         if self.in_x_pos in inputs: # if data arrives through port in_x_pos
             x = inputs[self.in_x_pos]
-            data[0] = self.evalpoly(x) + np.random.normal(loc=float(self.bias[0]),scale=self.noisestd)
+            data['x'] = x
+            data['y'] = advance_time(data['y'], self.elapsed, order=-1)
             sigma = sigma - self.elapsed # holds last status
 
         if self.in_y_pos in inputs: # if data arrives through port in_y_pos
             y = inputs[self.in_y_pos]
-            data[1] = self.evalpoly(y) + np.random.normal(loc=float(self.bias[1]),scale=self.noisestd)
+            data['x'] = advance_time(data['x'], self.elapsed, order=-1)
+            data['y'] = y
             sigma = sigma - self.elapsed # holds last status
         
         if (self.debug):
@@ -89,9 +97,10 @@ class GPSSensor(AtomicDEVS):
         Internal Transition Function.
         """
         sigma, current_time, data = self.state.get()
+        data['x'] = advance_time(data['x'], sigma, order=-1)
+        data['y'] = advance_time(data['y'], sigma, order=-1)
         current_time += sigma
         sigma = self.period
-
 
         if (self.debug):
             print("t: {:.2f} s, Parent name: {}, Atomic name: {}, Internal Transition Function".format(current_time,self.parent.parent.name,self.name))
@@ -103,8 +112,14 @@ class GPSSensor(AtomicDEVS):
         Output Funtion.
         """
         sigma, current_time, data = self.state.get()
-        outval = {self.out_meas_pos: data}
-        return outval
+        noise = np.random.multivariate_normal(
+                            [float(self.bias[0]), float(self.bias[1])],
+                            self.noisecov
+                            )
+        x = evaluate_poly(data['x'], sigma, order=1) + noise[0]
+        y = evaluate_poly(data['y'], sigma, order=1) + noise[1]
+
+        return {self.out_meas_pos: [x, y]}
 
     def timeAdvance(self):
         """
