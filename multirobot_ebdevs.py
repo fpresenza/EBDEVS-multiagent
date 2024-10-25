@@ -27,6 +27,8 @@ from atomics.kalman_filter import KalmanFilter
 from atomics.speedsensor import SpeedSensor, SpeedSensorDiff
 from atomics.gpssensor import GPSSensor
 
+from atomics.qsstools import *
+
 from utils import (
     read_json_file,
     append_csv_file
@@ -461,7 +463,8 @@ class MultiRobotSystem(CoupledDEVS):
         if (self.debug):
             print(
                  "t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"
-                 .format(current_time, self.name,x_b_micro,self.robots_states))
+                 .format(current_time, self.name,x_b_micro,self.robots_states)
+                 )
 
         # log new value of micro_states
         log = [micro_id, data['Time']]
@@ -470,26 +473,29 @@ class MultiRobotSystem(CoupledDEVS):
         log += [
             neighbor_id
             for neighbor_id in self.robots_states.keys()
-            if self.connected(micro_id, neighbor_id)
+            if self.connected(micro_id, neighbor_id, 0)
         ]
         append_csv_file(self.logpath + 'global.csv', log)
 
-    def getContextInformation(self, transmitter_id):
+    def getContextInformation(self, transmitter_id, current_time):
         # need to know the current time to make the polynomial advance in time
         transmitter_pose = self.robots_states[transmitter_id]['Pose']
+        previous_time = self.robots_states[transmitter_id]['Time']
+        delta_time = current_time - previous_time
         return [
             (
                 receiver_id, 
                 np.random.normal(
                     loc=self.distance(
                         transmitter_pose, 
-                        self.robots_states[receiver_id]['Pose']
+                        self.robots_states[receiver_id]['Pose'],
+                        delta_time
                     ),
                     scale=2.0    
                 ) 
             )
             for receiver_id in self.robots_states.keys()
-            if self.connected(transmitter_id, receiver_id)
+            if self.connected(transmitter_id, receiver_id, delta_time)
         ]
 
     def select(self, immChildren):
@@ -499,18 +505,23 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def distance(self, p_1, p_2):
+    def distance(self, p_1, p_2, delta_time):
         # print(f'p_1: {p_1}\n p_2: {p_2}')
-        return np.sqrt((p_1[0][0] - p_2[0][0])**2 + (p_1[1][0] - p_2[1][0])**2)
+        x1 = evaluate_poly(p_1[0],delta_time)
+        y1 = evaluate_poly(p_1[1],delta_time)
+        x2 = evaluate_poly(p_2[0],delta_time)
+        y2 = evaluate_poly(p_2[1],delta_time)
+        # return np.sqrt((p_1[0][0] - p_2[0][0])**2 + (p_1[1][0] - p_2[1][0])**2)
+        return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
-    def connected(self, transmitter_id, receiver_id):
+    def connected(self, transmitter_id, receiver_id, delta_time):
         if transmitter_id == receiver_id:
             return False
 
         transmitter_pose = self.robots_states[transmitter_id]['Pose']
         receiver_pose = self.robots_states[receiver_id]['Pose']
 
-        distance = self.distance(transmitter_pose, receiver_pose)
+        distance = self.distance(transmitter_pose, receiver_pose, delta_time)
         trasmiter_range = self.robots_states[transmitter_id]['CommRange']
         receiver_range = self.robots_states[receiver_id]['CommRange']
 
