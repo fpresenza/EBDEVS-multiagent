@@ -80,7 +80,7 @@ for step in range(len(data[:-1])):
         [[robot_index, neighbor] for neighbor in neighbors]
 
     if time < float(data[step + 1][1]):
-        teams = np.array([0, 1, 2, 3])
+        teams = np.arange(n)
         frames.append([time, positions.copy(), edges, teams])
 
 print('Total number of frames: {}'.format(len(frames)))
@@ -113,55 +113,26 @@ ax.set_aspect('equal')
 # ax.grid(1, lw=0.4)
 ax.set_xlabel(r'$x$ [m]', fontsize='small', labelpad=0.6)
 ax.set_ylabel(r'$y$ [m]', fontsize='small', labelpad=0.6)
-lim = 25.0
-ax.set_xlim(-lim, lim)
-ax.set_ylim(-lim, lim)
+lim = 1000.0
+ax.set_xlim(0, lim)
+ax.set_ylim(0, lim)
 ax.grid(zorder=0)
 
 anim = DevsAnimate(fig, ax, timestep, frames, maxlen=1)
 # cm.coolwarm goes from 0 (blue) to 255 (red)
 anim.set_teams({
-    '$0$': {
-        'id': 0,
+    i: {
+        'id': i,
         'tail': False,
         'style': {
-            'color': 'C0',
-            'marker': 'o',
-            'markersize': 10,
-            'zorder': 20
-        }
-    },
-    '$1$': {
-        'id': 1,
-        'tail': False,
-        'style': {
-            'color': 'C1',
-            'marker': 'o',
-            'markersize': 10,
-            'zorder': 20
-        }
-    },
-    '$2$': {
-        'id': 2,
-        'tail': False,
-        'style': {
-            'color': 'C2',
-            'marker': 'o',
-            'markersize': 10,
-            'zorder': 20
-        }
-    },
-    '$3$': {
-        'id': 3,
-        'tail': False,
-        'style': {
-            'color': 'C3',
-            'marker': 'o',
-            'markersize': 10,
+            'color': 'k',
+            'marker': f'${i}$',
+            'markersize': 5,
+            'markeredgewidth': 0.5,
             'zorder': 20
         }
     }
-})
+for i in range(n)})
 anim.set_edgestyle(color='k', lw=0.5, zorder=10)
 
 circles = []

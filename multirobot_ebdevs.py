@@ -17,6 +17,10 @@
 from pypdevs.DEVS import *
 from pypdevs.infinity import INFINITY
 
+from uvnpy.network.core import geodesics
+from uvnpy.network.subframeworks import superframework_extents
+from uvnpy.distances.core import minimum_rigidity_extents
+
 # Import all models to couple
 from atomics.qssintegrators import *
 from atomics.misc import *
@@ -29,7 +33,8 @@ from atomics.gpssensor import GPSSensor
 
 from utils import (
     read_json_file,
-    append_csv_file
+    append_csv_file,
+    robot_id_to_index
 )
 
 import sys
@@ -291,6 +296,8 @@ class Robot(CoupledDEVS):
             gainy=1, 
             comm_range=np.inf, 
             enable_GPS=False,
+            action_extent=1,
+            state_extent=1,
             logpath='./',
             debug=False):
         """
@@ -331,7 +338,9 @@ class Robot(CoupledDEVS):
                                    )
         token_handler = TokenHandler(robot_id=self.name,
                                      name='Token_Handler',
-                                     debug=self.debug
+                                     debug=self.debug,
+                                     action_extent=action_extent,
+                                     state_extent=state_extent
                                      )
         kalman_filter = KalmanFilter(robot_id=self.name,
                                      x0=np.random.normal(loc=self.x0, scale=1.0),
@@ -410,31 +419,57 @@ class MultiRobotSystem(CoupledDEVS):
         self.logpath = logpath
         self.debug = debug
 
-        self.current_time = 0 # TODO: time cannot be managed as in the other coupled/atomic models
+        self.current_time = 0.0 # TODO: time cannot be managed as in the other coupled/atomic models
 
-        self.robots = {}
         robots_config = read_json_file('robots.json')
-        for robot, config in robots_config.items():
-            self.robots[robot] = self.addSubModel(
-                Robot(**config, logpath=self.logpath, debug=self.debug)
-            )
-
-        self.robots_states = {}
+        n_robots = len(robots_config)
 
         self.router = self.addSubModel(
-            Router(agents_ids=list(robots_config.keys()), 
+            Router(agents_ids=[robot['name'] for robot in robots_config.values()], 
                    name='Router',
                    debug=self.debug
                    )
         )
-        self.connectPorts(self.robots['Robot_0'].OUT_router_token, self.router.in_agent_token['Robot_0'])
-        self.connectPorts(self.robots['Robot_1'].OUT_router_token, self.router.in_agent_token['Robot_1'])
-        self.connectPorts(self.robots['Robot_2'].OUT_router_token, self.router.in_agent_token['Robot_2'])
-        self.connectPorts(self.robots['Robot_3'].OUT_router_token, self.router.in_agent_token['Robot_3'])
-        self.connectPorts(self.router.out_agent_token['Robot_0'], self.robots['Robot_0'].IN_router_token)
-        self.connectPorts(self.router.out_agent_token['Robot_1'], self.robots['Robot_1'].IN_router_token)
-        self.connectPorts(self.router.out_agent_token['Robot_2'], self.robots['Robot_2'].IN_router_token)
-        self.connectPorts(self.router.out_agent_token['Robot_3'], self.robots['Robot_3'].IN_router_token)
+
+
+        self.robots_states = {}
+        for robot in robots_config.values():
+            robot_id = robot['name']
+            self.robots_states[robot_id] = {
+                'Time': self.current_time,
+                'Pose': [robot['x0'], robot['y0']],
+                'CommRange': robot['comm_range']
+            }
+
+        position = np.zeros((n_robots, 2))
+        adjacency_matrix = np.zeros((n_robots, n_robots))
+        for robot in robots_config.values():
+            robot_id = robot['name']
+            i = robot_id_to_index(robot_id)
+            position[i] = [robot['x0'], robot['y0']]
+            adjacency_matrix[i] = [
+                1.0 if self.connected(robot_id, other_id) else 0.0 
+                for other_id in self.robots_states.keys()
+            ]
+        geodesic_matrix = geodesics(adjacency_matrix)
+        action_extents = minimum_rigidity_extents(geodesic_matrix, position)
+        state_extents = superframework_extents(geodesic_matrix, action_extents)
+
+        self.robots = {}
+        for robot in robots_config.values():
+            robot_id = robot['name']
+            i = robot_id_to_index(robot_id)
+            self.robots[robot_id] = self.addSubModel(
+                Robot(
+                    **robot, 
+                    action_extent=action_extents[i],
+                    state_extent=state_extents[i],
+                    logpath=self.logpath, 
+                    debug=self.debug
+                )
+            )
+            self.connectPorts(self.robots[robot_id].OUT_router_token, self.router.in_agent_token[robot_id])
+            self.connectPorts(self.router.out_agent_token[robot_id], self.robots[robot_id].IN_router_token)
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
