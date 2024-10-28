@@ -220,3 +220,123 @@ class QSSIntegrator(AtomicDEVS):
 
         return sigma
 
+
+#-----------------------------------
+# QSS_Integrator with Y_up: QSS integrator with micro-macro state communication with its parent.
+# This class derives from QSSIntegrator => it's only necessary to reimplement the input and output transition functions.
+#-----------------------------------
+class QSSIntegrator_Yup(QSSIntegrator):
+    """
+    QSS1 integrator atomic model
+    """
+    def __init__(self, name=None, dQMin=1e-6, dQRel=1e-3, gain=1, x0=0, debug=False):
+        """
+        Constructor (parameterizable).
+        """
+        # Always call parent class' constructor FIRST:
+        QSSIntegrator.__init__(self, 
+                               name=name, 
+                               dQMin=dQMin, 
+                               dQRel=dQRel, 
+                               gain=gain,
+                               x0 = x0, 
+                               debug = debug
+                               )
+        self.y_up  = [self.name, 0.0, None]
+
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+
+    def intTransition(self): # re-implement this function
+        """
+        Internal Transition Function.
+        """
+        q, xprev, sigma, current_time = self.state.get()
+
+        current_time += sigma
+        x = advance_time(xprev, sigma, 1) # p: x, dt: sigma, order: 1
+        # x = [xprev[0] + sigma * xprev[1], xprev[1]]
+        q[0] = x[0]
+
+        self.dQ = max(self.dQRel * abs(x[0]), self.dQMin)
+
+        if (x[1]==0):
+            sigma = INFINITY
+        else:
+            sigma = abs(self.dQ/x[1])
+
+        if (sigma<0):
+            raise DEVSException(\
+                  "invalid state sigma <%f> in internal transition function"\
+                  % sigma)
+
+        if (self.debug):
+            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function, xprev: {}, x: {}, q: {}, sigma: {}".format(current_time,self.name,xprev,x,q,sigma))
+
+        # shares information to the parent to compute the Global Transition function
+        try:
+            self.y_up[2] = q.copy()
+            self.y_up[1] = current_time.copy()
+        except AttributeError:
+            self.y_up[2] = q
+            self.y_up[1] = current_time
+
+        return QSSState(q,x,sigma,current_time)
+
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        # Received a new event, so start processing it
+        derx     = inputs[self.IN_dx][0]
+        derx_val = derx * self.gain # [dx[i] * self.gain for i in range(len(dx))]
+
+        # if (x.port==0) {
+        q, x, sigma, current_time = self.state.get()
+        current_time += self.elapsed
+
+        if self.IN_dx in inputs:
+            # update polynomial x
+            x[0] =  x[0] + x[1] * self.elapsed
+            x[1] = derx_val # dx[0]
+
+            diffxq = [0.0]*10 #[0 for i in range(len(x))]
+
+            if (sigma>0):
+                # inferior delta crossing
+                # diffxq = q - x - dQ = {q[0] - x[0] - dQ, -x[1]} 
+                diffxq[1] = -x[1]
+                diffxq[0] =  q[0] - x[0] - self.dQ
+                sigma     = minposroot(diffxq, 1) # coeff: diffxq, order: 1
+                sigma_lo  = sigma
+
+                # superior delta difference
+                # diffxq = q - x + dQ = {q[0] - x[0] + dQ, -x[1]} 
+                diffxq[0] =  q[0] - x[0] + self.dQ
+                sigma_up  = minposroot(diffxq, 1) # coeff: diffxq, order: 1
+
+                # keep the smallest one
+                if (sigma_up < sigma):
+                    sigma = sigma_up
+
+                if (abs(x[0] - q[0]) > self.dQ):
+                    sigma = 0
+
+                if (self.debug):
+                    print("t: {:.2f} s, Atomic name: {}, External Transition Function, dx: {}, x: {}, sigma: {}, sigma_lo: {}, sigma_up: {}"\
+                            .format(current_time,self.name,derx_val,x,sigma,sigma_lo,sigma_up))
+
+        else:
+            x[0] = derx_val
+            sigma = 0
+
+        # shares information to the parent to compute the Global Transition function
+        try:
+            self.y_up[2] = q.copy()
+            self.y_up[1] = current_time.copy()
+        except AttributeError:
+            self.y_up[2] = q
+            self.y_up[1] = current_time
+
+        return QSSState(q,x,sigma,current_time)
