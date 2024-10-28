@@ -5,11 +5,21 @@ from atomics.qssintegrators import QSSIntegrator_Yup
 from atomics.misc import Splitter
 from atomics.speedsensor import SpeedSensor
 from atomics.gpssensor import GPSSensor
-# TODO: GPS sensor should be outside dynamics coupled
+# TODO: Speed and GPS sensors should be outside dynamics coupled
 
 
 class RobotDynamics(CoupledDEVS):
-    def __init__(self, name='RobotDynamics', dQMin=1e-6, dQRel=1e-3, x0=0.0, y0=0.0, gainx=1, gainy=1, enable_GPS='False', debug=False):
+    def __init__(
+        self, 
+        name='RobotDynamics', 
+        dQMin=1e-6, 
+        dQRel=1e-3, 
+        x0=0.0, 
+        y0=0.0, 
+        gainx=1, 
+        gainy=1, 
+        enable_GPS='False', 
+        debug=False):
         """
         Robot's dynamic model composed of two integrators for x and y and a splitter.
         """
@@ -17,47 +27,41 @@ class RobotDynamics(CoupledDEVS):
         CoupledDEVS.__init__(self, name)
 
         # Parameters
-        self.dQMin = dQMin
-        self.dQRel = dQRel
-        self.x0    = x0
-        self.y0    = y0
-        self.gainx = gainx
-        self.gainy = gainy
         self.debug = debug
 
         # dictionary to save childrens' states
-        _x0 = [0.0]*10
-        _x0[0] = x0
-        _y0 = [0.0]*10
-        _y0[0] = y0
-        self.y_up = [self.name, {'t': 0.0, 'x': _x0, 'y': _y0}]
+        self.y_up = [self.name, {'t': 0.0, 'x': [x0] + [0.0] * 9, 'y': [y0] + [0.0] * 9}]
         self.current_time = 0
 
         # Declare childrens: splitterx2, QSS integ x 2
-        splitter     = Splitter(name="splitter",
-                                numoutputs=2,
-                                debug=self.debug
-                                )
-        integrator_x = QSSIntegrator_Yup(name="x", 
-                                         dQMin=self.dQMin, 
-                                         dQRel=self.dQRel, 
-                                         gain=self.gainx, 
-                                         x0=self.x0, 
-                                         debug=self.debug
-                                         )
-        integrator_y = QSSIntegrator_Yup(name="y",
-                                         dQMin=self.dQMin, 
-                                         dQRel=self.dQRel, 
-                                         gain=self.gainy, 
-                                         x0=self.y0, 
-                                         debug=self.debug
-                                         )
-        speed_sensor = SpeedSensor(name="vmeas",
-                                  noisestd=0.5,
-                                  bias=np.zeros((2,1)),
-                                  transf=np.eye(2),
-                                  debug=self.debug
-                                  )
+        splitter     = Splitter(
+            name="splitter",
+            numoutputs=2,
+            debug=self.debug
+        )
+        integrator_x = QSSIntegrator_Yup(
+            name="x", 
+            dQMin=dQMin, 
+            dQRel=dQRel, 
+            gain=gainx, 
+            x0=x0, 
+            debug=self.debug
+        )
+        integrator_y = QSSIntegrator_Yup(
+            name="y",
+            dQMin=dQMin, 
+            dQRel=dQRel, 
+            gain=gainy, 
+            x0=y0, 
+            debug=self.debug
+        )
+        speed_sensor = SpeedSensor(
+            name="vmeas",
+            noisestd=0.5,
+            bias=np.zeros((2, 1), dtype=float),
+            transf=np.eye(2, dtype=float),
+            debug=self.debug
+        )
         # speed_sensor = SpeedSensorDiff(name="vmeas",
         #                            period=0.1,
         #                            noisestd=0.0,
@@ -66,12 +70,13 @@ class RobotDynamics(CoupledDEVS):
         #                            debug=self.debug
         #                            )
         if (enable_GPS):
-            gps_sensor = GPSSensor(name="GPS",
-                                   noisecov=np.zeros((2,2)),
-                                   bias=np.ones((2,1)),
-                                   period=1,
-                                   debug=self.debug
-                                   )
+            gps_sensor = GPSSensor(
+                name="GPS",
+                noisecov=np.zeros((2, 2), dtype=float),
+                bias=np.ones((2, 1), dtype=float),
+                period=1,
+                debug=self.debug
+        )
         self.splitter     = self.addSubModel(splitter)
         self.integrator_x = self.addSubModel(integrator_x)
         self.integrator_y = self.addSubModel(integrator_y)
