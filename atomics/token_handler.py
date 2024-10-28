@@ -137,10 +137,9 @@ class TokenHandlerState:
 class TokenHandler(AtomicDEVS):
     def __init__(
             self, 
-            robot_id, 
-            name=None, 
-            action_extent=1, 
-            state_extent=1, 
+            robot_id,
+            config,
+            name='TokenHandler', 
             debug=False
             ):
         """Atomic model for the toking handling protocol"""
@@ -150,8 +149,8 @@ class TokenHandler(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
-        self.action_extent = action_extent      # The robot's action extent
-        self.state_extent = state_extent       # The robot's state extent
+        self.action_extent = config['action']      # The robot's action extent
+        self.state_extent = config['state']       # The robot's state extent
         # self.status = []          # TODO
         self.debug = debug
 

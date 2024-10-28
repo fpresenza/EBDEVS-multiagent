@@ -1,132 +1,332 @@
 {
     "Robot_0": {
-        "name": "Robot_0",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 162.343,
-        "y0": 182.097,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            162.343,
+            182.097
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                162.343,
+                182.097
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 1,
-        "state_extent": 2
+        "enable_GPS": false
     },
     "Robot_1": {
-        "name": "Robot_1",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 145.759,
-        "y0": 104.87,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            145.759,
+            104.87
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                145.759,
+                104.87
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 1,
-        "state_extent": 2
+        "enable_GPS": false
     },
     "Robot_2": {
-        "name": "Robot_2",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 82.645,
-        "y0": 59.704,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            82.645,
+            59.704
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                82.645,
+                59.704
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 1,
-        "state_extent": 2
+        "enable_GPS": false
     },
     "Robot_3": {
-        "name": "Robot_3",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 78.051,
-        "y0": 158.593,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            78.051,
+            158.593
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                78.051,
+                158.593
+            ]
+        },
+        "token_handler": {
+            "action": 2,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 2,
-        "state_extent": 2
+        "enable_GPS": false
     },
     "Robot_4": {
-        "name": "Robot_4",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 14.097,
-        "y0": 140.411,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            14.097,
+            140.411
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                14.097,
+                140.411
+            ]
+        },
+        "token_handler": {
+            "action": 2,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 2,
-        "state_extent": 2
+        "enable_GPS": false
     },
     "Robot_5": {
-        "name": "Robot_5",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 169.784,
-        "y0": 91.93,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            169.784,
+            91.93
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                169.784,
+                91.93
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 1,
-        "state_extent": 2
+        "enable_GPS": false
     },
     "Robot_6": {
-        "name": "Robot_6",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 25.618,
-        "y0": 77.308,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            25.618,
+            77.308
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                25.618,
+                77.308
+            ]
+        },
+        "token_handler": {
+            "action": 2,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": true,
-        "action_extent": 2,
-        "state_extent": 2
+        "enable_GPS": true
     },
     "Robot_7": {
-        "name": "Robot_7",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 102.778,
-        "y0": 164.4,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            102.778,
+            164.4
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                102.778,
+                164.4
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 1,
-        "state_extent": 2
+        "enable_GPS": false
     },
     "Robot_8": {
-        "name": "Robot_8",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 176.862,
-        "y0": 155.808,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            176.862,
+            155.808
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                176.862,
+                155.808
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": true,
-        "action_extent": 1,
-        "state_extent": 2
+        "enable_GPS": true
     },
     "Robot_9": {
-        "name": "Robot_9",
-        "dQMin": 0.01,
-        "dQRel": 0.0,
-        "x0": 89.537,
-        "y0": 91.138,
-        "gainx": 1.0,
-        "gainy": 1.0,
+        "position": [
+            89.537,
+            91.138
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.01,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1
+        },
+        "kalman_filter": {
+            "estimated_position": [
+                89.537,
+                91.138
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
         "comm_range": 90.0,
-        "enable_GPS": false,
-        "action_extent": 1,
-        "state_extent": 2
+        "enable_GPS": false
     }
 }

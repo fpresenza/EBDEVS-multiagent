@@ -10,17 +10,8 @@ from coupled.robot_dynamics import RobotDynamics
 class Robot(CoupledDEVS):
     def __init__(
             self, 
-            name='Robot', 
-            dQMin=1e-6, 
-            dQRel=1e-3, 
-            x0=0.0, 
-            y0=0.0, 
-            gainx=1, 
-            gainy=1, 
-            comm_range=np.inf, 
-            enable_GPS=False,
-            action_extent=1,
-            state_extent=1,
+            config,
+            name='Robot',
             logpath='./',
             debug=False):
         """
@@ -30,46 +21,39 @@ class Robot(CoupledDEVS):
         CoupledDEVS.__init__(self, name)
 
         # Parameters
+        position = config['position']
+        comm_range = config['comm_range']
         self.debug = debug
 
         self.y_up = [
             self.name, 
             {
-                'Time': 0.0, 'Pose': [[x0] + [0.0] * 9, [y0] + [0.0] * 9], 
+                'Time': 0.0, 
+                'Pose': [[p] + [0.0] * 9 for p in position], 
                 'CommRange': comm_range
             }
         ]
         self.current_time = 0
 
         dynamics = RobotDynamics(
-            name="RobotDynamics",
-            dQMin=dQMin,
-            dQRel=dQRel,
-            x0=x0,
-            y0=y0,
-            gainx=gainx,
-            gainy=gainy,
-            enable_GPS=enable_GPS,
+            position=position,
+            config=config['dynamics'],
+            enable_GPS=config['enable_GPS'],
             debug=self.debug
         )
         controller = Controller(
-            name='Controller',
             robot_id=self.name,
-            period=0.1,
+            config=config['controller'],
             debug=self.debug
         )
         token_handler = TokenHandler(
-            name='Token_Handler',
             robot_id=self.name,
-            action_extent=action_extent,
-            state_extent=state_extent,
+            config=config['token_handler'],
             debug=self.debug,
         )
         kalman_filter = KalmanFilter(
-            name='Kalman_Filter',
             robot_id=self.name,
-            x0=np.random.normal(loc=x0, scale=1.0),
-            y0=np.random.normal(loc=y0, scale=1.0),
+            config=config['kalman_filter'],
             logpath=logpath,
             debug=self.debug
         )
@@ -111,18 +95,21 @@ class Robot(CoupledDEVS):
 
         micro_id, data = x_b_micro
         try:
+            self.y_up[1]['Time'] = data['t'].copy()
             self.y_up[1]['Pose'][0] = data['x'].copy()
             self.y_up[1]['Pose'][1] = data['y'].copy()
-            self.y_up[1]['Time'] = data['t'].copy()
             current_time = data['t'].copy()
         except AttributeError:
+            self.y_up[1]['Time'] = data['t']
             self.y_up[1]['Pose'][0] = data['x']
             self.y_up[1]['Pose'][1] = data['y']
-            self.y_up[1]['Time'] = data['t']
             current_time = data['t']
 
         if (self.debug):
-            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(current_time,self.name,x_b_micro))
+            print(
+                "t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}"
+                .format(current_time, self.name, x_b_micro)
+            )
 
     def select(self, immChildren):
         """

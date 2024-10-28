@@ -119,7 +119,13 @@ class KalmanFilterState:
 
 
 class KalmanFilter(AtomicDEVS):
-    def __init__(self, robot_id, x0, y0, name=None, logpath='./', debug=False):
+    def __init__(
+            self, 
+            robot_id, 
+            config, 
+            name='KalmanFilter', 
+            logpath='./', 
+            debug=False):
         """Atomic model for the kalman filter"""
 
         # Always call parent class' constructor FIRST:
@@ -127,6 +133,7 @@ class KalmanFilter(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
+        position = config['estimated_position']
         # self.status = []          # TODO
 
         # STATE:
@@ -144,7 +151,7 @@ class KalmanFilter(AtomicDEVS):
         self.debug = debug
 
         # kalman filter parameters (hardcoded)
-        self.position = np.array([[x0], [y0]])
+        self.position = np.array(position).reshape(-1, 1)
         self.covariance = np.array([[1.0, 0.0], [0.0, 1.0]])
         self.dynamic_process_covariance = np.array([[0.25, 0.0], [0.0, 0.25]])
         self.distance_measurement_covariance = np.array([[1.5]])

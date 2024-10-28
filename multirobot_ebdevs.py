@@ -49,7 +49,7 @@ class MultiRobotSystem(CoupledDEVS):
         robots_config = read_json_file('robots.json')
 
         self.router = self.addSubModel(
-            Router(agents_ids=[robot['name'] for robot in robots_config.values()], 
+            Router(agents_ids=list(robots_config.keys()), 
                    name='Router',
                    debug=self.debug
                    )
@@ -57,12 +57,12 @@ class MultiRobotSystem(CoupledDEVS):
 
         self.robots_states = {}
         self.robots = {}
-        for robot in robots_config.values():
-            robot_id = robot['name']
+        for robot_id, config in robots_config.items():
             i = robot_id_to_index(robot_id)
             self.robots[robot_id] = self.addSubModel(
                 Robot(
-                    **robot,
+                    config,
+                    name=robot_id,
                     logpath=self.logpath, 
                     debug=self.debug
                 )
