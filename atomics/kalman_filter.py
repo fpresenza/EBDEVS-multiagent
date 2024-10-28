@@ -1,7 +1,7 @@
 import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
-from utils import append_csv_file
+from utils.files import append_csv_file
 
 
 class KalmanGeneratorState:

@@ -256,7 +256,7 @@ class Controller(AtomicDEVS):
         # the list of outputs to be returned
         if position is None: # if Kalman filter has not yet sent an estimation of position
             # return np.array([0.0, 0.0]), {'2': np.array([-4.0, 4.0])}
-            return np.array([x, y]), {}
+            return np.array([0.0, 0.0]), {}
         else:
             # return np.array([0.0, 0.0]), {}
             return np.array([x, y]), {}

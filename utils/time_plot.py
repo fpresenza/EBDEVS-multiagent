@@ -9,7 +9,7 @@ import json
 import matplotlib.pyplot as plt
 import argparse
 
-from utils import read_json_file, find_latest_timestamp
+from files import read_json_file, find_latest_timestamp
 
 np.set_printoptions(suppress=True, precision=4)
 
@@ -105,5 +105,5 @@ for i, robot in enumerate(robot_ids):
         # ds='steps-post'
     )
 
-fig.savefig('position.png', format='png', dpi=360)
+fig.savefig('output/position.png', format='png', dpi=360)
 plt.show()

@@ -11,7 +11,7 @@ import matplotlib.cm as cm
 import argparse
 
 from plotting import Animate
-from utils import read_json_file, find_latest_timestamp
+from files import read_json_file, find_latest_timestamp
 
 np.set_printoptions(suppress=True, precision=4)
 
@@ -148,4 +148,4 @@ anim.ax.legend(
     fontsize='small',
     handletextpad=1
 )
-anim.run('xy_animation.mp4')
+anim.run('output/xy_animation.mp4')
