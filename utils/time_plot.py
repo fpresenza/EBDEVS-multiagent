@@ -105,5 +105,5 @@ for i, robot in enumerate(robot_ids):
         # ds='steps-post'
     )
 
-fig.savefig('output/position.png', format='png', dpi=360)
+fig.savefig(experiment_directory + 'position.png', format='png', dpi=360)
 plt.show()

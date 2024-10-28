@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
 
-from plotting import Animate
+from uvnpy.network.plot import Animate2
 from files import read_json_file, find_latest_timestamp
 
 np.set_printoptions(suppress=True, precision=4)
@@ -22,7 +22,7 @@ plt.rcParams['mathtext.fontset'] = 'dejavuserif'
 plt.rcParams['font.family'] = 'serif'
 
 
-class DevsAnimate(Animate):
+class DevsAnimate(Animate2):
     def __init__(self, *args, **kwargs):
         super(DevsAnimate, self).__init__(*args, **kwargs)
 
@@ -140,7 +140,7 @@ for p in frames[0][1]:
     circle = plt.Circle(p, 6.0, alpha=0.1)
     circles.append(circle)
     ax.add_artist(circle)
-anim.set_extra_artists(*circles)
+    anim.add_extra_artists(circle)
 
 anim.ax.legend(
     ncol=4,
@@ -148,4 +148,4 @@ anim.ax.legend(
     fontsize='small',
     handletextpad=1
 )
-anim.run('output/xy_animation.mp4')
+anim.run(experiment_directory + 'xy_animation.mp4')
