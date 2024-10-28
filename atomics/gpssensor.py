@@ -62,9 +62,6 @@ class GPSSensor(AtomicDEVS):
         self.in_x_pos = self.addInPort(name="in_x_pos")
         self.in_y_pos = self.addInPort(name="in_y_pos")
 
-        if (self.debug):
-            print("t: 0 s, Parent name: {}, Atomic name: {}, Init Function".format(self.parent.parent.name,self.name))
-
     def __lt__(self, other):
         return self.name < other.name
     

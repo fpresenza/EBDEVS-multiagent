@@ -58,9 +58,6 @@ class SpeedSensor(AtomicDEVS):
         #
         self.in_commanded_speed = self.addInPort(name="in_commanded_speed")
 
-        if (self.debug):
-            print("t: 0 s, Parent name: {}, Atomic name: {}, Init Function".format(self.parent.parent.name,self.name))
-
     def __lt__(self, other):
         return self.name < other.name
     
