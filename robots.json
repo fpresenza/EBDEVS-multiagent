@@ -47,7 +47,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 90.0,
-        "enable_GPS": true,
+        "enable_GPS": false,
         "action_extent": 2,
         "state_extent": 2
     },
@@ -60,7 +60,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 90.0,
-        "enable_GPS": true,
+        "enable_GPS": false,
         "action_extent": 2,
         "state_extent": 2
     },
@@ -73,7 +73,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 90.0,
-        "enable_GPS": true,
+        "enable_GPS": false,
         "action_extent": 1,
         "state_extent": 2
     },
@@ -99,7 +99,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 90.0,
-        "enable_GPS": true,
+        "enable_GPS": false,
         "action_extent": 1,
         "state_extent": 2
     },
@@ -125,7 +125,7 @@
         "gainx": 1.0,
         "gainy": 1.0,
         "comm_range": 90.0,
-        "enable_GPS": true,
+        "enable_GPS": false,
         "action_extent": 1,
         "state_extent": 2
     }
