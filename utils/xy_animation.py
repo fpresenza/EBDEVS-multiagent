@@ -26,6 +26,12 @@ class DevsAnimate(Animate2):
     def __init__(self, *args, **kwargs):
         super(DevsAnimate, self).__init__(*args, **kwargs)
 
+    def set_xlim(self, t):
+        return (0.0, 250.0 + t)
+
+    def set_ylim(self, t):
+        return (0.0, 250.0 + t)
+
     def _update_extra_artists(self, frame):
         positions = frame[1]
         n = int(len(positions))
