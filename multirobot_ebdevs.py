@@ -47,7 +47,6 @@ class MultiRobotSystem(CoupledDEVS):
         self.current_time = 0.0 # TODO: time cannot be managed as in the other coupled/atomic models
 
         robots_config = read_json_file('robots.json')
-        n_robots = len(robots_config)
 
         self.router = self.addSubModel(
             Router(agents_ids=[robot['name'] for robot in robots_config.values()], 
@@ -55,7 +54,6 @@ class MultiRobotSystem(CoupledDEVS):
                    debug=self.debug
                    )
         )
-
 
         self.robots_states = {}
         self.robots = {}
@@ -71,6 +69,8 @@ class MultiRobotSystem(CoupledDEVS):
             )
             self.connectPorts(self.robots[robot_id].OUT_router_token, self.router.in_agent_token[robot_id])
             self.connectPorts(self.router.out_agent_token[robot_id], self.robots[robot_id].IN_router_token)
+
+        self.distance_meas_stddev = 2.0
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
@@ -99,29 +99,18 @@ class MultiRobotSystem(CoupledDEVS):
         log += [
             neighbor_id
             for neighbor_id in self.robots_states.keys()
-            if self.connected(micro_id, neighbor_id, 0)
+            if self.connected(micro_id, neighbor_id, 0.0)
         ]
         append_csv_file(self.logpath + 'global.csv', log)
 
-    def getContextInformation(self, transmitter_id, current_time):
+    def getContextInformation(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
-        transmitter_pose = self.robots_states[transmitter_id]['Pose']
-        previous_time = self.robots_states[transmitter_id]['Time']
+        previous_time = self.robots_states[robot_1_id]['Time']
         delta_time = current_time - previous_time
         return [
-            (
-                receiver_id, 
-                np.random.normal(
-                    loc=self.distance(
-                        transmitter_pose, 
-                        self.robots_states[receiver_id]['Pose'],
-                        delta_time
-                    ),
-                    scale=2.0    
-                ) 
-            )
-            for receiver_id in self.robots_states.keys()
-            if self.connected(transmitter_id, receiver_id, delta_time)
+            (robot_2_id, self.distance_measurement(robot_1_id, robot_2_id, delta_time))
+            for robot_2_id in self.robots_states.keys()
+            if self.connected(robot_1_id, robot_2_id, delta_time)
         ]
 
     def select(self, immChildren):
@@ -131,24 +120,30 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def distance(self, p_1, p_2, delta_time):
-        # print(f'p_1: {p_1}\n p_2: {p_2}')
-        x1 = evaluate_poly(p_1[0],delta_time)
-        y1 = evaluate_poly(p_1[1],delta_time)
-        x2 = evaluate_poly(p_2[0],delta_time)
-        y2 = evaluate_poly(p_2[1],delta_time)
-        # return np.sqrt((p_1[0][0] - p_2[0][0])**2 + (p_1[1][0] - p_2[1][0])**2)
+    def distance(self, robot_1_id, robot_2_id, delta_time):
+        robot_1_pose = self.robots_states[robot_1_id]['Pose']
+        robot_2_pose = self.robots_states[robot_2_id]['Pose']
+
+        x1 = evaluate_poly(robot_1_pose[0], delta_time)
+        y1 = evaluate_poly(robot_1_pose[1], delta_time)
+        x2 = evaluate_poly(robot_2_pose[0], delta_time)
+        y2 = evaluate_poly(robot_2_pose[1], delta_time)
+
         return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
-    def connected(self, transmitter_id, receiver_id, delta_time):
-        if transmitter_id == receiver_id:
+    def distance_measurement(self, robot_1_id, robot_2_id, delta_time):
+        return np.random.normal(
+            loc=self.distance(robot_1_id, robot_2_id, delta_time),
+            scale=self.distance_meas_stddev    
+        ) 
+
+    def connected(self, robot_1_id, robot_2_id, delta_time):
+        if robot_1_id == robot_2_id:
             return False
 
-        transmitter_pose = self.robots_states[transmitter_id]['Pose']
-        receiver_pose = self.robots_states[receiver_id]['Pose']
+        distance = self.distance(robot_1_id, robot_2_id, delta_time)
 
-        distance = self.distance(transmitter_pose, receiver_pose, delta_time)
-        trasmiter_range = self.robots_states[transmitter_id]['CommRange']
-        receiver_range = self.robots_states[receiver_id]['CommRange']
+        trasmiter_range = self.robots_states[robot_1_id]['CommRange']
+        receiver_range = self.robots_states[robot_2_id]['CommRange']
 
         return (distance < trasmiter_range) and (distance < receiver_range)
