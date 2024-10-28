@@ -143,7 +143,7 @@ anim.set_edgestyle(color='k', lw=0.5, zorder=10)
 
 circles = []
 for p in frames[0][1]:
-    circle = plt.Circle(p, 6.0, alpha=0.1)
+    circle = plt.Circle(p, 90.0, alpha=0.1)
     circles.append(circle)
     ax.add_artist(circle)
     anim.add_extra_artists(circle)
