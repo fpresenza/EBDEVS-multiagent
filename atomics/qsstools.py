@@ -180,16 +180,16 @@ def advance_time(p, dt, order=None):
 
 	if(order == 1):
 		p[0] = p[0] + dt * p[1]
-		p = [p[0], p[1]]
+		# p = [p[0], p[1]]
 	elif (order == 2):
 		p[0] = p[0] + dt * p[1] + dt * dt * p[2]
 		p[1] = p[1] +  2 * p[2] * dt
-		p = [p[0], p[1], p[2]]
+		# p = [p[0], p[1], p[2]]
 	elif (order == 3):
 		p[0] = p[0] + dt * p[1] + dt * dt * p[2] + dt * dt * dt * p[3]
 		p[1] = p[1] +  2 * p[2] * dt + 3 * p[3] * dt * dt
 		p[2] = p[2] +  3 * p[3] * dt
-		p = [p[0], p[1], p[2], p[3]]
+		# p = [p[0], p[1], p[2], p[3]]
 	elif (order == 4):
 		p[0] = p[0] + dt * p[1] + dt * dt * p[2] + dt * dt * dt * p[3] + dt * dt * dt * dt * p[4]
 		p[1] = p[1] + 2 * p[2] * dt + 3 * p[3] * dt * dt + 4 * p[4] * dt * dt * dt
@@ -200,27 +200,32 @@ def advance_time(p, dt, order=None):
 	return p
 
 # Evaluation of the polynomial in dt
-def evaluate_poly(coeff,dt,order,debug=False):
-	if (order == 1):
-		p = coeff[0] + \
-			dt * coeff[1]
-	elif (order == 2):
-		p = coeff[0] + \
-			dt * coeff[1] + \
-			dt * dt * coeff[2]
-	elif (order == 3):
-		p = coeff[0] + \
-			dt * coeff[1] + \
-			dt * dt * coeff[2] + \
-			dt * dt * dt * coeff[3]
-	elif (order == 4):
-		p = coeff[0] + \
-			dt * coeff[1] + \
-			dt * dt * coeff[2] + \
-			dt * dt * dt * coeff[3] + \
-			dt * dt * dt * dt * coeff[4]
-	else:
-		p = 0.0
+def evaluate_poly(coeff,dt,order=1,debug=False):
+	# if (order == 1):
+	# 	p = coeff[0] + \
+	# 		dt * coeff[1]
+	# elif (order == 2):
+	# 	p = coeff[0] + \
+	# 		dt * coeff[1] + \
+	# 		dt * dt * coeff[2]
+	# elif (order == 3):
+	# 	p = coeff[0] + \
+	# 		dt * coeff[1] + \
+	# 		dt * dt * coeff[2] + \
+	# 		dt * dt * dt * coeff[3]
+	# elif (order == 4):
+	# 	p = coeff[0] + \
+	# 		dt * coeff[1] + \
+	# 		dt * dt * coeff[2] + \
+	# 		dt * dt * dt * coeff[3] + \
+	# 		dt * dt * dt * dt * coeff[4]
+	# else:
+	# 	p = 0.0
+	p = coeff[0] + \
+		dt * coeff[1] + \
+		dt * dt * coeff[2] + \
+		dt * dt * dt * coeff[3] + \
+		dt * dt * dt * dt * coeff[4]
 	if (debug):
 		print("Evaluate Poly: coeff = {}, dt = {}, order = {}, eval = {}".format(coeff,dt,order,p))
 	return float(p)

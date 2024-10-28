@@ -61,8 +61,10 @@ class QSSIntegrator(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        _q0     =  x0
-        _x0     = [x0, 0.0]
+        _q0     = [0.0]*10
+        _x0     = [0.0]*10
+        _q0[0]  = x0
+        _x0[0]  = x0
         _sigma0 = 0.0
         _t0     = 0.0
         self.state = QSSState(_q0, _x0, _sigma0, _t0) # q, x, sigma, t
@@ -96,7 +98,7 @@ class QSSIntegrator(AtomicDEVS):
         # TODO: replace by x = advance_time(xprev,sigma,1) # p: x, dt: sigma, order: 1
         # x = [xprev[0] + sigma * xprev[1], xprev[1]]
         x = advance_time(xprev, sigma, 1) # p: x, dt: sigma, order: 1
-        q = x[0]
+        q[0] = x[0]
 
         self.dQ = max(self.dQRel * abs(x[0]), self.dQMin)
 
@@ -134,26 +136,26 @@ class QSSIntegrator(AtomicDEVS):
             x[0] =  x[0] + x[1] * self.elapsed
             x[1] = derx_val # dx[0]
 
-            diffxq = [0 for i in range(len(x))]
+            diffxq = [0.0]*10 #[0 for i in range(len(x))]
 
             if (sigma>0):
                 # inferior delta crossing
                 # diffxq = q - x - dQ = {q[0] - x[0] - dQ, -x[1]} 
                 diffxq[1] = -x[1]
-                diffxq[0] =  q - x[0] - self.dQ
+                diffxq[0] =  q[0] - x[0] - self.dQ
                 sigma     = minposroot(diffxq, 1) # coeff: diffxq, order: 1
                 sigma_lo  = sigma
 
                 # superior delta difference
                 # diffxq = q - x + dQ = {q[0] - x[0] + dQ, -x[1]} 
-                diffxq[0] =  q - x[0] + self.dQ
+                diffxq[0] =  q[0] - x[0] + self.dQ
                 sigma_up  = minposroot(diffxq, 1) # coeff: diffxq, order: 1
 
                 # keep the smallest one
                 if (sigma_up < sigma):
                     sigma = sigma_up
 
-                if (abs(x[0] - q) > self.dQ):
+                if (abs(x[0] - q[0]) > self.dQ):
                     sigma = 0
 
                 if self.debug:
@@ -179,22 +181,21 @@ class QSSIntegrator(AtomicDEVS):
  
         q, xprev, sigma, current_time = self.state.get()
 
-
         if (sigma<0):
             raise DEVSException(\
                  "invalid state sigma <%f> in output function"\
                  % sigma)
 
-        # y[0] = x[0]
-        # y[1] = x[1]
-        # y = x
         current_time += sigma
-        # y = xprev
+
+        y = [0.0]*10
+        y[0] = xprev[0]
+        y[1] = xprev[1]
 
         # make time advance to get next q
         # this change in q will be performed right after in the internal transition function
-        # y = advance_time(y,sigma,1) # p: y, dt: sigma, order: 1
-        y = [xprev[0] + sigma * xprev[1], 0.0]
+        y = advance_time(y,sigma,1) # p: y, dt: sigma, order: 1
+        # y = [xprev[0] + sigma * xprev[1], 0.0]
         # y[1] = 0.0
 
         if self.debug:

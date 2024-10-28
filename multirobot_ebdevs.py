@@ -31,6 +31,8 @@ from atomics.kalman_filter import KalmanFilter
 from atomics.speedsensor import SpeedSensor, SpeedSensorDiff
 from atomics.gpssensor import GPSSensor
 
+from atomics.qsstools import *
+
 from utils import (
     read_json_file,
     append_csv_file,
@@ -72,9 +74,9 @@ class QSSIntegrator_Yup(QSSIntegrator):
         q, xprev, sigma, current_time = self.state.get()
 
         current_time += sigma
-        # x = advance_time(xprev,sigma,1) # p: x, dt: sigma, order: 1
-        x = [xprev[0] + sigma * xprev[1], xprev[1]]
-        q = x[0]
+        x = advance_time(xprev, sigma, 1) # p: x, dt: sigma, order: 1
+        # x = [xprev[0] + sigma * xprev[1], xprev[1]]
+        q[0] = x[0]
 
         self.dQ = max(self.dQRel * abs(x[0]), self.dQMin)
 
@@ -119,26 +121,26 @@ class QSSIntegrator_Yup(QSSIntegrator):
             x[0] =  x[0] + x[1] * self.elapsed
             x[1] = derx_val # dx[0]
 
-            diffxq = [0 for i in range(len(x))]
+            diffxq = [0.0]*10 #[0 for i in range(len(x))]
 
             if (sigma>0):
                 # inferior delta crossing
                 # diffxq = q - x - dQ = {q[0] - x[0] - dQ, -x[1]} 
                 diffxq[1] = -x[1]
-                diffxq[0] =  q - x[0] - self.dQ
+                diffxq[0] =  q[0] - x[0] - self.dQ
                 sigma     = minposroot(diffxq, 1) # coeff: diffxq, order: 1
                 sigma_lo  = sigma
 
                 # superior delta difference
                 # diffxq = q - x + dQ = {q[0] - x[0] + dQ, -x[1]} 
-                diffxq[0] =  q - x[0] + self.dQ
+                diffxq[0] =  q[0] - x[0] + self.dQ
                 sigma_up  = minposroot(diffxq, 1) # coeff: diffxq, order: 1
 
                 # keep the smallest one
                 if (sigma_up < sigma):
                     sigma = sigma_up
 
-                if (abs(x[0] - q) > self.dQ):
+                if (abs(x[0] - q[0]) > self.dQ):
                     sigma = 0
 
                 if (self.debug):
@@ -180,7 +182,11 @@ class RobotDynamics(CoupledDEVS):
         self.debug = debug
 
         # dictionary to save childrens' states
-        self.y_up = [self.name, {'t': 0.0, 'x': x0, 'y': y0}]
+        _x0 = [0.0]*10
+        _x0[0] = x0
+        _y0 = [0.0]*10
+        _y0[0] = y0
+        self.y_up = [self.name, {'t': 0.0, 'x': _x0, 'y': _y0}]
         self.current_time = 0
 
         # Declare childrens: splitterx2, QSS integ x 2
@@ -217,7 +223,7 @@ class RobotDynamics(CoupledDEVS):
         #                            )
         if (enable_GPS):
             gps_sensor = GPSSensor(name="GPS",
-                                   noisestd=0.0,
+                                   noisecov=np.zeros((2,2)),
                                    bias=np.ones((2,1)),
                                    period=1,
                                    debug=self.debug
@@ -318,7 +324,11 @@ class Robot(CoupledDEVS):
         self.enable_GPS = enable_GPS
         self.logpath = logpath
 
-        self.y_up = [self.name, {'Time': 0.0, 'Pose': [x0,  y0], 'CommRange': comm_range}]
+        _x0 = [0.0]*10
+        _x0[0] = x0
+        _y0 = [0.0]*10
+        _y0[0] = y0
+        self.y_up = [self.name, {'Time': 0.0, 'Pose': [_x0,  _y0], 'CommRange': comm_range}]
         self.current_time = 0
 
         dynamics = RobotDynamics(name="RobotDynamics",
@@ -488,34 +498,39 @@ class MultiRobotSystem(CoupledDEVS):
         if (self.debug):
             print(
                  "t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"
-                 .format(current_time, self.name,x_b_micro,self.robots_states))
+                 .format(current_time, self.name,x_b_micro,self.robots_states)
+                 )
 
         # log new value of micro_states
         log = [micro_id, data['Time']]
-        log += data['Pose']
+        log += [data['Pose'][0][0],data['Pose'][1][0]]
         log += [data['CommRange']]
         log += [
             neighbor_id
             for neighbor_id in self.robots_states.keys()
-            if self.connected(micro_id, neighbor_id)
+            if self.connected(micro_id, neighbor_id, 0)
         ]
         append_csv_file(self.logpath + 'global.csv', log)
 
-    def getContextInformation(self, transmitter_id):
+    def getContextInformation(self, transmitter_id, current_time):
+        # need to know the current time to make the polynomial advance in time
         transmitter_pose = self.robots_states[transmitter_id]['Pose']
+        previous_time = self.robots_states[transmitter_id]['Time']
+        delta_time = current_time - previous_time
         return [
             (
                 receiver_id, 
                 np.random.normal(
                     loc=self.distance(
                         transmitter_pose, 
-                        self.robots_states[receiver_id]['Pose']
+                        self.robots_states[receiver_id]['Pose'],
+                        delta_time
                     ),
                     scale=2.0    
                 ) 
             )
             for receiver_id in self.robots_states.keys()
-            if self.connected(transmitter_id, receiver_id)
+            if self.connected(transmitter_id, receiver_id, delta_time)
         ]
 
     def select(self, immChildren):
@@ -525,17 +540,23 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def distance(self, p_1, p_2):
-        return np.sqrt((p_1[0] - p_2[0])**2 + (p_1[1] - p_2[1])**2)
+    def distance(self, p_1, p_2, delta_time):
+        # print(f'p_1: {p_1}\n p_2: {p_2}')
+        x1 = evaluate_poly(p_1[0],delta_time)
+        y1 = evaluate_poly(p_1[1],delta_time)
+        x2 = evaluate_poly(p_2[0],delta_time)
+        y2 = evaluate_poly(p_2[1],delta_time)
+        # return np.sqrt((p_1[0][0] - p_2[0][0])**2 + (p_1[1][0] - p_2[1][0])**2)
+        return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
-    def connected(self, transmitter_id, receiver_id):
+    def connected(self, transmitter_id, receiver_id, delta_time):
         if transmitter_id == receiver_id:
             return False
 
         transmitter_pose = self.robots_states[transmitter_id]['Pose']
         receiver_pose = self.robots_states[receiver_id]['Pose']
 
-        distance = self.distance(transmitter_pose, receiver_pose)
+        distance = self.distance(transmitter_pose, receiver_pose, delta_time)
         trasmiter_range = self.robots_states[transmitter_id]['CommRange']
         receiver_range = self.robots_states[receiver_id]['CommRange']
 
