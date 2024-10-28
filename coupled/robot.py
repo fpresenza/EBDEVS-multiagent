@@ -30,57 +30,51 @@ class Robot(CoupledDEVS):
         CoupledDEVS.__init__(self, name)
 
         # Parameters
-        self.dQMin  = dQMin
-        self.dQRel  = dQRel
-        self.x0     = x0
-        self.y0     = y0
-        self.gainx  = gainx
-        self.gainy  = gainy
-        self.comm_range = comm_range
-        self.enable_GPS = enable_GPS
-        self.action_extent = action_extent
-        self.state_extent = state_extent
-        self.debug  = debug
-        self.logpath = logpath
+        self.debug = debug
 
-        _x0 = [0.0]*10
-        _x0[0] = x0
-        _y0 = [0.0]*10
-        _y0[0] = y0
-        self.y_up = [self.name, {'Time': 0.0, 'Pose': [_x0,  _y0], 'CommRange': comm_range}]
+        self.y_up = [
+            self.name, 
+            {
+                'Time': 0.0, 'Pose': [[x0] + [0.0] * 9, [y0] + [0.0] * 9], 
+                'CommRange': comm_range
+            }
+        ]
         self.current_time = 0
 
-        dynamics = RobotDynamics(name="RobotDynamics",
-                          dQMin=self.dQMin,
-                          dQRel=self.dQRel,
-                          x0=self.x0,
-                          y0=self.y0,
-                          gainx=self.gainx,
-                          gainy=self.gainy,
-                          enable_GPS=self.enable_GPS,
-                          debug=self.debug
-                         )
-        controller    = Controller(robot_id=self.name, 
-                                   name='Controller',
-                                   period=0.1,
-                                   debug=self.debug
-                                   )
-        token_handler = TokenHandler(robot_id=self.name,
-                                     name='Token_Handler',
-                                     debug=self.debug,
-                                     action_extent=self.action_extent,
-                                     state_extent=self.state_extent
-                                     )
-        kalman_filter = KalmanFilter(robot_id=self.name,
-                                     x0=np.random.normal(loc=self.x0, scale=1.0),
-                                     y0=np.random.normal(loc=self.y0, scale=1.0),
-                                     name='Kalman_Filter',
-                                     logpath=self.logpath,
-                                     debug=self.debug
-                                     )
+        dynamics = RobotDynamics(
+            name="RobotDynamics",
+            dQMin=dQMin,
+            dQRel=dQRel,
+            x0=x0,
+            y0=y0,
+            gainx=gainx,
+            gainy=gainy,
+            enable_GPS=enable_GPS,
+            debug=self.debug
+        )
+        controller = Controller(
+            name='Controller',
+            robot_id=self.name,
+            period=0.1,
+            debug=self.debug
+        )
+        token_handler = TokenHandler(
+            name='Token_Handler',
+            robot_id=self.name,
+            action_extent=action_extent,
+            state_extent=state_extent,
+            debug=self.debug,
+        )
+        kalman_filter = KalmanFilter(
+            name='Kalman_Filter',
+            robot_id=self.name,
+            x0=np.random.normal(loc=x0, scale=1.0),
+            y0=np.random.normal(loc=y0, scale=1.0),
+            logpath=logpath,
+            debug=self.debug
+        )
 
         self.dynamics      = self.addSubModel(dynamics)
-        # self.splitter_gen  = self.addSubModel(splitter_gen)
         self.controller    = self.addSubModel(controller)
         self.token_handler = self.addSubModel(token_handler)
         self.kalman_filter = self.addSubModel(kalman_filter)
