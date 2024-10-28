@@ -28,9 +28,9 @@ class Robot(CoupledDEVS):
         self.y_up = [
             self.name, 
             {
-                'Time': 0.0, 
-                'Pose': [[p] + [0.0] * 9 for p in position], 
-                'CommRange': comm_range
+                'time': 0.0, 
+                'pose': [[coord] + [0.0] * 9 for coord in position], 
+                'comm_range': comm_range
             }
         ]
         self.current_time = 0
@@ -94,21 +94,13 @@ class Robot(CoupledDEVS):
         # self.current_time += e_g
 
         micro_id, data = x_b_micro
-        try:
-            self.y_up[1]['Time'] = data['t'].copy()
-            self.y_up[1]['Pose'][0] = data['x'].copy()
-            self.y_up[1]['Pose'][1] = data['y'].copy()
-            current_time = data['t'].copy()
-        except AttributeError:
-            self.y_up[1]['Time'] = data['t']
-            self.y_up[1]['Pose'][0] = data['x']
-            self.y_up[1]['Pose'][1] = data['y']
-            current_time = data['t']
+        self.y_up[1]['time'] = data['time']
+        self.y_up[1]['pose'] = data['pose'].copy()
 
         if (self.debug):
             print(
                 "t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}"
-                .format(current_time, self.name, x_b_micro)
+                .format(data['time'], self.name, x_b_micro)
             )
 
     def select(self, immChildren):

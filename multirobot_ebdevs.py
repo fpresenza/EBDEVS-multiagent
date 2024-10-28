@@ -78,24 +78,19 @@ class MultiRobotSystem(CoupledDEVS):
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         # self.current_time += e_g
         micro_id, data = x_b_micro
-        try:
-            self.robots_states[micro_id] = data.copy()
-            current_time = data['Time'].copy()
-        except AttributeError:
-            self.robots_states[micro_id] = data
-            current_time = data['Time']
+        self.robots_states[micro_id] = data.copy()
         
         # print("Coupled name: {}, Global Transition Function, micro_id: {}".format(self.name,micro_id))
         if (self.debug):
             print(
                  "t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"
-                 .format(current_time, self.name,x_b_micro,self.robots_states)
+                 .format(data['time'], self.name, x_b_micro, self.robots_states)
                  )
 
         # log new value of micro_states
-        log = [micro_id, data['Time']]
-        log += [data['Pose'][0][0],data['Pose'][1][0]]
-        log += [data['CommRange']]
+        log = [micro_id, data['time']]
+        log += [data['pose'][0][0],data['pose'][1][0]]
+        log += [data['comm_range']]
         log += [
             neighbor_id
             for neighbor_id in self.robots_states.keys()
@@ -105,7 +100,7 @@ class MultiRobotSystem(CoupledDEVS):
 
     def getContextInformation(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
-        previous_time = self.robots_states[robot_1_id]['Time']
+        previous_time = self.robots_states[robot_1_id]['time']
         delta_time = current_time - previous_time
         return [
             (robot_2_id, self.distance_measurement(robot_1_id, robot_2_id, delta_time))
@@ -121,8 +116,8 @@ class MultiRobotSystem(CoupledDEVS):
         return immChildren[0]
 
     def distance(self, robot_1_id, robot_2_id, delta_time):
-        robot_1_pose = self.robots_states[robot_1_id]['Pose']
-        robot_2_pose = self.robots_states[robot_2_id]['Pose']
+        robot_1_pose = self.robots_states[robot_1_id]['pose']
+        robot_2_pose = self.robots_states[robot_2_id]['pose']
 
         x1 = evaluate_poly(robot_1_pose[0], delta_time)
         y1 = evaluate_poly(robot_1_pose[1], delta_time)
@@ -143,7 +138,7 @@ class MultiRobotSystem(CoupledDEVS):
 
         distance = self.distance(robot_1_id, robot_2_id, delta_time)
 
-        trasmiter_range = self.robots_states[robot_1_id]['CommRange']
-        receiver_range = self.robots_states[robot_2_id]['CommRange']
+        trasmiter_range = self.robots_states[robot_1_id]['comm_range']
+        receiver_range = self.robots_states[robot_2_id]['comm_range']
 
         return (distance < trasmiter_range) and (distance < receiver_range)

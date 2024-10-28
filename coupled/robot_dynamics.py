@@ -25,8 +25,13 @@ class RobotDynamics(CoupledDEVS):
         self.debug = debug
 
         # dictionary to save childrens' states
-        x0, y0 = position
-        self.y_up = [self.name, {'t': 0.0, 'x': [x0] + [0.0] * 9, 'y': [y0] + [0.0] * 9}]
+        self.y_up = [
+            self.name, 
+            {
+                'time': 0.0, 
+                'pose': [[coord] + [0.0] * 9 for coord in position], 
+            }
+        ]
         self.current_time = 0
 
         # Declare childrens: splitterx2, QSS integ x 2
@@ -38,13 +43,13 @@ class RobotDynamics(CoupledDEVS):
         integrator_x = QSSIntegrator_Yup(
             name="x", 
             **config['x'],
-            x0=x0, 
+            x0=position[0], 
             debug=self.debug
         )
         integrator_y = QSSIntegrator_Yup(
             name="y",
             **config['y'],
-            x0=y0, 
+            x0=position[1], 
             debug=self.debug
         )
         speed_sensor = SpeedSensor(
@@ -110,16 +115,16 @@ class RobotDynamics(CoupledDEVS):
         # self.current_time += e_g
 
         micro_id, children_time, data = x_b_micro[0]
-        try:
-            self.y_up[1][micro_id] = data.copy()
-            self.y_up[1]['t'] = children_time.copy()
-        except AttributeError:
-            self.y_up[1][micro_id] = data
-            self.y_up[1]['t'] = children_time
+
+        self.y_up[1]['time'] = children_time
+        if micro_id == 'x':
+            self.y_up[1]['pose'][0] = data.copy()
+        elif micro_id == 'y':
+            self.y_up[1]['pose'][1] = data.copy()
 
         if (self.debug):
             # print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
-            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(children_time,self.name,x_b_micro))
+            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(children_time, self.name, x_b_micro))
 
     def select(self, immChildren):
         """
