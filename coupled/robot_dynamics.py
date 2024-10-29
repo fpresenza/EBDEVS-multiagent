@@ -53,10 +53,9 @@ class RobotDynamics(CoupledDEVS):
             debug=self.debug
         )
         speed_sensor = SpeedSensor(
-            name="vmeas",
-            noisestd=0.5,
             bias=np.zeros((2, 1), dtype=float),
-            transf=np.eye(2, dtype=float),
+            transformation_matrix=np.eye(2, dtype=float),
+            velocity_measurement_covariance=np.array([[0.15, 0.0], [0.0, 0.15]]),
             debug=self.debug
         )
         # speed_sensor = SpeedSensorDiff(name="vmeas",
