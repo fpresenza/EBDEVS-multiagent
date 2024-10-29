@@ -1,6 +1,9 @@
 import numpy as np
+
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
+
+from uvnpy.distances.localization import StatelessKalmanFilter
 from utils.files import append_csv_file
 
 
@@ -60,9 +63,11 @@ class KalmanFilter(AtomicDEVS):
         self.debug = debug
 
         # kalman filter parameters (hardcoded)
-        self.velocity_measurement_covariance = np.array([[0.0225, 0.0], [0.0, 0.0225]])
-        self.distance_measurement_covariance = np.array([[100.0]])
-        self.position_measurement_covariance = np.array([[100.0, 0.0], [0.0, 100.0]])
+        self.ekf = StatelessKalmanFilter(
+            input_covariance=np.array([[0.0225, 0.0], [0.0, 0.0225]]),
+            distance_measurement_covariance=np.array([[100.0]]),
+            position_measurement_covariance=np.array([[100.0, 0.0], [0.0, 100.0]])
+        )
 
         # PORTS:
         #  Declare as many input and output ports as desired
@@ -90,11 +95,22 @@ class KalmanFilter(AtomicDEVS):
 
         if self.in_dynamics_velmeas in inputs: # if data arrives through port in_dynamics_velmeas
             speed_measurement = inputs[self.in_dynamics_velmeas].reshape(2, 1)
-            position, covariance = self.dynamic_step(position, covariance, speed_measurement) # events list
+            position, covariance = self.ekf.first_order_dynamic_step(
+                position,
+                covariance,
+                self.elapsed,
+                speed_measurement
+            )
             sigma = 0.0 # holds last status
         elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
-            robot_id, neighbor_position, distance = inputs[self.in_handler_extpos]
-            position, covariance = self.range_step(position, covariance, neighbor_position, distance) # events list
+            robot_id, neighbor_position, distance_measurement = inputs[self.in_handler_extpos]
+            position, covariance = self.ekf.asynchronous_distance_measurement_step(
+                position, 
+                covariance, 
+                distance_measurement, 
+                neighbor_position, 
+                np.zeros((2, 2), dtype=float)
+            )
 
         log = [current_time, position[0][0], position[1][0]]
         append_csv_file(self.logpath + 'kalman_{}.csv'.format(self.robot_id), log)
@@ -139,30 +155,3 @@ class KalmanFilter(AtomicDEVS):
         # based (typically) on current State.
         sigma, _, _, _ = self.state.get()
         return sigma
-
-    def dynamic_step(self, position, covariance, speed_measurement):
-        """Prediction step based on control actions"""
-        # the list of outputs to be returned
-        position += speed_measurement * self.elapsed      # debe ser el tiempo entre acciones de control (chequear)
-        covariance += self.velocity_measurement_covariance * self.elapsed**2
-        return position, covariance
-
-    def range_step(self, position, covariance, neighbor_position, dist):
-        """Update step based on distance measurements with neighbors
-
-        args:
-        -----
-            neighbor_position : neighbor position
-            dist : distance measurements
-        """
-        r = position - neighbor_position
-        d = np.sqrt(np.square(r).sum())
-        H = r.T / d
-        PHt = covariance.dot(H.T)
-        Pz = H.dot(PHt) + self.distance_measurement_covariance
-        # TODO: include neighbor covariance
-        # Pz = H.dot(PHt) + H.dot(Pj.dot(H.T)) + self.distance_measurement_covariance
-        K = PHt / Pz
-        position += K.dot(dist - d)
-        covariance -= K.dot(H).dot(covariance)
-        return position, covariance
