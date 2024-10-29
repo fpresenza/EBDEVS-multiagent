@@ -13,24 +13,24 @@ class ControllerState:
 
     def __init__(
             self, 
-            sigma=0.1, 
-            tvalue=0.0, 
-            last_position=np.array([0.0, 0.0]), 
-            external_action=np.array([0.0, 0.0])
-        ):
+            sigma, 
+            tvalue, 
+            subframework_state,
+            externally_commanded_action
+            ):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, last_position, external_action)
+        self.set(sigma, tvalue, subframework_state, externally_commanded_action)
 
-    def set(self, sigma, tvalue, last_position, external_action):
+    def set(self, sigma, tvalue, subframework_state, externally_commanded_action):
         self._sigma  = sigma
         self._tvalue = tvalue
-        self._last_position = last_position
-        self._external_action = external_action
+        self._subframework_state = subframework_state
+        self._externally_commanded_action = externally_commanded_action
 
     def get(self):
-        return self._sigma, self._tvalue, self._last_position, self._external_action
+        return self._sigma, self._tvalue, self._subframework_state, self._externally_commanded_action
 
 
 class Controller(AtomicDEVS):
@@ -49,11 +49,9 @@ class Controller(AtomicDEVS):
         self.state = ControllerState(
             sigma=self.period,   # waits till first token
             tvalue=0.0, 
-            last_position=None, 
-            external_action=np.zeros(2, dtype=float)
+            subframework_state={self.robot_id: None},
+            externally_commanded_action=np.zeros(2, dtype=float)
         )
-        self.subframework = {}
-
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -64,7 +62,6 @@ class Controller(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.out_kalman_intact   = self.addOutPort(name="out_kalman_intact")
         self.out_handler_intact  = self.addOutPort(name="out_handler_intact")
         self.out_dynamics_intact = self.addOutPort(name="out_dynamics_intact")
         
@@ -72,7 +69,7 @@ class Controller(AtomicDEVS):
         self.in_handler_extpos  = self.addInPort(name="in_handler_extpos")
         self.in_handler_extact  = self.addInPort(name="in_handler_extact")
         
-        self.first_control_call = True
+        self.outputs_queue = []
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -81,17 +78,17 @@ class Controller(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, last_position, external_action = self.state.get()
+        sigma, current_time, subframework_state, externally_commanded_action = self.state.get()
         current_time += self.elapsed
 
         if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
-            last_position = inputs[self.in_kalman_intpos]
+            subframework_state[self.robot_id] = inputs[self.in_kalman_intpos]
             sigma = sigma - self.elapsed # holds last status
         elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
             node_id, external_position = inputs[self.in_handler_extpos]
-            self.subframework[node_id] = external_position
+            subframework_state[node_id] = external_position
         elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
-            external_action += inputs[self.in_handler_extact]
+            externally_commanded_action += inputs[self.in_handler_extact]
             sigma = sigma - self.elapsed # holds last status
 
         if (self.debug):
@@ -100,42 +97,40 @@ class Controller(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return ControllerState(sigma, current_time, last_position, external_action) 
+        return ControllerState(sigma, current_time, subframework_state, externally_commanded_action)
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        sigma, current_time, last_position, external_action = self.state.get()
+        sigma, current_time, subframework_state, externally_commanded_action = self.state.get()
         current_time += sigma
-        self.action.pop()
-        if len(self.action) == 0:
+
+        self.outputs_queue.pop()
+        if len(self.outputs_queue) == 0:
             sigma = self.period
-            self.first_control_call = True
-            external_action = 0
+            externally_commanded_action = np.zeros(2, dtype=float)
         else:
-            sigma = 0
+            sigma = 0.0
 
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
-        return ControllerState(sigma,current_time,last_position, external_action) 
+        return ControllerState(sigma, current_time, subframework_state, externally_commanded_action) 
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        sigma, current_time, last_position, external_action = self.state.get()
-        if self.first_control_call:
-            internal_action, external_action = self.control_action(last_position, external_action)
-            self.action = [
-                {self.out_kalman_intact: internal_action}, 
-                {self.out_handler_intact: external_action},
-                {self.out_dynamics_intact: internal_action}
+        sigma, current_time, subframework_state, externally_commanded_action = self.state.get()
+        if len(self.outputs_queue) == 0:
+            own_action, others_action = self.control_action(subframework_state, externally_commanded_action)
+            self.outputs_queue = [
+                {self.out_handler_intact: others_action},
+                {self.out_dynamics_intact: own_action}
             ]
-            self.first_control_call = False
 
-        return self.action[-1]
+        return self.outputs_queue[-1]
 
     def timeAdvance(self):
         """
@@ -149,16 +144,11 @@ class Controller(AtomicDEVS):
     def __lt__(self, other):
         return self.name < other.name
 
-    def control_action(self, position, external_action):
+    def control_action(self, subframework_state, externally_commanded_action):
         """Compute control action"""
-        _, current_time, _, _ = self.state.get()
-        x = 0.0
-        y = 0.0
-        # the list of outputs to be returned
-        if position is None: # if Kalman filter has not yet sent an estimation of position
-            # return np.array([0.0, 0.0]), {'2': np.array([-4.0, 4.0])}
-            return np.array([0.0, 0.0]), {}
-        else:
-            # return np.array([0.0, 0.0]), {}
-            return np.array([x, y]), {}
-
+        own_action = np.zeros(2, dtype=float) + externally_commanded_action
+        others_action = {
+            node_id: np.zeros(2, dtype=float)
+            for node_id in subframework_state if node_id != self.robot_id
+        }
+        return own_action, others_action
