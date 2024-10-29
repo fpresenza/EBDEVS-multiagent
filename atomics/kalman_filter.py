@@ -163,7 +163,7 @@ class KalmanFilter(AtomicDEVS):
         self.out_control_intpos = self.addOutPort(name="out_control_intpos")
         self.out_handler_intpos = self.addOutPort(name="out_handler_intpos")
         #
-        self.in_control_intact = self.addInPort(name="in_control_intact")
+        self.in_dynamics_velmeas = self.addInPort(name="in_dynamics_velmeas")
         self.in_handler_extpos = self.addInPort(name="in_handler_extpos")
 
         if (self.debug):
@@ -179,8 +179,8 @@ class KalmanFilter(AtomicDEVS):
         sigma, current_time, data = self.state.get()
         current_time += self.elapsed
 
-        if self.in_control_intact in inputs: # if data arrives through port in_control_intact
-            speed_measurement = inputs[self.in_control_intact].reshape(2,1)
+        if self.in_dynamics_velmeas in inputs: # if data arrives through port in_dynamics_velmeas
+            speed_measurement = inputs[self.in_dynamics_velmeas].reshape(2, 1)
             new_position = self.dynamic_step(speed_measurement) # events list
             data = [
                 {self.out_control_intpos: new_position},
