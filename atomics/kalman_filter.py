@@ -9,19 +9,20 @@ class KalmanFilterState:
     Encapsulates the system's state
     """
 
-    def __init__(self, sigmaval=0.1, tval=0.0, dataval=[]):
+    def __init__(self, sigma, tvalue, position, covariance):
         """
         Constructor (parameterizable).
         """
-        self.set(sigmaval, tval, dataval)
+        self.set(sigma, tvalue, position, covariance)
 
-    def set(self, sigmavalue, tvalue, datavalue):
-        self._sigma  = sigmavalue
+    def set(self, sigma, tvalue, position, covariance):
+        self._sigma = sigma
         self._tvalue = tvalue
-        self._data   = datavalue
+        self._position = position
+        self._covariance = covariance
 
     def get(self):
-        return self._sigma, self._tvalue, self._data
+        return self._sigma, self._tvalue, self._position, self._covariance
 
 
 class KalmanFilter(AtomicDEVS):
@@ -39,15 +40,17 @@ class KalmanFilter(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
-        position = config['estimated_position']
+        
         # self.status = []          # TODO
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        _time0  = 0.0
-        _sigma0 = INFINITY # waits till firts token
-        _data0  = []
-        self.state = KalmanFilterState(_sigma0,_time0,_data0) 
+        self.state = KalmanFilterState(
+            sigma=INFINITY,
+            tvalue=0.0,
+            position=np.array(config['position']),
+            covariance=np.array(config['covariance'])
+        )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -57,11 +60,9 @@ class KalmanFilter(AtomicDEVS):
         self.debug = debug
 
         # kalman filter parameters (hardcoded)
-        self.position = np.array(position).reshape(-1, 1)
-        self.covariance = np.array([[1.0, 0.0], [0.0, 1.0]])
-        self.dynamic_process_covariance = np.array([[0.25, 0.0], [0.0, 0.25]])
-        self.distance_measurement_covariance = np.array([[1.5]])
-        self.position_measurement_covariance = np.array([[2.0, 0.0], [0.0, 2.0]])
+        self.velocity_measurement_covariance = np.array([[0.0225, 0.0], [0.0, 0.0225]])
+        self.distance_measurement_covariance = np.array([[25.0]])
+        self.position_measurement_covariance = np.array([[25.0, 0.0], [0.0, 25.0]])
 
         # PORTS:
         #  Declare as many input and output ports as desired
@@ -71,6 +72,8 @@ class KalmanFilter(AtomicDEVS):
         #
         self.in_dynamics_velmeas = self.addInPort(name="in_dynamics_velmeas")
         self.in_handler_extpos = self.addInPort(name="in_handler_extpos")
+
+        self.outputs_queue = []
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -82,53 +85,51 @@ class KalmanFilter(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, data = self.state.get()
+        sigma, current_time, position, covariance = self.state.get()
         current_time += self.elapsed
 
         if self.in_dynamics_velmeas in inputs: # if data arrives through port in_dynamics_velmeas
             speed_measurement = inputs[self.in_dynamics_velmeas].reshape(2, 1)
-            new_position = self.dynamic_step(speed_measurement) # events list
-            data = [
-                {self.out_control_intpos: new_position},
-                {self.out_handler_intpos: new_position}
-            ]
-            sigma = 0 # holds last status
+            position, covariance = self.dynamic_step(position, covariance, speed_measurement) # events list
+            sigma = 0.0 # holds last status
         elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
-            robot_id, ext_position, distance = inputs[self.in_handler_extpos]
-            new_position = self.range_step(ext_position, distance) # events list
-            data = [{self.out_control_intpos: new_position}]
-            sigma = 0 # holds last status
+            robot_id, neighbor_position, distance = inputs[self.in_handler_extpos]
+            position, covariance = self.range_step(position, covariance, neighbor_position, distance) # events list
 
-        log = [current_time, new_position[0][0], new_position[1][0]]
+        log = [current_time, position[0][0], position[1][0]]
         append_csv_file(self.logpath + 'kalman_{}.csv'.format(self.robot_id), log)
         
         if (self.debug):
-            print("t: {:.2f} s, Atomic name: {}, External Transition Function".format(current_time,self.name))
+            print("t: {:.2f} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
 
-        return KalmanFilterState(sigma, current_time, data)
+        return KalmanFilterState(sigma, current_time, position, covariance)
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, data = self.state.get()
-        data.pop()
-        if len(data) == 0:
+        _, current_time, position, covariance = self.state.get()
+
+        if len(self.outputs_queue) == 0:
             sigma = INFINITY
         else:
-            sigma = 0
+            sigma = 0.0
 
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
             
-        return KalmanFilterState(sigma,current_time,data) 
+        return KalmanFilterState(sigma, current_time, position, covariance) 
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        sigma, current_time, data = self.state.get()
-        return data[-1]
+        if len(self.outputs_queue) == 0:
+            _, _, position, _ = self.state.get()
+            self.outputs_queue.append({self.out_control_intpos: position})
+            self.outputs_queue.append({self.out_handler_intpos: position})
+
+        return self.outputs_queue.pop()
 
     def timeAdvance(self):
         """
@@ -136,34 +137,32 @@ class KalmanFilter(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _ = self.state.get()
+        sigma, _, _, _ = self.state.get()
         return sigma
 
-    def dynamic_step(self, speed_measurement):
+    def dynamic_step(self, position, covariance, speed_measurement):
         """Prediction step based on control actions"""
         # the list of outputs to be returned
-        self.position += speed_measurement * self.elapsed      # debe ser el tiempo entre acciones de control (chequear)
-        self.covariance += self.dynamic_process_covariance * self.elapsed**2
-        return self.position.copy()
+        position += speed_measurement * self.elapsed      # debe ser el tiempo entre acciones de control (chequear)
+        covariance += self.velocity_measurement_covariance * self.elapsed**2
+        return position, covariance
 
-    def range_step(self, ext_position, dist):
+    def range_step(self, position, covariance, neighbor_position, dist):
         """Update step based on distance measurements with neighbors
 
         args:
         -----
-            ext_position : neighbor position
+            neighbor_position : neighbor position
             dist : distance measurements
         """
-        r = self.position - ext_position
+        r = position - neighbor_position
         d = np.sqrt(np.square(r).sum())
         H = r.T / d
-        PHt = self.covariance.dot(H.T)
+        PHt = covariance.dot(H.T)
         Pz = H.dot(PHt) + self.distance_measurement_covariance
         # TODO: include neighbor covariance
         # Pz = H.dot(PHt) + H.dot(Pj.dot(H.T)) + self.distance_measurement_covariance
         K = PHt / Pz
-        self.position += K.dot(dist - d)
-        self.covariance -= K.dot(H).dot(self.covariance)
-        return self.position.copy()
-
-
+        position += K.dot(dist - d)
+        covariance -= K.dot(H).dot(covariance)
+        return position, covariance
