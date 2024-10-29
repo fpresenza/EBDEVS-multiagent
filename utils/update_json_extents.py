@@ -17,7 +17,7 @@ comm_range = np.zeros(n_robots)
 
 for robot_id, config in robots_config.items():
     i = robot_id_to_index(robot_id)
-    position[i] = config['position']
+    position[i] = np.ravel(config['position'])
     comm_range[i] = config['comm_range']
 
 adjacency_matrix = np.zeros((n_robots, n_robots))
