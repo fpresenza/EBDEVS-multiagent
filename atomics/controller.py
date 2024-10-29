@@ -124,10 +124,8 @@ class Controller(AtomicDEVS):
         if len(self.outputs_queue) == 0:
             sigma, current_time, subframework_state, externally_commanded_action = self.state.get()
             own_action, others_action = self.control_action(subframework_state, externally_commanded_action)
-            self.outputs_queue = [
-                {self.out_handler_intact: others_action},
-                {self.out_dynamics_intact: own_action}
-            ]
+            self.outputs_queue.append({self.out_handler_intact: others_action})
+            self.outputs_queue.append({self.out_dynamics_intact: own_action})
 
         return self.outputs_queue.pop()
 
