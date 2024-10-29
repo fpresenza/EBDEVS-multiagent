@@ -1,8 +1,8 @@
 {
     "Robot_0": {
         "position": [
-            162.343,
-            182.097
+            [162.343],
+            [182.097]
         ],
         "dynamics": {
             "x": {
@@ -20,9 +20,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                162.343,
-                182.097
+            "position": [
+                [162.343],
+                [182.097]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -34,8 +44,8 @@
     },
     "Robot_1": {
         "position": [
-            145.759,
-            104.87
+            [145.759],
+            [104.870]
         ],
         "dynamics": {
             "x": {
@@ -53,9 +63,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                145.759,
-                104.87
+            "position": [
+                [145.759],
+                [104.870]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -67,8 +87,8 @@
     },
     "Robot_2": {
         "position": [
-            82.645,
-            59.704
+            [82.645],
+            [59.704]
         ],
         "dynamics": {
             "x": {
@@ -86,9 +106,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                82.645,
-                59.704
+            "position": [
+                [82.645],
+                [59.704]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -100,8 +130,8 @@
     },
     "Robot_3": {
         "position": [
-            78.051,
-            158.593
+            [78.051],
+            [158.593]
         ],
         "dynamics": {
             "x": {
@@ -119,9 +149,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                78.051,
-                158.593
+            "position": [
+                [78.051],
+                [158.593]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -133,8 +173,8 @@
     },
     "Robot_4": {
         "position": [
-            14.097,
-            140.411
+            [14.097],
+            [140.411]
         ],
         "dynamics": {
             "x": {
@@ -152,9 +192,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                14.097,
-                140.411
+            "position": [
+                [14.097],
+                [140.411]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -166,8 +216,8 @@
     },
     "Robot_5": {
         "position": [
-            169.784,
-            91.93
+            [169.784],
+            [91.930]
         ],
         "dynamics": {
             "x": {
@@ -185,9 +235,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                169.784,
-                91.93
+            "position": [
+                [169.784],
+                [91.930]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -199,8 +259,8 @@
     },
     "Robot_6": {
         "position": [
-            25.618,
-            77.308
+            [25.618],
+            [77.308]
         ],
         "dynamics": {
             "x": {
@@ -218,9 +278,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                25.618,
-                77.308
+            "position": [
+                [25.618],
+                [77.308]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -232,8 +302,8 @@
     },
     "Robot_7": {
         "position": [
-            102.778,
-            164.4
+            [102.778],
+            [164.400]
         ],
         "dynamics": {
             "x": {
@@ -251,9 +321,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                102.778,
-                164.4
+            "position": [
+                [102.778],
+                [164.400]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -265,8 +345,8 @@
     },
     "Robot_8": {
         "position": [
-            176.862,
-            155.808
+            [176.862],
+            [155.808]
         ],
         "dynamics": {
             "x": {
@@ -284,9 +364,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                176.862,
-                155.808
+            "position": [
+                [176.862],
+                [155.808]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {
@@ -298,8 +388,8 @@
     },
     "Robot_9": {
         "position": [
-            89.537,
-            91.138
+            [89.537],
+            [91.138]
         ],
         "dynamics": {
             "x": {
@@ -317,9 +407,19 @@
             "period": 0.1
         },
         "kalman_filter": {
-            "estimated_position": [
-                89.537,
-                91.138
+            "position": [
+                [89.537],
+                [91.138]
+            ],
+            "covariance": [
+                [
+                    10.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    10.0
+                ]
             ]
         },
         "token_handler": {

@@ -29,7 +29,7 @@ class Robot(CoupledDEVS):
             self.name, 
             {
                 'time': 0.0, 
-                'pose': [[coord] + [0.0] * 9 for coord in position], 
+                'pose': [coord + [0.0] * 9 for coord in position], 
                 'comm_range': comm_range
             }
         ]

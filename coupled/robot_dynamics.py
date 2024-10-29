@@ -29,7 +29,7 @@ class RobotDynamics(CoupledDEVS):
             self.name, 
             {
                 'time': 0.0, 
-                'pose': [[coord] + [0.0] * 9 for coord in position], 
+                'pose': [coord + [0.0] * 9 for coord in position], 
             }
         ]
         self.current_time = 0
@@ -43,13 +43,13 @@ class RobotDynamics(CoupledDEVS):
         integrator_x = QSSIntegrator_Yup(
             name="x", 
             **config['x'],
-            x0=position[0], 
+            x0=position[0][0], 
             debug=self.debug
         )
         integrator_y = QSSIntegrator_Yup(
             name="y",
             **config['y'],
-            x0=position[1], 
+            x0=position[1][0], 
             debug=self.debug
         )
         speed_sensor = SpeedSensor(
