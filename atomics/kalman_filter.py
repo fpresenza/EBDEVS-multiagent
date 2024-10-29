@@ -61,8 +61,8 @@ class KalmanFilter(AtomicDEVS):
 
         # kalman filter parameters (hardcoded)
         self.velocity_measurement_covariance = np.array([[0.0225, 0.0], [0.0, 0.0225]])
-        self.distance_measurement_covariance = np.array([[25.0]])
-        self.position_measurement_covariance = np.array([[25.0, 0.0], [0.0, 25.0]])
+        self.distance_measurement_covariance = np.array([[100.0]])
+        self.position_measurement_covariance = np.array([[100.0, 0.0], [0.0, 100.0]])
 
         # PORTS:
         #  Declare as many input and output ports as desired
