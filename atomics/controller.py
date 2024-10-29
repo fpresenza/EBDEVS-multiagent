@@ -106,7 +106,6 @@ class Controller(AtomicDEVS):
         sigma, current_time, subframework_state, externally_commanded_action = self.state.get()
         current_time += sigma
 
-        self.outputs_queue.pop()
         if len(self.outputs_queue) == 0:
             sigma = self.period
             externally_commanded_action = np.zeros(2, dtype=float)
@@ -130,7 +129,7 @@ class Controller(AtomicDEVS):
                 {self.out_dynamics_intact: own_action}
             ]
 
-        return self.outputs_queue[-1]
+        return self.outputs_queue.pop()
 
     def timeAdvance(self):
         """
