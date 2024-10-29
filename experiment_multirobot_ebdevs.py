@@ -22,7 +22,7 @@ import argparse
 from pypdevs.simulator import Simulator
 
 # Import the model to be simulated
-from multirobot_ebdevs import MultiRobotSystem
+from coupled.multirobot_ebdevs import MultiRobotSystem
 
 # Configuration (parameter sweeping)
 #
