@@ -199,7 +199,7 @@ class TokenHandler(AtomicDEVS):
                 sigma = sigma - self.elapsed # holds last status
             else:
                 data += data_received # events list
-                sigma = 0
+                sigma = 0.0
             if (self.debug):
                 print("t: {} s, Atomic name: {}, External Transition Function, token: {} from Router".format(current_time,self.name,token))
 
@@ -215,7 +215,7 @@ class TokenHandler(AtomicDEVS):
             data.append({self.out_router_token: token})
             self.action_token_order+=1
 
-            sigma = 0
+            sigma = 0.0
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Controller".format(current_time,self.name,self.parent.name,token))
 
@@ -231,7 +231,7 @@ class TokenHandler(AtomicDEVS):
             data.append({self.out_router_token: token})
             self.state_token_order+=1
 
-            sigma = 0
+            sigma = 0.0
             if (self.debug):
                 print("t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Kalman".format(current_time,self.name,self.parent.name,token))
 
@@ -242,13 +242,16 @@ class TokenHandler(AtomicDEVS):
         Internal Transition Function.
         """
         _, current_time, data = self.state.get()
+        
         data.pop(0)
         if len(data) == 0:
             sigma = INFINITY
         else:
-            sigma = 0
+            sigma = 0.0
+
         if (self.debug):
             print("t: {} s, Atomic name: {}@{}, Internal Transition Function".format(current_time,self.name,self.parent.name))
+
         return TokenHandlerState(sigma,current_time,data)
     
     def outputFnc(self):
