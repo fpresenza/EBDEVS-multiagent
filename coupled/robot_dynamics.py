@@ -3,7 +3,8 @@ import numpy as np
 from pypdevs.DEVS import CoupledDEVS
 from atomics.qssintegrators import QSSIntegrator_Yup
 from atomics.misc import Splitter
-from atomics.speedsensor import SpeedSensor
+# from atomics.speedsensor import SpeedSensor
+from atomics.stochastic_systems import ZeroOrderLinearSystem
 from atomics.gpssensor import GPSSensor
 # TODO: Speed and GPS sensors should be outside dynamics coupled
 
@@ -52,19 +53,13 @@ class RobotDynamics(CoupledDEVS):
             x0=position[1][0], 
             debug=self.debug
         )
-        speed_sensor = SpeedSensor(
-            bias=np.zeros((2, 1), dtype=float),
-            transformation_matrix=np.eye(2, dtype=float),
-            velocity_measurement_covariance=np.array([[0.15, 0.0], [0.0, 0.15]]),
+        speed_sensor = ZeroOrderLinearSystem(
+            input_matrix=np.eye(2, dtype=float),
+            noise_mean=np.zeros((2, 1), dtype=float),
+            noise_covariance=np.array([[0.15, 0.0], [0.0, 0.15]]),
             debug=self.debug
         )
-        # speed_sensor = SpeedSensorDiff(name="vmeas",
-        #                            period=0.1,
-        #                            noisestd=0.0,
-        #                            bias=np.zeros((2,1)),
-        #                            transf=np.eye(2),
-        #                            debug=self.debug
-        #                            )
+
         if (enable_GPS):
             gps_sensor = GPSSensor(
                 name="GPS",
@@ -72,7 +67,7 @@ class RobotDynamics(CoupledDEVS):
                 bias=np.ones((2, 1), dtype=float),
                 period=1,
                 debug=self.debug
-        )
+            )
         self.splitter     = self.addSubModel(splitter)
         self.integrator_x = self.addSubModel(integrator_x)
         self.integrator_y = self.addSubModel(integrator_y)
@@ -84,19 +79,19 @@ class RobotDynamics(CoupledDEVS):
         self.OUT_dynamics_x    = self.addOutPort(name="OUT_dynamics_x")
         self.OUT_dynamics_y    = self.addOutPort(name="OUT_dynamics_y")
         self.OUT_measured_v    = self.addOutPort(name="OUT_measured_v")
-        self.IN_dynamics_vx_vy = self.addInPort( name="IN_dynamics_vx_vy")
+        self.IN_control_input = self.addInPort( name="IN_control_input")
         if (enable_GPS):
             self.OUT_measured_pos    = self.addOutPort(name="OUT_measured_pos")
 
         # Connect coupled model's ports with atomic models' ports
-        self.connectPorts(self.IN_dynamics_vx_vy, self.splitter.in_splitter_msgs)
+        self.connectPorts(self.IN_control_input, self.splitter.in_splitter_msgs)
         self.connectPorts(self.splitter.out_splitter_msgs[0], self.integrator_x.IN_dx)
         self.connectPorts(self.splitter.out_splitter_msgs[1], self.integrator_y.IN_dx)
         self.connectPorts(self.integrator_x.OUT_q, self.OUT_dynamics_x)
         self.connectPorts(self.integrator_y.OUT_q, self.OUT_dynamics_y)
         ## SpeedSensor
-        self.connectPorts(self.IN_dynamics_vx_vy, self.speed_sensor.in_commanded_speed)
-        self.connectPorts(self.speed_sensor.out_measured_speed, self.OUT_measured_v)
+        self.connectPorts(self.IN_control_input, self.speed_sensor.input)
+        self.connectPorts(self.speed_sensor.output, self.OUT_measured_v)
         ## SpeedSensorDiff
         # self.connectPorts(self.integrator_x.OUT_q, self.speed_sensor.in_position_x)
         # self.connectPorts(self.integrator_y.OUT_q, self.speed_sensor.in_position_y)

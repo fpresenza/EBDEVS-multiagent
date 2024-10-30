@@ -4,116 +4,24 @@ from pypdevs.infinity import INFINITY
 from atomics.qsstools import *
 
 
-class SpeedSensorState:
+class SpeedSensorDiffState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, velocity_measurement):
+    def __init__(self, sigma, tvalue, data):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, velocity_measurement)
+        self.set(sigma, tvalue, data)
 
-    def set(self, sigma, tvalue, velocity_measurement):
-        self._sigma  = sigma
+    def set(self, sigma, tvalue, data):
+        self._sigma = sigma
         self._tvalue = tvalue
-        self._velocity_measurement   = velocity_measurement
+        self._data = data
 
     def get(self):
-        return self._sigma, self._tvalue, self._velocity_measurement
+        return self._sigma, self._tvalue, self.data
 
-
-class SpeedSensor(AtomicDEVS):
-    def __init__(
-            self,
-            bias,
-            transformation_matrix,
-            velocity_measurement_covariance,
-            name='SpeedSensor',
-            debug=False):
-        """Atomic model for the speed sensor"""
-
-        # Always call parent class' constructor FIRST:
-        AtomicDEVS.__init__(self, name)
-
-        # Parameters
-        self.bias = bias
-        self.transformation_matrix  = transformation_matrix
-        self.velocity_measurement_covariance = velocity_measurement_covariance
-        self.debug = debug
-
-        # STATE:
-        #  Define 'state' attribute (initial sate):
-        self.state = SpeedSensorState(sigma=INFINITY, tvalue=0.0, velocity_measurement=None) 
-
-        # ELAPSED TIME:
-        #  Initialize 'elapsed time' attribute if required
-        #  (by default, value is 0.0):
-        self.elapsed = 0.0
-
-
-        # PORTS:
-        #  Declare as many input and output ports as desired
-        #  (usually store returned references in local variables):
-        self.out_measured_speed = self.addOutPort(name="out_measured_speed")
-        #
-        self.in_commanded_speed = self.addInPort(name="in_commanded_speed")
-
-    def __lt__(self, other):
-        return self.name < other.name
-    
-    def extTransition(self, inputs):
-        """
-        External Transition Function.
-        """
-        sigma, current_time, _ = self.state.get()
-        current_time += self.elapsed
-
-        # data arrive through port in_control_intact
-        v = inputs[self.in_commanded_speed].reshape(2, 1)
-        velocity_measurement = np.random.multivariate_normal(
-            mean=np.ravel(self.transformation_matrix.dot(v) + self.bias),
-            cov=self.velocity_measurement_covariance
-        )
-        sigma = 0.0    # holds last status
-        
-        if (self.debug):
-            print("t: {:.2f} s, Parent name: {}, Atomic name: {}, External Transition Function, v: {}, velocity_measurement: {}".format(current_time,self.parent.parent.name,self.name,v,velocity_measurement))
-
-        return SpeedSensorState(sigma, current_time, velocity_measurement) 
-    
-    def intTransition(self):
-        """
-        Internal Transition Function.
-        """
-        sigma, current_time, velocity_measurement = self.state.get()
-        current_time += sigma
-        sigma = INFINITY
-
-        if (self.debug):
-            print(
-                "t: {:.2f} s, Parent name: {}, Atomic name: {}, Internal Transition Function"
-                .format(current_time, self.parent.parent.name, self.name)
-            )
-            
-        return SpeedSensorState(sigma, current_time, velocity_measurement) 
-    
-    def outputFnc(self):
-        """
-        Output Funtion.
-        """
-        _, _, velocity_measurement = self.state.get()
-        return {self.out_measured_speed: velocity_measurement}
-
-    def timeAdvance(self):
-        """
-        Time-Advance Function.
-        """
-        # Compute 'ta', the time to the next scheduled internal transition,
-        # based (typically) on current State.
-        sigma, _, _ = self.state.get()
-        return sigma
-    
 
 class SpeedSensorDiff(AtomicDEVS):
     def __init__(self,name=None,period=0.1,noisestd=0.0,bias=np.zeros((2,1)),transf=np.eye(2),debug=False):
@@ -135,7 +43,7 @@ class SpeedSensorDiff(AtomicDEVS):
         _xprev = np.array([0.0],dtype=float)
         _yprev = np.array([0.0],dtype=float)
         _data0  = {'xprev': _xprev, 'yprev': _yprev, 'x': _x0, 'y': _y0}
-        self.state = SpeedSensorState(_sigma0,_time0,_data0) 
+        self.state = SpeedSensorDiffState(_sigma0,_time0,_data0) 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -186,7 +94,7 @@ class SpeedSensorDiff(AtomicDEVS):
         if (self.debug):
             print("t: {:.2f} s, Parent name: {}, Atomic name: {}, External Transition Function, v: {}, vmeasured: {}".format(current_time,self.parent.parent.name,self.name,v,vmeasured))
 
-        return SpeedSensorState(sigma, current_time, data) 
+        return SpeedSensorDiffState(sigma, current_time, data) 
     
     def intTransition(self):
         """
@@ -206,7 +114,7 @@ class SpeedSensorDiff(AtomicDEVS):
         if (self.debug):
             print("t: {:.2f} s, Parent name: {}, Atomic name: {}, Internal Transition Function".format(current_time,self.parent.parent.name,self.name))
             
-        return SpeedSensorState(sigma,current_time,data) 
+        return SpeedSensorDiffState(sigma,current_time,data) 
     
     def outputFnc(self):
         """

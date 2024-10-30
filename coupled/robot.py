@@ -76,7 +76,7 @@ class Robot(CoupledDEVS):
         # self.connectPorts(self.IN_vx_vy, self.splitter_gen.in_splitter_msgs)
         # self.connectPorts(self.splitter_gen.out_splitter_in, self.dynamics.IN_dynamics_vx_vy)
         
-        self.connectPorts(self.controller.out_dynamics_intact, self.dynamics.IN_dynamics_vx_vy)
+        self.connectPorts(self.controller.out_dynamics_intact, self.dynamics.IN_control_input)
         self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
         self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
         self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)
