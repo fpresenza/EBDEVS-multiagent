@@ -9,6 +9,7 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
+import subprocess
 
 from uvnpy.network.plot import Animate2
 from files import read_json_file, find_latest_timestamp
@@ -154,4 +155,7 @@ anim.ax.legend(
     fontsize='small',
     handletextpad=1
 )
-anim.run(experiment_directory + 'xy_animation.mp4')
+video_path = experiment_directory + 'xy_animation.mp4'
+anim.run(video_path)
+
+subprocess.run(["mpv", video_path])
