@@ -105,211 +105,36 @@ class Gain(AtomicDEVS):
         # based (typically) on current State.
         return self.sigma
 
+
 ######################## 
 # Splitter atomic model
 ########################
-
-class SplitterGeneratorState:
-    """
-    Encapsulates the system's state
-    """
-
-    def __init__(self, sigmaval=0.1, tval=0.0):
-        """
-        Constructor (parameterizable).
-        """
-        self.set(sigmaval, tval)
-
-    def set(self, sigmavalue, tvalue):
-        self._sigma  = sigmavalue
-        self._tvalue = tvalue
-
-    def get(self):
-        return self._sigma, self._tvalue
-
-class SplitterGenerator(AtomicDEVS):
-    def __init__(self,name=None,period=1):
-        """
-        Atomic model for generating the splitter inputs
-        """
-
-        # Always call parent class' constructor FIRST:
-        AtomicDEVS.__init__(self, name)
-
-        # STATE:
-        #  Define 'state' attribute (initial sate):
-        _time0  = 0.0
-        _sigma0 = 0
-        self.state = SplitterGeneratorState(_sigma0,_time0) 
-        # ELAPSED TIME:
-        #  Initialize 'elapsed time' attribute if required
-        #  (by default, value is 0.0):
-        self.elapsed = 0.0
-
-        # PORTS:
-        #  Declare as many input and output ports as desired
-        #  (usually store returned references in local variables):
-        self.out_splitter_in = self.addOutPort(name="out_splitter_in")
- 
-        # Parameters
-        self.msgs = [
-            {self.out_splitter_in: np.array([-1.0, 1.0])},
-            {self.out_splitter_in: np.array([1.2, 5.6])},
-            {self.out_splitter_in: np.array([-4.8, 2.3])},
-            {self.out_splitter_in: np.array([-1.7, 9.8])},
-            {self.out_splitter_in: np.array([-5.2, 7.5])},
-        ]
-        self.period = period
-
-    def __lt__(self, other):
-        return self.name < other.name
-
-    def extTransition(self, inputs):
-        """
-        External Transition Function.
-        """
-        # it should never be executed
-        sigma, current_time = self.state.get()
-        current_time += self.elapsed
-        return SplitterGeneratorState(sigma,current_time) 
-    
-    def intTransition(self):
-        """
-        Internal Transition Function.
-        """
-        sigma, current_time = self.state.get()
-        current_time += sigma
-        self.msgs.pop()
-        if len(self.msgs) == 0:
-            sigma = INFINITY
-        else:
-            sigma = self.period
-        return SplitterGeneratorState(sigma,current_time) 
-    
-    def outputFnc(self):
-        """
-        Output Function.
-        """
-        # sigma, current_time = self.state.get()
-        return self.msgs[-1]
-
-    def timeAdvance(self):
-        """
-        Time-Advance Function.
-        """
-        # Compute 'ta', the time to the next scheduled internal transition,
-        # based (typically) on current State.
-        sigma, current_time = self.state.get()
-        return sigma
-
-class SplitterGeneratorCircTraj(AtomicDEVS):
-    def __init__(self,name=None,period=1,radius=2,freq=1,debug=False):
-        """
-        Atomic model for generating the splitter inputs
-        """
-
-        # Always call parent class' constructor FIRST:
-        AtomicDEVS.__init__(self, name)
-
-        # STATE:
-        #  Define 'state' attribute (initial sate):
-        _time0  = 0.0
-        _sigma0 = 0
-        self.state = SplitterGeneratorState(_sigma0,_time0) 
-        # ELAPSED TIME:
-        #  Initialize 'elapsed time' attribute if required
-        #  (by default, value is 0.0):
-        self.elapsed = 0.0
-
-        # PORTS:
-        #  Declare as many input and output ports as desired
-        #  (usually store returned references in local variables):
-        self.out_splitter_in = self.addOutPort(name="out_splitter_in")
- 
-        # Parameters
-        self.period = period
-        self.radius = radius
-        self.omega  = 2*np.pi*freq
-        self.debug  = debug
-
-        if (self.debug):
-            print("t: 0 s, Atomic name: {}, Init Function, radius = {}".format(self.name, self.radius))
-
-    def __lt__(self, other):
-        return self.name < other.name
-
-    def extTransition(self, inputs):
-        """
-        External Transition Function.
-        """
-        # it should never be executed
-        sigma, current_time = self.state.get()
-        current_time += self.elapsed
-
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time,self.name))
-
-        return SplitterGeneratorState(sigma,current_time) 
-    
-    def intTransition(self):
-        """
-        Internal Transition Function.
-        """
-        sigma, current_time = self.state.get()
-        current_time += sigma
-        sigma = self.period
-
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
-
-        return SplitterGeneratorState(sigma,current_time) 
-    
-    def outputFnc(self):
-        """
-        Output Function.
-        """
-        sigma, current_time = self.state.get()
-        x = -self.radius*self.omega*np.sin(self.omega*current_time)
-        y =  self.radius*self.omega*np.cos(self.omega*current_time)
-        data = np.array([x, y])
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, Output Function, data: {}".format(current_time,self.name, data))
-        return {self.out_splitter_in: data}
-
-    def timeAdvance(self):
-        """
-        Time-Advance Function.
-        """
-        # Compute 'ta', the time to the next scheduled internal transition,
-        # based (typically) on current State.
-        sigma, current_time = self.state.get()
-        return sigma
-    
 class SplitterState:
     """
     Encapsulates the system's state
     """
 
-    def __init__(self, sigmaval=0.1, tval=0.0, uval=[]):
+    def __init__(self, sigma, tvalue, data):
         """
         Constructor (parameterizable).
         """
-        self.set(sigmaval, tval, uval)
+        self.set(sigma, tvalue, data)
 
-    def set(self, sigmavalue, tvalue, uval):
-        self._sigma  = sigmavalue
+    def set(self, sigma, tvalue, data):
+        self._sigma  = sigma
         self._tvalue = tvalue
-        self._uval = uval
+        self._data = data
 
     def get(self):
-        return self._sigma, self._tvalue, self._uval
+        return self._sigma, self._tvalue, self._data
+
 
 class Splitter(AtomicDEVS):
     """
     Split input message in as many outputs as elements the message has 
     """
   
-    def __init__(self, name=None, numoutputs=1, debug=False):
+    def __init__(self, num_outputs, name='Splitter', debug=False):
         """
         Constructor (parameterizable).
         """
@@ -317,15 +142,12 @@ class Splitter(AtomicDEVS):
         AtomicDEVS.__init__(self, name)
     
         # PARAMETERS
-        self.N  = numoutputs # number of output ports
+        self.num_outputs = num_outputs # number of output ports
         self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        _time0 = 0.0
-        _sigma0 = INFINITY
-        _data0 = []
-        self.state = SplitterState(_sigma0,_time0,_data0)
+        self.state = SplitterState(sigma=INFINITY, tvalue=0.0, data=[])
 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -337,32 +159,17 @@ class Splitter(AtomicDEVS):
         #  (usually store returned references in local variables):
         self.in_splitter_msgs = self.addInPort(name="IN")
         self.out_splitter_msgs = []
-        for i in range(self.N):
+        for i in range(self.num_outputs):
             self.out_splitter_msgs.append(self.addOutPort(name="out_splitter_port_{}".format(i)))
-        # self.out_splitter_port0 = self.addOutPort(name="out_splitter_port0")
-        # self.out_splitter_port1 = self.addOutPort(name="out_splitter_port1")
+
+        self.outputs_queue = []
+
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
 
 
     def __lt__(self, other):
         return self.name < other.name
-
-    def intTransition(self):
-        """
-        Internal Transition Function.
-        """
-        sigma, current_time, data = self.state.get()
-        current_time += sigma
-        data.pop()
-        if len(data) == 0:
-            sigma = INFINITY
-        else:
-            sigma = 0.0
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
-
-        return SplitterState(sigma,current_time,data)
 
     def extTransition(self, inputs):
         """
@@ -372,31 +179,41 @@ class Splitter(AtomicDEVS):
         current_time += self.elapsed
 
         # Received a new event, so start processing it
-        in0   = inputs[self.in_splitter_msgs]
-        i=0
-        data = []
-        for msg in in0:
-            data.append({self.out_splitter_msgs[i]: [msg]})
-            i += 1
-        # data = [
-        #        {self.out_splitter_port0: 0},
-        #        {self.out_splitter_port1: 1}
-        # ]
-        sigma = 0
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time,self.name))
+        data = list(inputs[self.in_splitter_msgs])
 
-        return SplitterState(sigma,current_time,data) 
+        sigma = 0.0
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
+
+        return SplitterState(sigma, current_time, data) 
+
+    def intTransition(self):
+        """
+        Internal Transition Function.
+        """
+        sigma, current_time, data = self.state.get()
+        current_time += sigma
+
+        if len(self.outputs_queue) == 0:
+            sigma = INFINITY
+        else:
+            sigma = 0.0
+        
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+
+        return SplitterState(sigma,current_time,data)
 
     def outputFnc(self):
         """
         Output Function.
         """
-        sigma, current_time, data = self.state.get()
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, Output Function, data: ".format(current_time,self.name, data[-1]))
+        if len(self.outputs_queue) == 0:
+            _, _, data = self.state.get()
+            for i, splitted_data in enumerate(data):
+                self.outputs_queue.append({self.out_splitter_msgs[i]: [splitted_data]})
 
-        return data[-1]
+        return self.outputs_queue.pop()
     
     def timeAdvance(self):
         """
@@ -407,3 +224,120 @@ class Splitter(AtomicDEVS):
         sigma, _, _ = self.state.get()
         return sigma
 
+######################## 
+# Merger atomic model
+########################
+class MergerState:
+    """
+    Encapsulates the system's state
+    """
+
+    def __init__(self, sigma, tvalue, data):
+        """
+        Constructor (parameterizable).
+        """
+        self.set(sigma, tvalue, data)
+
+    def set(self, sigma, tvalue, data):
+        self._sigma  = sigma
+        self._tvalue = tvalue
+        self._data = data
+
+    def get(self):
+        return self._sigma, self._tvalue, self._data
+
+
+class Merger(AtomicDEVS):
+    """
+    Split input message in as many outputs as elements the message has 
+    """
+  
+    def __init__(self, name=None, num_outputs=1, debug=False):
+        """
+        Constructor (parameterizable).
+        """
+        # Always call parent class' constructor FIRST:
+        AtomicDEVS.__init__(self, name)
+    
+        # PARAMETERS
+        self.num_outputs = num_outputs # number of output ports
+        self.debug = debug
+
+        # STATE:
+        #  Define 'state' attribute (initial sate):
+        self.state = MergerState(sigma=INFINITY, tvalue=0.0, data=[])
+
+        # ELAPSED TIME:
+        #  Initialize 'elapsed time' attribute if required
+        #  (by default, value is 0.0):
+        self.elapsed = 0.0
+    
+        # PORTS:
+        #  Declare as many input and output ports as desired
+        #  (usually store returned references in local variables):
+        self.in_splitter_msgs = self.addInPort(name="IN")
+        self.out_splitter_msgs = []
+        for i in range(self.num_outputs):
+            self.out_splitter_msgs.append(self.addOutPort(name="out_splitter_port_{}".format(i)))
+
+        self.outputs_queue = []
+
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        _, current_time, _ = self.state.get()
+        current_time += self.elapsed
+
+        # Received a new event, so start processing it
+        data = inputs[self.in_splitter_msgs].copy()
+
+        sigma = 0.0
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
+
+        return MergerState(sigma, current_time, data) 
+
+    def intTransition(self):
+        """
+        Internal Transition Function.
+        """
+        sigma, current_time, data = self.state.get()
+        current_time += sigma
+
+        if len(self.outputs_queue) == 0:
+            sigma = INFINITY
+        else:
+            sigma = 0.0
+        
+        if (self.debug):
+            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+
+        return MergerState(sigma,current_time,data)
+
+    def outputFnc(self):
+        """
+        Output Function.
+        """
+        if len(self.outputs_queue) == 0:
+            _, _, data = self.state.get()
+            for i, splitted_data in enumerate(data):
+                self.outputs_queue.append({self.out_splitter_msgs[i]: [splitted_data]})
+
+        return self.outputs_queue.pop()
+    
+    def timeAdvance(self):
+        """
+        Time-Advance Function.
+        """
+        # Compute 'ta', the time to the next scheduled internal transition,
+        # based (typically) on current State.
+        sigma, _, _ = self.state.get()
+        return sigma
