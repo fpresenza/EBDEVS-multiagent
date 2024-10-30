@@ -24,7 +24,7 @@ class GPSSensorState:
 
 
 class GPSSensor(AtomicDEVS):
-    def __init__(self,name=None,
+    def __init__(self,name='GPSSensor',
                  noisecov=np.zeros((2,2)),
                  bias=np.zeros((2,1)),
                  period=1,
