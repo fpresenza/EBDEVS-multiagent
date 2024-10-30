@@ -70,7 +70,7 @@ class MultiRobotSystem(CoupledDEVS):
             self.connectPorts(self.robots[robot_id].OUT_router_token, self.router.in_agent_token[robot_id])
             self.connectPorts(self.router.out_agent_token[robot_id], self.robots[robot_id].IN_router_token)
 
-        self.distance_meas_stddev = 2.0
+        self.distance_measurement_stddev = 10.0
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
@@ -129,7 +129,7 @@ class MultiRobotSystem(CoupledDEVS):
     def distance_measurement(self, robot_1_id, robot_2_id, delta_time):
         return np.random.normal(
             loc=self.distance(robot_1_id, robot_2_id, delta_time),
-            scale=self.distance_meas_stddev    
+            scale=self.distance_measurement_stddev    
         ) 
 
     def connected(self, robot_1_id, robot_2_id, delta_time):

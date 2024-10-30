@@ -1,4 +1,5 @@
 import numpy as np
+
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
@@ -79,7 +80,7 @@ class Controller(AtomicDEVS):
         External Transition Function.
         """
         sigma, current_time, subframework_state, externally_commanded_action = self.state.get()
-        current_time += self.elapsed
+        current_time += self.elapsed    # NOTE: self.elapsed is always zero
 
         if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
             subframework_state[self.robot_id] = inputs[self.in_kalman_intpos]

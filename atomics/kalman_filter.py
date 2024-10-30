@@ -43,6 +43,8 @@ class KalmanFilter(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
+        self.logpath = logpath
+        self.debug = debug
         
         # self.status = []          # TODO
 
@@ -59,8 +61,6 @@ class KalmanFilter(AtomicDEVS):
         #  (by default, value is 0.0):
         self.elapsed = 0.0
 
-        self.logpath = logpath
-        self.debug = debug
 
         # kalman filter parameters (hardcoded)
         self.ekf = StatelessKalmanFilter(
@@ -94,12 +94,12 @@ class KalmanFilter(AtomicDEVS):
         current_time += self.elapsed
 
         if self.in_dynamics_velmeas in inputs: # if data arrives through port in_dynamics_velmeas
-            speed_measurement = inputs[self.in_dynamics_velmeas].reshape(2, 1)
+            velocity_measurement = inputs[self.in_dynamics_velmeas].reshape(2, 1)
             position, covariance = self.ekf.first_order_dynamic_step(
                 position,
                 covariance,
                 self.elapsed,
-                speed_measurement
+                velocity_measurement
             )
             sigma = 0.0 # holds last status
         elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
