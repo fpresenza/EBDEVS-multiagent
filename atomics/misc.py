@@ -249,10 +249,10 @@ class MergerState:
 
 class Merger(AtomicDEVS):
     """
-    Split input message in as many outputs as elements the message has 
+    Merger several input messages in one output 
     """
   
-    def __init__(self, name=None, num_outputs=1, debug=False):
+    def __init__(self, num_inputs, name='Merger', debug=False):
         """
         Constructor (parameterizable).
         """
@@ -260,12 +260,12 @@ class Merger(AtomicDEVS):
         AtomicDEVS.__init__(self, name)
     
         # PARAMETERS
-        self.num_outputs = num_outputs # number of output ports
+        self.num_inputs = num_inputs # number of input ports
         self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = MergerState(sigma=INFINITY, tvalue=0.0, data=[])
+        self.state = MergerState(sigma=INFINITY, tvalue=0.0, data=[None] * num_inputs)
 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -275,10 +275,11 @@ class Merger(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.in_splitter_msgs = self.addInPort(name="IN")
-        self.out_splitter_msgs = []
-        for i in range(self.num_outputs):
-            self.out_splitter_msgs.append(self.addOutPort(name="out_splitter_port_{}".format(i)))
+        self.in_merger_msgs = []
+        for i in range(self.num_inputs):
+            self.in_merger_msgs.append(self.addInPort(name="IN_merger_port_{}".format(i)))
+
+        self.out_merger_msgs = self.addOutPort(name="OUT")
 
         self.outputs_queue = []
 
@@ -293,13 +294,16 @@ class Merger(AtomicDEVS):
         """
         External Transition Function.
         """
-        _, current_time, _ = self.state.get()
+        _, current_time, data = self.state.get()
         current_time += self.elapsed
 
         # Received a new event, so start processing it
-        data = inputs[self.in_splitter_msgs].copy()
+        for i in range(self.num_inputs):
+            if self.in_merger_msgs[i] in inputs:
+                data[i] = inputs[self.in_merger_msgs[i]]
 
         sigma = 0.0
+
         if (self.debug):
             print("t: {} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
 
@@ -311,11 +315,7 @@ class Merger(AtomicDEVS):
         """
         sigma, current_time, data = self.state.get()
         current_time += sigma
-
-        if len(self.outputs_queue) == 0:
-            sigma = INFINITY
-        else:
-            sigma = 0.0
+        sigma = INFINITY
         
         if (self.debug):
             print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
@@ -326,12 +326,9 @@ class Merger(AtomicDEVS):
         """
         Output Function.
         """
-        if len(self.outputs_queue) == 0:
-            _, _, data = self.state.get()
-            for i, splitted_data in enumerate(data):
-                self.outputs_queue.append({self.out_splitter_msgs[i]: [splitted_data]})
+        _, _, data = self.state.get()
 
-        return self.outputs_queue.pop()
+        return {self.out_merger_msgs: data}
     
     def timeAdvance(self):
         """

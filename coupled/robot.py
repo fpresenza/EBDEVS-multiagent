@@ -71,8 +71,6 @@ class Robot(CoupledDEVS):
         self.IN_router_token  = self.addInPort(name="in_router")
 
         # Connect coupled model's ports with atomic models' ports
-        self.connectPorts(self.dynamics.OUT_dynamics_x, self.OUT_x)
-        self.connectPorts(self.dynamics.OUT_dynamics_y, self.OUT_y)
         # self.connectPorts(self.IN_vx_vy, self.splitter_gen.in_splitter_msgs)
         # self.connectPorts(self.splitter_gen.out_splitter_in, self.dynamics.IN_dynamics_vx_vy)
         
