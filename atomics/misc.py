@@ -17,8 +17,10 @@ import sys
 import numpy as np
 
 # Import code for DEVS model representation:
-from pypdevs.DEVS import *
+from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
+
+from atomics.qsstools import advance_time
 
 #################### 
 # Gain atomic model 
@@ -301,6 +303,9 @@ class Merger(AtomicDEVS):
         for i in range(self.num_inputs):
             if self.in_merger_msgs[i] in inputs:
                 data[i] = inputs[self.in_merger_msgs[i]]
+            else:
+                if data[i] != None:
+                    data[i] = advance_time(data[i], self.elapsed, order=-1)
 
         sigma = 0.0
 
