@@ -78,13 +78,13 @@ for i, robot in enumerate(robot_ids):
         time[robot], position_x[robot],
         color='C{}'.format(i),
         marker='.',
-        # ds='steps-post'
+        ds='steps-post'
     )
     ax[1].plot(
         time[robot], position_y[robot],
         color='C{}'.format(i),
         marker='.',
-        # ds='steps-post'
+        ds='steps-post'
     )
 
     kalman_data = np.loadtxt(experiment_directory + 'kalman_{}.csv'.format(robot), delimiter=',')
@@ -95,14 +95,14 @@ for i, robot in enumerate(robot_ids):
         color='C{}'.format(i),
         marker='s',
         markersize=2,
-        # ds='steps-post'
+        ds='steps-post'
     )
     ax[1].plot(
         t, est_py,
         color='C{}'.format(i),
         marker='s',
         markersize=2,
-        # ds='steps-post'
+        ds='steps-post'
     )
 
 fig.savefig(experiment_directory + 'position.png', format='png', dpi=360)
