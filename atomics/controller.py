@@ -89,7 +89,8 @@ class Controller(AtomicDEVS):
             node_id, external_position = inputs[self.in_handler_extpos]
             subframework_state[node_id] = external_position
         elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
-            externally_commanded_action += inputs[self.in_handler_extact]
+            _, external_action = inputs[self.in_handler_extact]
+            externally_commanded_action += external_action
             sigma = sigma - self.elapsed # holds last status
 
         if (self.debug):
