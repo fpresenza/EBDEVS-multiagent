@@ -76,6 +76,7 @@ class KalmanFilter(AtomicDEVS):
         self.out_handler_intpos = self.addOutPort(name="out_handler_intpos")
         #
         self.in_dynamics_velmeas = self.addInPort(name="in_dynamics_velmeas")
+        self.in_gps_posmeas = self.addInPort(name="in_gps_posmeas")
         self.in_handler_extpos = self.addInPort(name="in_handler_extpos")
 
         self.outputs_queue = []
@@ -102,6 +103,13 @@ class KalmanFilter(AtomicDEVS):
                 velocity_measurement
             )
             sigma = 0.0 # holds last status
+        elif self.in_gps_posmeas in inputs: # if data arrives through port in_gps_posmeas
+            position_measurement = inputs[self.in_gps_posmeas].reshape(2, 1)
+            position, covariance = self.ekf.position_measurement_step(
+                position,
+                covariance,
+                position_measurement
+            )
         elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
             robot_id, neighbor_position, distance_measurement = inputs[self.in_handler_extpos]
             position, covariance = self.ekf.asynchronous_distance_measurement_step(
