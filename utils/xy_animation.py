@@ -77,16 +77,18 @@ with open(experiment_directory + 'global.csv', 'r') as file:
 frames = []
 positions = np.zeros((n, 2), dtype=float)
 edges = []
-for step in range(len(data[:-1])):
-    robot_index = robot_ids.index(data[step][0])
-    time = float(data[step][1])
-    positions[robot_index] = data[step][2:4]
-    neighbors = [int(r[-1]) for r in data[step][5:]]
+last_time = -1e-3
+for step, step_data in enumerate(data[1:]):
+    robot_index = robot_ids.index(step_data[0])
+    time = float(step_data[1])
+    positions[robot_index] = step_data[2:4]
+    neighbors = [int(r[-1]) for r in step_data[5:]]
 
     edges = [e for e in edges if robot_index not in e] + \
         [[robot_index, neighbor] for neighbor in neighbors]
 
-    if time < float(data[step + 1][1]):
+    if time > last_time + 1e-3:
+        last_time = time
         teams = np.arange(n)
         frames.append([time, positions.copy(), edges, teams])
 
