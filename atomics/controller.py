@@ -81,17 +81,16 @@ class Controller(AtomicDEVS):
         """
         sigma, current_time, subframework_state, externally_commanded_action = self.state.get()
         current_time += self.elapsed    # NOTE: self.elapsed is always zero
+        sigma = sigma - self.elapsed    # holds last status
 
         if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
             subframework_state[self.robot_id] = inputs[self.in_kalman_intpos]
-            sigma = sigma - self.elapsed # holds last status
         elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
             node_id, external_position = inputs[self.in_handler_extpos]
             subframework_state[node_id] = external_position
         elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
             _, external_action = inputs[self.in_handler_extact]
             externally_commanded_action += external_action
-            sigma = sigma - self.elapsed # holds last status
 
         if (self.debug):
             print(
