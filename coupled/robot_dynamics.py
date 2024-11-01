@@ -11,7 +11,6 @@ class RobotDynamics(CoupledDEVS):
         position,
         config,
         name='RobotDynamics', 
-        enable_GPS='False', 
         debug=False):
         """
         Robot's dynamic model composed of two integrators for x and y and a splitter.
