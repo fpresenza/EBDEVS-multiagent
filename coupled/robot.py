@@ -94,13 +94,9 @@ class Robot(CoupledDEVS):
         
         self.connectPorts(self.speed_sensor.output, self.kalman_filter.in_dynamics_velmeas)
 
-        if config['enable_GPS']:
+        if config['gps_sensor']['enabled']:
             gps_sensor = PositioningSystem(
-                config={
-                    'noise_mean': np.zeros((2, 1), dtype=float),
-                    'noise_covariance': np.array([[25.0, 0.0], [0.0, 25.0]]),
-                    'period': 1.0
-                },
+                config=config['gps_sensor'],
                 debug=self.debug
             )
             self.gps_sensor = self.addSubModel(gps_sensor)

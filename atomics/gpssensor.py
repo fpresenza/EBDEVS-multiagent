@@ -169,9 +169,9 @@ class PositioningSystem(AtomicDEVS):
         AtomicDEVS.__init__(self, name)
 
         # Parameters
+        self.noise_mean = np.array(config['bias'])
+        self.noise_covariance = np.array(config['covariance'])
         self.period = config['period']
-        self.noise_mean = config['noise_mean']
-        self.noise_covariance = config['noise_covariance']
 
         # STATE:
         #  Define 'state' attribute (initial sate):
