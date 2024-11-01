@@ -3,6 +3,11 @@ from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 from atomics.qsstools import *
 
+
+# do not reset random seed
+np.random.seed(0)
+
+
 class GPSSensorState:
     """
     Encapsulates the system's state
@@ -129,15 +134,6 @@ class GPSSensor(AtomicDEVS):
     
     def evalpoly(self,p):
         return p[0]+p[1]*0 # eval poly in zero time
-
-
-import numpy as np
-
-from pypdevs.DEVS import AtomicDEVS
-from pypdevs.infinity import INFINITY
-
-# do not reset random seed
-np.random.seed(0)
 
 
 class PositioningSystemState:
