@@ -102,7 +102,7 @@ class ZeroOrderLinearSystem(StochasticSystem):
         current_time += self.elapsed
 
         # data arrive through port in_control_intact
-        input = inputs[self.input].reshape(-1, 1)
+        input = np.reshape(inputs[self.input], (-1, 1))
         noise_sample = np.random.multivariate_normal(
             mean=self.output_noise[0].ravel(),
             cov=self.output_noise[1]
