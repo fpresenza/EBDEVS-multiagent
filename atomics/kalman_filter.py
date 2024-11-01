@@ -61,12 +61,11 @@ class KalmanFilter(AtomicDEVS):
         #  (by default, value is 0.0):
         self.elapsed = 0.0
 
-
         # kalman filter parameters (hardcoded)
         self.ekf = StatelessKalmanFilter(
             input_covariance=np.array([[0.0225, 0.0], [0.0, 0.0225]]),
             distance_measurement_covariance=np.array([[100.0]]),
-            position_measurement_covariance=np.array([[100.0, 0.0], [0.0, 100.0]])
+            position_measurement_covariance=np.array([[25.0, 0.0], [0.0, 25.0]])
         )
 
         # PORTS:
