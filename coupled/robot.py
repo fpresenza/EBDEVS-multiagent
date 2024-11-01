@@ -6,8 +6,7 @@ from atomics.controller import Controller
 from atomics.token_handler import TokenHandler
 from atomics.kalman_filter import KalmanFilter
 from coupled.robot_dynamics import RobotDynamics
-# from atomics.speedsensor import SpeedSensor
-from atomics.stochastic_systems import ZeroOrderLinearSystem
+from atomics.speedsensor import SpeedSensor
 from atomics.gpssensor import PositioningSystem
 
 
@@ -60,10 +59,12 @@ class Robot(CoupledDEVS):
             logpath=logpath,
             debug=self.debug
         )
-        speed_sensor = ZeroOrderLinearSystem(
-            input_matrix=np.eye(2, dtype=float),
-            noise_mean=np.zeros((2, 1), dtype=float),
-            noise_covariance=np.array([[0.15, 0.0], [0.0, 0.15]]),
+        speed_sensor = SpeedSensor(
+            config={
+                'noise_mean': np.zeros((2, 1), dtype=float),
+                'noise_covariance': np.array([[0.0225, 0.0], [0.0, 0.0225]]),
+                'period': 0.2
+            },
             debug=self.debug
         )
 
@@ -74,11 +75,9 @@ class Robot(CoupledDEVS):
         self.speed_sensor = self.addSubModel(speed_sensor)
 
         # Declare the coupled model's output ports:
-        # self.IN_vx_vy = self.addInPort(name="robot_vx_vy")
         self.OUT_router_token = self.addOutPort(name="out_router")
         self.IN_router_token  = self.addInPort(name="in_router")
 
-    
         self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
 
         self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
@@ -91,7 +90,7 @@ class Robot(CoupledDEVS):
         
         self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)        
         self.connectPorts(self.controller.out_dynamics_intact, self.dynamics.IN_control_input)
-        self.connectPorts(self.controller.out_dynamics_intact, self.speed_sensor.input)
+        self.connectPorts(self.dynamics.OUT_position, self.speed_sensor.input)
         
         self.connectPorts(self.speed_sensor.output, self.kalman_filter.in_dynamics_velmeas)
 
@@ -99,7 +98,7 @@ class Robot(CoupledDEVS):
             gps_sensor = PositioningSystem(
                 config={
                     'noise_mean': np.zeros((2, 1), dtype=float),
-                    'noise_covariance':np.array([[25.0, 0.0], [0.0, 25.0]]),
+                    'noise_covariance': np.array([[25.0, 0.0], [0.0, 25.0]]),
                     'period': 1.0
                 },
                 debug=self.debug
@@ -107,8 +106,6 @@ class Robot(CoupledDEVS):
             self.gps_sensor = self.addSubModel(gps_sensor)
             self.connectPorts(self.dynamics.OUT_position, self.gps_sensor.input)
             self.connectPorts(self.gps_sensor.output, self.kalman_filter.in_gps_posmeas)
-
-
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
