@@ -181,7 +181,7 @@ class PositioningSystem(AtomicDEVS):
         # STATE:
         #  Define 'state' attribute (initial sate):
         self.state = PositioningSystemState(
-            sigma=INFINITY, #self.period,   # waits till first token
+            sigma=self.period,   # waits till first token
             tvalue=0.0, 
             position=None
         )
@@ -239,12 +239,15 @@ class PositioningSystem(AtomicDEVS):
         """
         sigma, current_time, position = self.state.get()
 
-        px = position[0][0]
-        py = position[1][0]
+        try:
+            px = position[0][0]
+            py = position[1][0]
+        except TypeError:
+            raise "Error: PositioningSystem has not received position data yet."
         noise_sample = np.random.multivariate_normal(
             mean=self.noise_mean.ravel(),
             cov=self.noise_covariance
-        ).reshape(-1, 1)
+        )
         output = np.array([px, py]) + noise_sample
 
         return {self.output: output}
