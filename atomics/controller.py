@@ -137,7 +137,7 @@ class Controller(AtomicDEVS):
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
         sigma, _, _, _ = self.state.get()
-        return sigma
+        return max(sigma, 0.0)
 
     def __lt__(self, other):
         return self.name < other.name
