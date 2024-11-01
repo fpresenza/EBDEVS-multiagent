@@ -97,7 +97,6 @@ class Robot(CoupledDEVS):
 
         if config['enable_GPS']:
             gps_sensor = PositioningSystem(
-                robot_id=self.name,
                 config={
                     'noise_mean': np.zeros((2, 1), dtype=float),
                     'noise_covariance':np.array([[25.0, 0.0], [0.0, 25.0]]),

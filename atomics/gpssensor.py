@@ -162,14 +162,13 @@ class PositioningSystemState:
 
 
 class PositioningSystem(AtomicDEVS):
-    def __init__(self, robot_id, config, name='PositioningSystem', debug=False):
-        """Atomic model for the rigidity maintenance controller"""
+    def __init__(self, config, name='PositioningSystem', debug=False):
+        """Atomic model for the positioning system"""
 
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
 
         # Parameters
-        self.robot_id = robot_id    # Robot identifier
         self.period = config['period']
         self.noise_mean = config['noise_mean']
         self.noise_covariance = config['noise_covariance']
