@@ -14,8 +14,6 @@ parser.add_argument(
 )
 arg = parser.parse_args()
 
-
-
 robots_config = read_json_file('robots.json')
 
 for config in robots_config.values():
