@@ -60,11 +60,7 @@ class Robot(CoupledDEVS):
             debug=self.debug
         )
         speed_sensor = SpeedSensor(
-            config={
-                'noise_mean': np.zeros((2, 1), dtype=float),
-                'noise_covariance': np.array([[0.0225, 0.0], [0.0, 0.0225]]),
-                'period': 0.2
-            },
+            config=config['speed_sensor'],
             debug=self.debug
         )
 
