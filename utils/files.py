@@ -25,8 +25,6 @@ def find_latest_timestamp(parent_path):
     located in parent_path, and named with format:
         "%Y-%m-%d_%H-%M-%S"
     """
-    # print(os.listdir('.'))
-    print(os.getcwd())
     directories = [d for d in os.listdir(parent_path) if os.path.isdir(parent_path + d)]
     latest = directories[0]
     
