@@ -32,7 +32,7 @@ def find_latest_timestamp(parent_path):
         if timestamp > latest:
             latest = timestamp
 
-    return latest + '/'
+    return parent_path + latest + '/'
 
 
 def robot_id_to_index(robot_id):

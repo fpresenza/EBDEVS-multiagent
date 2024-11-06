@@ -37,7 +37,7 @@ arg = parser.parse_args()
 # ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-experiment_directory = 'output/' + find_latest_timestamp('output/')
+experiment_directory = find_latest_timestamp('output/')
 robots_config = read_json_file(experiment_directory + 'robots.json')
 robot_ids = list(robots_config)
 n = len(robot_ids)
