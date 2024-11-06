@@ -24,6 +24,10 @@ plt.rcParams['font.family'] = 'serif'
 # ------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='')
 parser.add_argument(
+    '-n', '--name',
+    default='', type=str, help='simulation file name'
+)
+parser.add_argument(
     '-s', '--skip',
     default=1, type=int, help='skip frames'
 )
@@ -37,7 +41,11 @@ arg = parser.parse_args()
 # ------------------------------------------------------------------
 # Read simulated data
 # ------------------------------------------------------------------
-experiment_directory = find_latest_timestamp('output/')
+if len(arg.name) > 0:
+    experiment_directory = 'output/' + arg.name + '/'
+else:
+    experiment_directory = find_latest_timestamp('output/')
+
 robots_config = read_json_file(experiment_directory + 'robots.json')
 robot_ids = list(robots_config)
 n = len(robot_ids)
