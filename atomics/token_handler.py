@@ -244,11 +244,15 @@ class TokenHandler(AtomicDEVS):
                     # check if token creator is within action extent
                     if token.hops_travelled <= self.action_extent:
                         # send data to controller
-                        data = (token.creator, token.data)
+                        data = (
+                            token.creator, 
+                            token.data,
+                            token.hops_travelled,
+                            distance
+                        )
                         msgs.append({self.out_controller_extpos: data})
                         if token.hops_travelled == 1:
                             # send data to positioning system
-                            data += (distance,)
                             msgs.append({self.out_kalman_extpos: data})
 
         return history, msgs
