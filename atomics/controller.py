@@ -109,7 +109,7 @@ class Controller(AtomicDEVS):
 
         if len(self.outputs_queue) == 0:
             sigma = self.period
-            u_rigidity_external = np.zeros((2, 1), dtype=float)
+            u_rigidity_external[:] = 0.0
         else:
             sigma = 0.0
 
