@@ -3,6 +3,11 @@ import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
+from uvnpy.distances.control import (
+    RigidityMaintenance,
+    CollisionAvoidance
+)
+
 # do not reset random seed
 np.random.seed(0)
 
@@ -71,6 +76,8 @@ class Controller(AtomicDEVS):
         self.in_handler_extact  = self.addInPort(name="in_handler_extact")
         
         self.outputs_queue = []
+
+        self.collision = CollisionAvoidance(power=2.0)
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -146,23 +153,31 @@ class Controller(AtomicDEVS):
     def control_action(self, subframework, external_action):
         """Compute control action"""
         if self.robot_id in subframework:
-            position = subframework[self.robot_id]
+            position = subframework[self.robot_id][0]
 
             u_target = np.zeros((2, 1), dtype=float)
-            u_collision = np.zeros((2, 1), dtype=float)
+            obstacles = np.array([
+                p.ravel() for p, hops in subframework.values() if hops == 1
+            ])
+            if len(obstacles) > 0:
+                u_collision = 20000.0 * self.collision.update(
+                    position.ravel(), obstacles
+                ).reshape(-1, 1)
+            else:
+                u_collision = np.zeros((2, 1), dtype=float)
 
-            ids, positions = list(zip(*subframework.items()))
-            subframework_action = np.zeros((len(subframework), 2), dtype=float)
-            subframework_action = {
+            subframeworks_ids, subframework_positions = list(zip(*subframework.items()))
+            rigidity_actions = np.zeros((len(subframework), 2), dtype=float)
+            rigidity_actions = {
                 node_id: action.reshape(-1, 1)
-                for node_id, action in zip(ids, subframework_action)
+                for node_id, action in zip(subframeworks_ids, rigidity_actions)
             }
 
-            u_rigidity = subframework_action.pop(self.robot_id)
+            u_rigidity = rigidity_actions.pop(self.robot_id)
             u_rigidity += external_action 
             
             own_action = u_target + u_collision + u_rigidity
-            others_action = subframework_action
+            others_action = rigidity_actions
         else:
             own_action = np.zeros((2, 1), dtype=float)
             others_action = {
