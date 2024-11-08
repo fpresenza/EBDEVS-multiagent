@@ -50,7 +50,7 @@ class Controller(AtomicDEVS):
         self.state = ControllerState(
             sigma=self.period,   # waits till first token
             tvalue=0.0, 
-            subframework={self.robot_id: None},
+            subframework={},
             external_action=np.zeros((2, 1), dtype=float)
         )
         # ELAPSED TIME:
@@ -109,6 +109,7 @@ class Controller(AtomicDEVS):
 
         if len(self.outputs_queue) == 0:
             sigma = self.period
+            subframework = {}
             external_action[:] = 0.0
         else:
             sigma = 0.0
@@ -144,7 +145,7 @@ class Controller(AtomicDEVS):
 
     def control_action(self, subframework, external_action):
         """Compute control action"""
-        if subframework[self.robot_id] is not None:
+        if self.robot_id in subframework:
             position = subframework[self.robot_id]
 
             u_target = np.zeros((2, 1), dtype=float)
