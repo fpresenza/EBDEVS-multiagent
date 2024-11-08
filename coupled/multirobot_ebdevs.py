@@ -28,9 +28,9 @@ from coupled.robot import Robot
 
 from utils.files import (
     read_json_file,
-    append_csv_file,
-    robot_id_to_index
+    append_csv_file
 )
+from utils.core import robot_id_to_index
 
 
 class MultiRobotSystem(CoupledDEVS):
