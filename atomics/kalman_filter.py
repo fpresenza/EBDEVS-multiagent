@@ -111,6 +111,7 @@ class KalmanFilter(AtomicDEVS):
                 covariance,
                 position_measurement
             )
+            sigma = 0.0 # holds last status
         elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
             robot_id, neighbor_position, distance_measurement = inputs[self.in_handler_extpos]
             position, covariance = self.ekf.asynchronous_distance_measurement_step(
@@ -120,6 +121,7 @@ class KalmanFilter(AtomicDEVS):
                 neighbor_position, 
                 np.zeros((2, 2), dtype=float)
             )
+            sigma = 0.0 # holds last status
 
         log = [current_time, position[0][0], position[1][0]]
         append_csv_file(self.logpath + 'kalman_{}.csv'.format(self.robot_id), log)
@@ -154,7 +156,7 @@ class KalmanFilter(AtomicDEVS):
             self.outputs_queue.append({self.out_control_intpos: position})
             self.outputs_queue.append({self.out_handler_intpos: position})
 
-        return self.outputs_queue.pop()
+        return self.outputs_queue.pop(0)
 
     def timeAdvance(self):
         """
