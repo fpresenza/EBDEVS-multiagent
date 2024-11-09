@@ -102,8 +102,8 @@ class Controller(AtomicDEVS):
             if hops == 1:
                 obstacles.append(external_position.ravel())
         elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
-            _, external_action = inputs[self.in_handler_extact]
-            external_action += external_action
+            _, external_action_term = inputs[self.in_handler_extact]
+            external_action += external_action_term
 
         if (self.debug):
             print(
