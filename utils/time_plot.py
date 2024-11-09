@@ -71,7 +71,7 @@ for k, row in enumerate(data):
     position_y[robot].append(float(row[3]))
 
 # ------------------------------------------------------------------
-# Plots vs time
+# Position vs time
 # ------------------------------------------------------------------
 fig, ax = plt.subplots(2, 1, figsize=(10, 8))
 ax[0].set_xlabel('time [$sec$]')
@@ -86,13 +86,15 @@ for i, robot in enumerate(robot_ids):
         time[robot], position_x[robot],
         color='C{}'.format(i),
         marker='.',
-        ds='steps-post'
+        ds='steps-post',
+        label='{}'.format(i)
     )
     ax[1].plot(
         time[robot], position_y[robot],
         color='C{}'.format(i),
         marker='.',
-        ds='steps-post'
+        ds='steps-post',
+        label='{}'.format(i)
     )
 
     kalman_data = np.loadtxt(experiment_directory + 'kalman_{}.csv'.format(robot), delimiter=',')
@@ -113,5 +115,45 @@ for i, robot in enumerate(robot_ids):
         ds='steps-post'
     )
 
+ax[0].legend()
+ax[1].legend()
 fig.savefig(experiment_directory + 'position.png', format='png', dpi=360)
+
+# ------------------------------------------------------------------
+# Control vs time
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(2, 1, figsize=(10, 8))
+ax[0].set_xlabel('time [$sec$]')
+ax[0].set_ylabel('$x$-control [$m$]')
+ax[0].grid()
+ax[1].set_xlabel('time [$sec$]')
+ax[1].set_ylabel('$y$-control [$m$]')
+ax[1].grid()
+
+for i, robot in enumerate(robot_ids):
+    control_data = np.loadtxt(experiment_directory + 'controller_{}.csv'.format(robot), delimiter=',')
+    t, ctrl_x, ctrl_y = control_data.T
+
+    ax[0].plot(
+        t, ctrl_x,
+        color='C{}'.format(i),
+        marker='s',
+        markersize=2,
+        ds='steps-post',
+        label='{}'.format(i)
+    )
+    ax[1].plot(
+        t, ctrl_y,
+        color='C{}'.format(i),
+        marker='s',
+        markersize=2,
+        ds='steps-post',
+        label='{}'.format(i)
+    )
+
+ax[0].legend()
+ax[1].legend()
+fig.savefig(experiment_directory + 'control.png', format='png', dpi=360)
+
+
 plt.show()
