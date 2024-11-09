@@ -137,6 +137,7 @@ class TokenHandler(AtomicDEVS):
                     hops_travelled=0
                 )
                 history['out']['state'] += 1
+                position = None
                 self.outputs_queue.append({self.out_router_token: state_token})
 
             sigma = 0.0
