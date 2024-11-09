@@ -112,7 +112,7 @@ class KalmanFilter(AtomicDEVS):
                 position_measurement
             )
         elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
-            robot_id, neighbor_position, _, distance_measurement = inputs[self.in_handler_extpos]
+            robot_id, neighbor_position, distance_measurement = inputs[self.in_handler_extpos]
             position, covariance = self.ekf.asynchronous_distance_measurement_step(
                 position, 
                 covariance, 

@@ -22,21 +22,23 @@ class ControllerState:
             sigma, 
             tvalue, 
             subframework,
-            external_action
+            external_action,
+            obstacles
             ):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, subframework, external_action)
+        self.set(sigma, tvalue, subframework, external_action, obstacles)
 
-    def set(self, sigma, tvalue, subframework, external_action):
+    def set(self, sigma, tvalue, subframework, external_action, obstacles):
         self._sigma  = sigma
         self._tvalue = tvalue
         self._subframework = subframework
-        self._externally_commanded_action = external_action
+        self._external_action = external_action
+        self._obstacles = obstacles
 
     def get(self):
-        return self._sigma, self._tvalue, self._subframework, self._externally_commanded_action
+        return self._sigma, self._tvalue, self._subframework, self._external_action, self._obstacles
 
 
 class Controller(AtomicDEVS):
@@ -56,7 +58,8 @@ class Controller(AtomicDEVS):
             sigma=self.period,   # waits till first token
             tvalue=0.0, 
             subframework={},
-            external_action=np.zeros((2, 1), dtype=float)
+            external_action=np.zeros((2, 1), dtype=float),
+            obstacles=[]
         )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -86,15 +89,18 @@ class Controller(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, subframework, external_action = self.state.get()
+        sigma, current_time, subframework, external_action, obstacles = self.state.get()
         current_time += self.elapsed    # NOTE: self.elapsed is always zero
         sigma = sigma - self.elapsed    # holds last status
 
         if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
-            subframework[self.robot_id] = (inputs[self.in_kalman_intpos], 0)
+            position = inputs[self.in_kalman_intpos]
+            subframework[self.robot_id] = position.ravel()
         elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
-            node_id, external_position, hops, _ = inputs[self.in_handler_extpos]
-            subframework[node_id] = (external_position, hops)
+            node_id, external_position, hops = inputs[self.in_handler_extpos]
+            subframework[node_id] = external_position.ravel()
+            if hops == 1:
+                obstacles.append(external_position.ravel())
         elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
             _, external_action = inputs[self.in_handler_extact]
             external_action += external_action
@@ -105,34 +111,35 @@ class Controller(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return ControllerState(sigma, current_time, subframework, external_action)
+        return ControllerState(sigma, current_time, subframework, external_action, obstacles)
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        sigma, current_time, subframework, external_action = self.state.get()
+        sigma, current_time, subframework, external_action, obstacles = self.state.get()
         current_time += sigma
 
         if len(self.outputs_queue) == 0:
             sigma = self.period
             subframework = {}
             external_action[:] = 0.0
+            obstacles = []
         else:
             sigma = 0.0
 
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
-        return ControllerState(sigma, current_time, subframework, external_action) 
+        return ControllerState(sigma, current_time, subframework, external_action, obstacles) 
     
     def outputFnc(self):
         """
         Output Funtion.
         """
         if len(self.outputs_queue) == 0:
-            sigma, current_time, subframework, external_action = self.state.get()
-            own_action, others_action = self.control_action(subframework, external_action)
+            sigma, current_time, subframework, external_action, obstacles = self.state.get()
+            own_action, others_action = self.control_action(subframework, external_action, obstacles)
             self.outputs_queue.append({self.out_handler_intact: others_action})
             self.outputs_queue.append({self.out_dynamics_intact: own_action})
 
@@ -144,37 +151,36 @@ class Controller(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _, _ = self.state.get()
+        sigma, _, _, _, _ = self.state.get()
         return max(sigma, 0.0)
 
     def __lt__(self, other):
         return self.name < other.name
 
-    def control_action(self, subframework, external_action):
+    def control_action(self, subframework, external_action, obstacles):
         """Compute control action"""
         if self.robot_id in subframework:
-            position = subframework[self.robot_id][0]
+            position = subframework[self.robot_id]
 
+            # target collection
             u_target = np.zeros((2, 1), dtype=float)
-            obstacles = np.array([
-                p.ravel() for p, hops in subframework.values() if hops == 1
-            ])
+
+            # obstacle avoidance
             if len(obstacles) > 0:
                 u_collision = 20000.0 * self.collision.update(
-                    position.ravel(), obstacles
+                    position, obstacles
                 ).reshape(-1, 1)
             else:
                 u_collision = np.zeros((2, 1), dtype=float)
 
-            subframeworks_ids, subframework_positions = list(zip(*subframework.items()))
+            # rigidity maintenance
+            subframework_ids, subframework_positions = list(zip(*subframework.items()))
             rigidity_actions = np.zeros((len(subframework), 2), dtype=float)
             rigidity_actions = {
                 node_id: action.reshape(-1, 1)
-                for node_id, action in zip(subframeworks_ids, rigidity_actions)
+                for node_id, action in zip(subframework_ids, rigidity_actions)
             }
-
-            u_rigidity = rigidity_actions.pop(self.robot_id)
-            u_rigidity += external_action 
+            u_rigidity = rigidity_actions.pop(self.robot_id) + external_action 
             
             own_action = u_target + u_collision + u_rigidity
             others_action = rigidity_actions
