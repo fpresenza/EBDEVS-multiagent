@@ -46,6 +46,7 @@ class Robot(CoupledDEVS):
         controller = Controller(
             robot_id=self.name,
             config=config['controller'],
+            logpath=logpath,
             debug=self.debug
         )
         token_handler = TokenHandler(

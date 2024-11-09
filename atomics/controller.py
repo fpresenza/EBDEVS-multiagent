@@ -8,6 +8,9 @@ from uvnpy.distances.control import (
     CollisionAvoidance
 )
 
+from utils.files import append_csv_file
+
+
 # do not reset random seed
 np.random.seed(0)
 
@@ -42,7 +45,13 @@ class ControllerState:
 
 
 class Controller(AtomicDEVS):
-    def __init__(self, robot_id, config, name='Controller', debug=False):
+    def __init__(
+            self,
+            robot_id,
+            config,
+            name='Controller',
+            logpath='./',
+            debug=False):
         """Atomic model for the rigidity maintenance controller"""
 
         # Always call parent class' constructor FIRST:
@@ -50,7 +59,9 @@ class Controller(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
+        self.logpath = logpath
         self.period = config['period']
+        self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
@@ -65,8 +76,6 @@ class Controller(AtomicDEVS):
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
         self.elapsed = 0.0
-
-        self.debug = debug
 
         # PORTS:
         #  Declare as many input and output ports as desired
@@ -142,6 +151,9 @@ class Controller(AtomicDEVS):
             own_action, others_action = self.control_action(subframework, external_action, obstacles)
             self.outputs_queue.append({self.out_handler_intact: others_action})
             self.outputs_queue.append({self.out_dynamics_intact: own_action})
+
+            log = [current_time, own_action[0][0], own_action[1][0]]
+            append_csv_file(self.logpath + 'controller_{}.csv'.format(self.robot_id), log)
 
         return self.outputs_queue.pop()
 
