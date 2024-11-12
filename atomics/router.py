@@ -136,7 +136,7 @@ class RouterState:
 
 
 class Router(AtomicDEVS):
-    def __init__(self, agents_ids, name=None, debug=False):
+    def __init__(self, agents_ids, targets_ids, name=None, debug=False):
         """Atomic model for the Router """
 
         # Always call parent class' constructor FIRST:
@@ -144,7 +144,8 @@ class Router(AtomicDEVS):
 
         # Parameters
         # self.agents = range(number_of_robots)
-        self.agents = agents_ids
+        self.agents  = agents_ids
+        self.targets = targets_ids
         num_agents = len(agents_ids)
         # self.status = []          # TODO
         self.debug = debug
@@ -166,11 +167,18 @@ class Router(AtomicDEVS):
         self.out_agent_token = {
             agent: self.addOutPort(name="out_agent_token_{}".format(i)) for i, agent in enumerate(self.agents)
         }
+        self.out_target = {
+            agent: self.addOutPort(name="out_target_{}".format(i)) for i, agent in enumerate(self.targets)
+        }
         self.in_agent_token = {
             agent: self.addInPort(name="in_agent_token_{}".format(i)) for i,agent in enumerate(self.agents)
         }
+        self.in_target = {
+            agent: self.addInPort(name="in_target_{}".format(i)) for i,agent in enumerate(self.targets)
+        }
 
-        self.in_port_mapping = {"in_agent_token_{}".format(i): agent_id for i, agent_id in enumerate(self.agents)}
+        self.in_agents_port_mapping  = {"in_agent_token_{}".format(i): agent_id for i, agent_id in enumerate(self.agents)}
+        self.in_targets_port_mapping = {"in_target_{}".format(i): target_id for i, target_id in enumerate(self.targets)}
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -184,14 +192,25 @@ class Router(AtomicDEVS):
         current_time += self.elapsed
 
         port, token = list(inputs.items())[0]
-        transmitter = self.in_port_mapping[port.name]
-        receivers = self.parent.getContextInformation(transmitter, current_time)
-        if len(receivers) > 0:
-            data += [
-                {self.out_agent_token[receiver_id]: (token, distance_meas)} 
-                for receiver_id, distance_meas in receivers
-            ]
-            sigma = 0 # holds last status
+        if 'agent' in port.name:
+            transmitter = self.in_agents_port_mapping[port.name]
+            receivers = self.parent.getContextInformation(transmitter, current_time)
+            if len(receivers) > 0:
+                data += [
+                    {self.out_agent_token[receiver_id]: (token, distance_meas)} 
+                    for receiver_id, distance_meas in receivers
+                ]
+
+        elif 'target' in port.name:
+            transmitter = self.in_targets_port_mapping[port.name]
+            receivers = self.parent.getContextInformation(transmitter, current_time)
+            if len(receivers) > 0:
+                data += [
+                    {self.out_agent_token[receiver_id]: (token, distance_meas)} 
+                    for receiver_id, distance_meas in receivers
+                ]
+
+        sigma = 0 # holds last status
 
         if (self.debug):
                 print("t: {} s, Atomic name: {}, External Transition Function, transmitter: {} -> receivers: {}".format(current_time,self.name,transmitter,receivers))
