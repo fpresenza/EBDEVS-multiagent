@@ -10,26 +10,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    162.75581620385734
+                    154.94579428280346
                 ],
                 [
-                    181.2176897122059
+                    183.4386842484365
                 ]
             ],
             "covariance": [
@@ -52,7 +54,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -73,7 +75,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -103,26 +105,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    146.39209988218218
+                    143.55464192069599
                 ],
                 [
-                    104.4462647855564
+                    99.0308518504429
                 ]
             ],
             "covariance": [
@@ -145,7 +149,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -166,7 +170,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -196,26 +200,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    81.30347883689836
+                    83.41385609474575
                 ],
                 [
-                    60.07605084443512
+                    60.48066175811621
                 ]
             ],
             "covariance": [
@@ -238,7 +244,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -259,7 +265,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -289,26 +295,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    76.4172402914327
+                    74.80842095184832
                 ],
                 [
-                    158.2677071414549
+                    147.6948272541591
                 ]
             ],
             "covariance": [
@@ -331,7 +339,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -352,7 +360,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -382,26 +390,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    14.682750970120084
+                    16.05741781283753
                 ],
                 [
-                    139.8328247440086
+                    145.59695080998827
                 ]
             ],
             "covariance": [
@@ -424,7 +434,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -445,7 +455,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -475,26 +485,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    170.62214868830034
+                    170.55964369925778
                 ],
                 [
-                    93.25103621529657
+                    91.01137700282379
                 ]
             ],
             "covariance": [
@@ -517,7 +529,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -538,7 +550,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -568,26 +580,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    26.042573065523886
+                    27.287429898674986
                 ],
                 [
-                    76.88090024130221
+                    78.74292280100853
                 ]
             ],
             "covariance": [
@@ -610,7 +624,7 @@
             "enabled": true,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -631,7 +645,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -661,26 +675,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    102.82245401044717
+                    95.46146922016614
                 ],
                 [
-                    164.55964326101952
+                    162.83134181224642
                 ]
             ],
             "covariance": [
@@ -703,7 +719,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -724,7 +740,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -754,26 +770,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    175.75784539888545
+                    173.66980597641398
                 ],
                 [
-                    157.01852929208724
+                    160.18761762080305
                 ]
             ],
             "covariance": [
@@ -796,7 +814,7 @@
             "enabled": true,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -817,7 +835,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -847,26 +865,28 @@
         ],
         "dynamics": {
             "x": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.01,
+                "dQMin": 0.05,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
         },
         "controller": {
-            "period": 0.1
+            "period": 0.1,
+            "dmax": 85.5,
+            "steepness": 0.55
         },
         "kalman_filter": {
             "position": [
                 [
-                    88.83300067236311
+                    94.48309123837622
                 ],
                 [
-                    91.59685944583235
+                    87.80716555675137
                 ]
             ],
             "covariance": [
@@ -889,7 +909,7 @@
             "enabled": false,
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
@@ -910,7 +930,7 @@
         "speed_sensor": {
             "bias": [
                 [
-                    0.0    
+                    0.0
                 ],
                 [
                     0.0
