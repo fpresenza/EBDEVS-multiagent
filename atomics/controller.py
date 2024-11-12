@@ -90,6 +90,13 @@ class Controller(AtomicDEVS):
         self.outputs_queue = []
 
         self.collision = CollisionAvoidance(power=2.0)
+        self.rigidity = RigidityMaintenance(
+            dim=2,
+            dmax=config['dmax'],
+            steepness=config['steepness'],
+            eigenvalues='all',
+            functional='log'
+        )
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -148,8 +155,8 @@ class Controller(AtomicDEVS):
         """
         if len(self.outputs_queue) == 0:
             sigma, current_time, subframework, external_action, obstacles = self.state.get()
-            own_action, others_action = self.control_action(subframework, external_action, obstacles)
-            self.outputs_queue.append({self.out_handler_intact: others_action})
+            own_action, others_actions = self.control_action(subframework, external_action, obstacles)
+            self.outputs_queue.append({self.out_handler_intact: others_actions})
             self.outputs_queue.append({self.out_dynamics_intact: own_action})
 
             log = [current_time, own_action[0][0], own_action[1][0]]
@@ -187,20 +194,27 @@ class Controller(AtomicDEVS):
 
             # rigidity maintenance
             subframework_ids, subframework_positions = list(zip(*subframework.items()))
-            rigidity_actions = np.zeros((len(subframework), 2), dtype=float)
-            rigidity_actions = {
-                node_id: action.reshape(-1, 1)
-                for node_id, action in zip(subframework_ids, rigidity_actions)
-            }
-            u_rigidity = rigidity_actions.pop(self.robot_id) + external_action 
+            if len(subframework) > 1:
+                subframework_positions = np.array(subframework_positions)
+                rigidity_actions = 5.0 * self.rigidity.update(subframework_positions)
+                rigidity_actions = {
+                    node_id: action.reshape(-1, 1)
+                    for node_id, action in zip(subframework_ids, rigidity_actions)
+                }
+                # if self.robot_id == 'Robot_0':
+                #     print(rigidity_actions[self.robot_id].ravel(), external_action.ravel())
+                u_rigidity = rigidity_actions.pop(self.robot_id) + external_action
+            else:
+                rigidity_actions = {}
+                u_rigidity = external_action
             
             own_action = u_target + u_collision + u_rigidity
-            others_action = rigidity_actions
+            others_actions = rigidity_actions
         else:
             own_action = np.zeros((2, 1), dtype=float)
-            others_action = {
+            others_actions = {
                 node_id: np.zeros((2, 1), dtype=float)
                 for node_id in subframework if node_id != self.robot_id
             }
 
-        return own_action, others_action
+        return own_action, others_actions
