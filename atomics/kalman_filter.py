@@ -11,21 +11,21 @@ class KalmanFilterState:
     """
     Encapsulates the system's state
     """
-
-    def __init__(self, sigma, tvalue, position, covariance):
+    def __init__(self, sigma, tvalue, tvalue_prev, position, covariance):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, position, covariance)
+        self.set(sigma, tvalue, tvalue_prev, position, covariance)
 
-    def set(self, sigma, tvalue, position, covariance):
+    def set(self, sigma, tvalue, tvalue_prev, position, covariance):
         self._sigma = sigma
         self._tvalue = tvalue
+        self._tvalue_prev = tvalue_prev
         self._position = position
         self._covariance = covariance
 
     def get(self):
-        return self._sigma, self._tvalue, self._position, self._covariance
+        return self._sigma, self._tvalue, self._tvalue_prev, self._position, self._covariance
 
 
 class KalmanFilter(AtomicDEVS):
@@ -53,6 +53,7 @@ class KalmanFilter(AtomicDEVS):
         self.state = KalmanFilterState(
             sigma=INFINITY,
             tvalue=0.0,
+            tvalue_prev=0.0,
             position=np.array(config['position']),
             covariance=np.array(config['covariance'])
         )
@@ -90,7 +91,7 @@ class KalmanFilter(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, position, covariance = self.state.get()
+        sigma, current_time, previous_time, position, covariance = self.state.get()
         current_time += self.elapsed
 
         if self.in_dynamics_velmeas in inputs: # if data arrives through port in_dynamics_velmeas
@@ -98,10 +99,11 @@ class KalmanFilter(AtomicDEVS):
             position, covariance = self.ekf.first_order_dynamic_step(
                 position,
                 covariance,
-                self.elapsed,
+                current_time - previous_time,
                 velocity_measurement
             )
             sigma = 0.0 # holds last status
+            previous_time = current_time
         elif self.in_gps_posmeas in inputs: # if data arrives through port in_gps_posmeas
             position_measurement = inputs[self.in_gps_posmeas].reshape(2, 1)
             position, covariance = self.ekf.position_measurement_step(
@@ -109,6 +111,7 @@ class KalmanFilter(AtomicDEVS):
                 covariance,
                 position_measurement
             )
+            sigma = 0.0 # holds last status
         elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
             robot_id, neighbor_position, distance_measurement = inputs[self.in_handler_extpos]
             position, covariance = self.ekf.asynchronous_distance_measurement_step(
@@ -118,6 +121,7 @@ class KalmanFilter(AtomicDEVS):
                 neighbor_position, 
                 np.zeros((2, 2), dtype=float)
             )
+            sigma = 0.0 # holds last status
 
         log = [current_time, position[0][0], position[1][0]]
         append_csv_file(self.logpath + 'kalman_{}.csv'.format(self.robot_id), log)
@@ -125,13 +129,13 @@ class KalmanFilter(AtomicDEVS):
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
 
-        return KalmanFilterState(sigma, current_time, position, covariance)
+        return KalmanFilterState(sigma, current_time, previous_time, position, covariance)
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, position, covariance = self.state.get()
+        _, current_time, previous_time, position, covariance = self.state.get()
 
         if len(self.outputs_queue) == 0:
             sigma = INFINITY
@@ -139,20 +143,20 @@ class KalmanFilter(AtomicDEVS):
             sigma = 0.0
 
         if (self.debug):
-            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time, self.name))
             
-        return KalmanFilterState(sigma, current_time, position, covariance) 
+        return KalmanFilterState(sigma, current_time, previous_time, position, covariance) 
     
     def outputFnc(self):
         """
         Output Funtion.
         """
         if len(self.outputs_queue) == 0:
-            _, _, position, _ = self.state.get()
+            _, _, _, position, _ = self.state.get()
             self.outputs_queue.append({self.out_control_intpos: position})
             self.outputs_queue.append({self.out_handler_intpos: position})
 
-        return self.outputs_queue.pop()
+        return self.outputs_queue.pop(0)
 
     def timeAdvance(self):
         """
@@ -160,5 +164,5 @@ class KalmanFilter(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _, _ = self.state.get()
+        sigma, _, _, _, _ = self.state.get()
         return sigma

@@ -137,6 +137,7 @@ class TokenHandler(AtomicDEVS):
                     hops_travelled=0
                 )
                 history['out']['state'] += 1
+                position = None
                 self.outputs_queue.append({self.out_router_token: state_token})
 
             sigma = 0.0
@@ -245,11 +246,10 @@ class TokenHandler(AtomicDEVS):
                     if token.hops_travelled <= self.action_extent:
                         # send data to controller
                         data = (token.creator, token.data)
-                        msgs.append({self.out_controller_extpos: data})
+                        msgs.append({self.out_controller_extpos: data + (token.hops_travelled, )})
                         if token.hops_travelled == 1:
                             # send data to positioning system
-                            data += (distance,)
-                            msgs.append({self.out_kalman_extpos: data})
+                            msgs.append({self.out_kalman_extpos: data + (distance, )})
 
         return history, msgs
 

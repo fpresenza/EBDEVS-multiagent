@@ -25,8 +25,6 @@ def find_latest_timestamp(parent_path):
     located in parent_path, and named with format:
         "%Y-%m-%d_%H-%M-%S"
     """
-    # print(os.listdir('.'))
-    print(os.getcwd())
     directories = [d for d in os.listdir(parent_path) if os.path.isdir(parent_path + d)]
     latest = directories[0]
     
@@ -34,9 +32,4 @@ def find_latest_timestamp(parent_path):
         if timestamp > latest:
             latest = timestamp
 
-    return latest + '/'
-
-
-def robot_id_to_index(robot_id):
-    underscore = robot_id.rindex('_')
-    return int(robot_id[underscore + 1:])
+    return parent_path + latest + '/'

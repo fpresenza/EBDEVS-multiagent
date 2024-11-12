@@ -181,7 +181,7 @@ class Splitter(AtomicDEVS):
         current_time += self.elapsed
 
         # Received a new event, so start processing it
-        data = list(inputs[self.in_splitter_msgs])
+        data = np.ravel(inputs[self.in_splitter_msgs])    # serialize data
 
         sigma = 0.0
         if (self.debug):
