@@ -182,34 +182,30 @@ class Controller(AtomicDEVS):
             position = subframework[self.robot_id]
 
             # target collection
-            u_target = np.zeros((2, 1), dtype=float)
+            own_target = np.zeros((2, 1), dtype=float)
 
             # obstacle avoidance
             if len(obstacles) > 0:
-                u_collision = 20000.0 * self.collision.update(
+                own_collision = 20000.0 * self.collision.update(
                     position, obstacles
                 ).reshape(-1, 1)
             else:
-                u_collision = np.zeros((2, 1), dtype=float)
+                own_collision = np.zeros((2, 1), dtype=float)
 
             # rigidity maintenance
-            subframework_ids, subframework_positions = list(zip(*subframework.items()))
+            own_rigidity = external_action
+            others_rigidity = {}
             if len(subframework) > 1:
-                subframework_positions = np.array(subframework_positions)
-                rigidity_actions = 5.0 * self.rigidity.update(subframework_positions)
-                rigidity_actions = {
+                subframework_ids, subframework_positions = list(zip(*subframework.items()))
+                subframework_actions = 5.0 * self.rigidity.update(np.array(subframework_positions))
+                others_rigidity = {
                     node_id: action.reshape(-1, 1)
-                    for node_id, action in zip(subframework_ids, rigidity_actions)
+                    for node_id, action in zip(subframework_ids, subframework_actions)
                 }
-                # if self.robot_id == 'Robot_0':
-                #     print(rigidity_actions[self.robot_id].ravel(), external_action.ravel())
-                u_rigidity = rigidity_actions.pop(self.robot_id) + external_action
-            else:
-                rigidity_actions = {}
-                u_rigidity = external_action
+                own_rigidity += others_rigidity.pop(self.robot_id)
             
-            own_action = u_target + u_collision + u_rigidity
-            others_actions = rigidity_actions
+            own_action = own_target + own_collision + own_rigidity
+            others_actions = others_rigidity
         else:
             own_action = np.zeros((2, 1), dtype=float)
             others_actions = {
