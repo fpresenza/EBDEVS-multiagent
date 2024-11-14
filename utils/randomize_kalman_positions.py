@@ -1,11 +1,9 @@
 import numpy as np
 import argparse
 
-from files import (
-    read_json_file,
-    write_json_file,
-    robot_id_to_index
-)
+from files import read_json_file, write_json_file
+from core import robot_id_to_index
+
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument(

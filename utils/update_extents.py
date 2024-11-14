@@ -4,11 +4,9 @@ from uvnpy.network.core import geodesics
 from uvnpy.network.subframeworks import superframework_extents
 from uvnpy.distances.core import minimum_rigidity_extents
 
-from files import (
-    read_json_file,
-    write_json_file,
-    robot_id_to_index
-)
+from files import read_json_file, write_json_file
+from core import robot_id_to_index
+
 
 robots_config = read_json_file('robots.json')
 n_robots = len(robots_config)
