@@ -204,6 +204,7 @@ class Router(AtomicDEVS):
         elif 'target' in port.name:
             transmitter = self.in_targets_port_mapping[port.name]
             receivers = self.parent.getContextInformation(transmitter, current_time)
+            print(f'token: {token}')
             if len(receivers) > 0:
                 data += [
                     {self.out_agent_token[receiver_id]: (token, distance_meas)} 

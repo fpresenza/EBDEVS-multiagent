@@ -67,13 +67,14 @@ class Target(AtomicDEVS):
         _status0 = 'Active' # target active
         self.state = TargetState(_sigma0,_time0,_status0) 
 
+        # initialize y_up
         self.y_up = [
             self.name, 
             {
                 'time': 0.0, 
                 'pose': [coord + [0.0] * 9 for coord in self.position], # 10-tuple
                 'comm_range': self.comm_range,
-                'status': _status0
+                'status': _status0,
             }
         ]
 
@@ -85,8 +86,8 @@ class Target(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.OUT = self.addOutPort(name="OUT_router_target")
-        self.IN  = self.addInPort(name="IN_router_target")
+        self.OUT_router_target = self.addOutPort(name="OUT_router_target")
+        self.IN_router_target  = self.addInPort(name="IN_router_target")
 
     def __lt__(self, other):
         return self.name < other.name
@@ -101,15 +102,7 @@ class Target(AtomicDEVS):
 
         if status=='Passive':
             sigma = INFINITY
-            self.y_up = [
-                self.name, 
-                {
-                    'time': 0.0, 
-                    'pose': [coord + [0.0] * 9 for coord in self.position], 
-                    'comm_range': self.comm_range,
-                    'status': status
-                }
-            ]
+            self.y_up[1]['status']='Passive'
         else:
             sigma = self.period
 
@@ -128,9 +121,9 @@ class Target(AtomicDEVS):
         sigma, current_time, _ = self.state.get()
         current_time += self.elapsed
 
-        if self.IN in inputs: # external events turn off the target
+        if self.IN_router_target in inputs: # external events turn off the target
             status = 'Passive' # target passivated
-            sigma  = 0
+            sigma  = 0.0
 
         if (self.debug):
             print(
@@ -164,7 +157,7 @@ class Target(AtomicDEVS):
                 .format(current_time,self.parent.parent.name,self.name,status)
             )
 
-        return {self.OUT: status}
+        return {self.OUT_router_target: status}
     
     def timeAdvance(self):
         """

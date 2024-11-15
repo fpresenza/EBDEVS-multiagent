@@ -76,6 +76,7 @@ class MultiRobotSystem(CoupledDEVS):
         self.targets_states = {}
         self.targets = {}
         for target_id, config in targets_config.items():
+            i = robot_id_to_index(target_id)
             self.targets[target_id] = self.addSubModel(
                 Target(
                     config,
@@ -85,14 +86,40 @@ class MultiRobotSystem(CoupledDEVS):
                 )
             )
             self.connectPorts(self.targets[target_id].OUT_router_target, self.router.in_target[target_id]) # target -> router
-            self.connectPorts(self.router.out_target[robot_id], self.targets[target_id].IN_router_target) # router -> target
+            self.connectPorts(self.router.out_target[target_id], self.targets[target_id].IN_router_target) # router -> target
+
+        # targets_states must be initialized at the very beginning
+        for target_id in targets_config:
+            data = {
+                'time': 0.0, 
+                'pose': [coord + [0.0] * 9 for coord in targets_config[target_id]["position"]], # 10-tuple
+                'comm_range': targets_config[target_id]["comm_range"],
+                'status': "Active",
+            }
+            self.targets_states[target_id] = data
+            # log new value of micro_states
+            log = [target_id, data['time']]
+            log += [data['pose'][0][0],data['pose'][1][0]]
+            log += [data['comm_range']]
+            log += [data['status']]
+            log += [
+                neighbor_id
+                for neighbor_id in self.robots_states.keys()
+                if self.connected(target_id, neighbor_id, 0.0) # checks and registers current neighboring robots
+            ]
+            append_csv_file(self.logpath + 'targets.csv', log)
+
+        self.distance_measurement_stddev = 10.0
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         # self.current_time += e_g
-        micro_id, data = x_b_micro
+        if len(x_b_micro)==1:
+            micro_id, data = x_b_micro[0]
+        else:
+            micro_id, data = x_b_micro
 
         if 'Robot' in micro_id:
             self.robots_states[micro_id] = data.copy()
@@ -133,7 +160,7 @@ class MultiRobotSystem(CoupledDEVS):
         if 'Robot' in agent_1_id:
             previous_time = self.robots_states[agent_1_id]['time']
         else: # 'Token'
-            previous_time = self.tokens_states[agent_1_id]['time']
+            previous_time = self.targets_states[agent_1_id]['time']
         delta_time = current_time - previous_time
         return [
             (robot_2_id, self.distance_measurement(agent_1_id, robot_2_id, delta_time))
