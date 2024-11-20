@@ -4,6 +4,7 @@ from pypdevs.DEVS import CoupledDEVS
 
 from atomics.controller import Controller
 from atomics.token_handler import TokenHandler
+from atomics.target_handler import TargetHandler
 from atomics.kalman_filter import KalmanFilter
 from coupled.robot_dynamics import RobotDynamics
 from atomics.speedsensor import SpeedSensor
@@ -54,6 +55,10 @@ class Robot(CoupledDEVS):
             config=config['token_handler'],
             debug=self.debug,
         )
+        target_handler = TargetHandler(
+            config=config['target_handler'],
+            debug=self.debug,
+        )
         kalman_filter = KalmanFilter(
             robot_id=self.name,
             config=config['kalman_filter'],
@@ -68,6 +73,7 @@ class Robot(CoupledDEVS):
         self.dynamics = self.addSubModel(dynamics)
         self.controller = self.addSubModel(controller)
         self.token_handler = self.addSubModel(token_handler)
+        self.target_handler = self.addSubModel(target_handler)
         self.kalman_filter = self.addSubModel(kalman_filter)
         self.speed_sensor = self.addSubModel(speed_sensor)
 

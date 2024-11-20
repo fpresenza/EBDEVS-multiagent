@@ -49,6 +49,9 @@
             "action": 1,
             "state": 2
         },
+        "target_handler": {
+            "period": 1.0
+        },
         "comm_range": 90.0,
         "gps_sensor": {
             "enabled": false,
@@ -143,6 +146,9 @@
         "token_handler": {
             "action": 1,
             "state": 2
+        },
+        "target_handler": {
+            "period": 1.0
         },
         "comm_range": 90.0,
         "gps_sensor": {
@@ -239,6 +245,9 @@
             "action": 1,
             "state": 2
         },
+        "target_handler": {
+            "period": 1.0
+        },
         "comm_range": 90.0,
         "gps_sensor": {
             "enabled": false,
@@ -333,6 +342,9 @@
         "token_handler": {
             "action": 2,
             "state": 2
+        },
+        "target_handler": {
+            "period": 1.0
         },
         "comm_range": 90.0,
         "gps_sensor": {
@@ -429,6 +441,9 @@
             "action": 2,
             "state": 2
         },
+        "target_handler": {
+            "period": 1.0
+        },
         "comm_range": 90.0,
         "gps_sensor": {
             "enabled": false,
@@ -523,6 +538,9 @@
         "token_handler": {
             "action": 1,
             "state": 2
+        },
+        "target_handler": {
+            "period": 1.0
         },
         "comm_range": 90.0,
         "gps_sensor": {
@@ -619,6 +637,9 @@
             "action": 2,
             "state": 2
         },
+        "target_handler": {
+            "period": 1.0
+        },
         "comm_range": 90.0,
         "gps_sensor": {
             "enabled": true,
@@ -713,6 +734,9 @@
         "token_handler": {
             "action": 1,
             "state": 2
+        },
+        "target_handler": {
+            "period": 1.0
         },
         "comm_range": 90.0,
         "gps_sensor": {
@@ -809,6 +833,9 @@
             "action": 1,
             "state": 2
         },
+        "target_handler": {
+            "period": 1.0
+        },
         "comm_range": 90.0,
         "gps_sensor": {
             "enabled": true,
@@ -903,6 +930,9 @@
         "token_handler": {
             "action": 1,
             "state": 2
+        },
+        "target_handler": {
+            "period": 1.0
         },
         "comm_range": 90.0,
         "gps_sensor": {
