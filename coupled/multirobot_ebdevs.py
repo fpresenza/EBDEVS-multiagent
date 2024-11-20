@@ -205,6 +205,5 @@ class MultiRobotSystem(CoupledDEVS):
             trasmitter_range = self.robots_states[agent_1_id]['comm_range']
         else: # 'Target'
             trasmitter_range = self.targets_states[agent_1_id]['comm_range']
-        receiver_range = self.robots_states[robot_2_id]['comm_range']
 
-        return (distance < trasmitter_range) and (distance < receiver_range)
+        return distance < trasmitter_range
