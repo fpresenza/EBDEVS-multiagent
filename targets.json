@@ -8,19 +8,21 @@
                 192.097
             ]
         ],
+        "period": 1.0,
         "comm_range": 300.0,
-        "period": 1.0
+        "collect_range": 30.0
     },
     "Target_1": {
         "position": [
             [
-                155.759
+                162.343
             ],
             [
-                114.87
+                480.0
             ]
         ],
+        "period": 1.0,
         "comm_range": 300.0,
-        "period": 1.0
+        "collect_range": 30.0
     }
 }
