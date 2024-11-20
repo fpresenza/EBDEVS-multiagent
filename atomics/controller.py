@@ -107,7 +107,7 @@ class Controller(AtomicDEVS):
         """
         sigma, current_time, subframework, external_action, obstacles = self.state.get()
         current_time += self.elapsed    # NOTE: self.elapsed is always zero
-        sigma = sigma - self.elapsed    # holds last status
+        sigma -= self.elapsed    # holds last status
 
         if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
             position = inputs[self.in_kalman_intpos]
@@ -138,9 +138,9 @@ class Controller(AtomicDEVS):
 
         if len(self.outputs_queue) == 0:
             sigma = self.period
-            subframework = {}
+            subframework.clear()
             external_action[:] = 0.0
-            obstacles = []
+            obstacles.clear()
         else:
             sigma = 0.0
 
@@ -154,7 +154,7 @@ class Controller(AtomicDEVS):
         Output Funtion.
         """
         if len(self.outputs_queue) == 0:
-            sigma, current_time, subframework, external_action, obstacles = self.state.get()
+            _, current_time, subframework, external_action, obstacles = self.state.get()
             own_action, others_actions = self.control_action(subframework, external_action, obstacles)
             self.outputs_queue.append({self.out_handler_intact: others_actions})
             self.outputs_queue.append({self.out_dynamics_intact: own_action})
