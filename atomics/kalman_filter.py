@@ -72,14 +72,12 @@ class KalmanFilter(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.out_control_intpos = self.addOutPort(name="out_control_intpos")
-        self.out_handler_intpos = self.addOutPort(name="out_handler_intpos")
         #
         self.in_dynamics_velmeas = self.addInPort(name="in_dynamics_velmeas")
         self.in_gps_posmeas = self.addInPort(name="in_gps_posmeas")
         self.in_handler_extpos = self.addInPort(name="in_handler_extpos")
 
-        self.outputs_queue = []
+        self.outPorts = {'position': self.addOutPort(name="out_position")}
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -137,10 +135,7 @@ class KalmanFilter(AtomicDEVS):
         """
         _, current_time, previous_time, position, covariance = self.state.get()
 
-        if len(self.outputs_queue) == 0:
-            sigma = INFINITY
-        else:
-            sigma = 0.0
+        sigma = INFINITY
 
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time, self.name))
@@ -151,12 +146,9 @@ class KalmanFilter(AtomicDEVS):
         """
         Output Funtion.
         """
-        if len(self.outputs_queue) == 0:
-            _, _, _, position, _ = self.state.get()
-            self.outputs_queue.append({self.out_control_intpos: position})
-            self.outputs_queue.append({self.out_handler_intpos: position})
+        _, _, _, position, _ = self.state.get()
 
-        return self.outputs_queue.pop(0)
+        return {self.outPorts['position']: position}
 
     def timeAdvance(self):
         """
