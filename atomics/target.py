@@ -22,19 +22,19 @@ class TargetState:
     Encapsulates the system's state
     """
 
-    def __init__(self, sigmaval=0.1, tval=0.0, dataval=[]):
+    def __init__(self, sigma=0.1, tvalue=0.0, status=None):
         """
         Constructor (parameterizable).
         """
-        self.set(sigmaval, tval, dataval)
+        self.set(sigma, tval, dataval)
 
-    def set(self, sigmavalue, tvalue, datavalue):
-        self._sigma  = sigmavalue
+    def set(self, sigma, tvalue, datavalue):
+        self._sigma  = sigma
         self._tvalue = tvalue
-        self._data   = datavalue
+        self._status = status
 
     def get(self):
-        return self._sigma, self._tvalue, self._data
+        return self._sigma, self._tvalue, self._status
 
 class Target(AtomicDEVS):
     """
@@ -61,10 +61,11 @@ class Target(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        _time0  = 0.0
-        _sigma0 = period
-        _status0 = 'Active' # target active
-        self.state = TargetState(_sigma0,_time0,_status0) 
+        self.state = TargetState(
+            sigma=self.period,
+            tvalue=0.0,
+            status='Active'
+        ) 
 
         # initialize y_up
         self.y_up = [
@@ -73,7 +74,7 @@ class Target(AtomicDEVS):
                 'time': 0.0, 
                 'pose': [coord + [0.0] * 9 for coord in self.position], # 10-tuple
                 'comm_range': self.comm_range,
-                'status': _status0,
+                'status': 'Active',
             }
         ]
 
