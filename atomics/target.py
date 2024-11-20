@@ -57,8 +57,8 @@ class Target(AtomicDEVS):
         # PARAMETERS
         self.position  = config['position']
         self.comm_range = config['comm_range']
+        self.period = config['period']
         self.debug = debug
-        self.period = period
 
         # STATE:
         #  Define 'state' attribute (initial sate):
@@ -96,23 +96,22 @@ class Target(AtomicDEVS):
         """
         Internal Transition Function.
         """
-  
         sigma, current_time, status = self.state.get()
         current_time += sigma
 
-        if status=='Passive':
+        if status == 'Passive':
             sigma = INFINITY
-            self.y_up[1]['status']='Passive'
+            self.y_up[1]['status'] = 'Passive'
         else:
             sigma = self.period
 
         if (self.debug):
             print(
                 "t: {:.2f} s, Parent name: {}, Atomic name: {}, Internal Transition Function, Status: {}"
-                .format(current_time,self.parent.parent.name,self.name,status)
+                .format(current_time, self.parent.parent.name, self.name,status)
             )
             
-        return TargetState(sigma,current_time,status) 
+        return TargetState(sigma, current_time, status) 
     
     def extTransition(self, inputs):
         """
