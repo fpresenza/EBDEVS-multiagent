@@ -45,7 +45,6 @@ class Target(AtomicDEVS):
             self,
             config, # position, comm_range
             name = 'Target', 
-            period = 1.0,
             debug=False
         ):
         """
