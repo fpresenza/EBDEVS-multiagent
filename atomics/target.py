@@ -26,9 +26,9 @@ class TargetState:
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tval, dataval)
+        self.set(sigma, tvalue, status)
 
-    def set(self, sigma, tvalue, datavalue):
+    def set(self, sigma, tvalue, status):
         self._sigma  = sigma
         self._tvalue = tvalue
         self._status = status
