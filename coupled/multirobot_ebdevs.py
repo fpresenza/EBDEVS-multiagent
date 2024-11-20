@@ -31,7 +31,6 @@ from utils.files import (
     read_json_file,
     append_csv_file
 )
-from utils.core import robot_id_to_index
 
 
 class MultiRobotSystem(CoupledDEVS):
@@ -61,7 +60,6 @@ class MultiRobotSystem(CoupledDEVS):
         self.robots_states = {}
         self.robots = {}
         for robot_id, config in robots_config.items():
-            i = robot_id_to_index(robot_id)
             self.robots[robot_id] = self.addSubModel(
                 Robot(
                     config,
@@ -76,12 +74,10 @@ class MultiRobotSystem(CoupledDEVS):
         self.targets_states = {}
         self.targets = {}
         for target_id, config in targets_config.items():
-            i = robot_id_to_index(target_id)
             self.targets[target_id] = self.addSubModel(
                 Target(
                     config,
                     name=target_id,
-                    period=1,
                     debug=self.debug
                 )
             )
@@ -99,7 +95,7 @@ class MultiRobotSystem(CoupledDEVS):
             self.targets_states[target_id] = data
             # log new value of micro_states
             log = [target_id, data['time']]
-            log += [data['pose'][0][0],data['pose'][1][0]]
+            log += [data['pose'][0][0], data['pose'][1][0]]
             log += [data['comm_range']]
             log += [data['status']]
             log += [
@@ -116,7 +112,7 @@ class MultiRobotSystem(CoupledDEVS):
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         # self.current_time += e_g
-        if len(x_b_micro)==1:
+        if len(x_b_micro) == 1:
             micro_id, data = x_b_micro[0]
         else:
             micro_id, data = x_b_micro
