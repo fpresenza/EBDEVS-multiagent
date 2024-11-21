@@ -230,10 +230,6 @@ class TokenHandler(AtomicDEVS):
             token = copy.deepcopy(token)
             token.hops_travelled += 1
 
-            # check if retransmission is needed
-            if token.hops_travelled < token.hops_to_target:
-                broadcast = [token]
-
             try:
                 # gets order from received dictionary
                 last_order = history['in'][token.kind][token.creator]
@@ -244,6 +240,11 @@ class TokenHandler(AtomicDEVS):
             # check if token is newer than last received
             if token.order > last_order:
                 history['in'][token.kind][token.creator] = token.order
+
+                # check if retransmission is needed
+                if token.hops_travelled < token.hops_to_target:
+                    broadcast += [token]
+
                 # check if token is of kind action
                 if token.kind == 'action':
                     try:
@@ -253,6 +254,7 @@ class TokenHandler(AtomicDEVS):
                         response.append({self.outPorts['external_action']: data})
                     except KeyError:
                         pass
+
                 # check if token is of kind state
                 elif token.kind == 'state':
                     # check if token creator is within action extent
