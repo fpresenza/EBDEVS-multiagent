@@ -17,6 +17,7 @@ import os
 import datetime
 import shutil
 import argparse
+import time
 
 # Import code for model simulation:
 from pypdevs.simulator import Simulator
@@ -99,7 +100,10 @@ sim.setClassicDEVS()
 #    ======================================================================
 
 # 4. Simulate the model
+a = time.perf_counter()
 sim.simulate()
+b = time.perf_counter()
+print("Elapsed Time: {} sec".format(b - a))
 
 # Gather information for output
 # evt_list = m.collector.state.events
