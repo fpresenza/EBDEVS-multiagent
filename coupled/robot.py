@@ -3,6 +3,7 @@ import numpy as np
 from pypdevs.DEVS import CoupledDEVS
 
 from atomics.controller import Controller
+from atomics.radio_module import RadioModule
 from atomics.token_handler import TokenHandler
 from atomics.target_handler import TargetHandler
 from atomics.kalman_filter import KalmanFilter
@@ -50,6 +51,10 @@ class Robot(CoupledDEVS):
             logpath=logpath,
             debug=self.debug
         )
+        radio_module = RadioModule(
+            robot_id=self.name,
+            debug=self.debug,
+        )
         token_handler = TokenHandler(
             robot_id=self.name,
             config=config['token_handler'],
@@ -72,6 +77,7 @@ class Robot(CoupledDEVS):
 
         self.dynamics = self.addSubModel(dynamics)
         self.controller = self.addSubModel(controller)
+        self.radio_module = self.addSubModel(radio_module)
         self.token_handler = self.addSubModel(token_handler)
         self.target_handler = self.addSubModel(target_handler)
         self.kalman_filter = self.addSubModel(kalman_filter)
@@ -81,22 +87,28 @@ class Robot(CoupledDEVS):
         self.outPorts = {'radio': self.addOutPort(name="out_radio")}
         self.inPorts  = {'radio': self.addInPort(name="in_radio")}
 
-        self.connectPorts(self.inPorts['radio'], self.token_handler.inPorts['radio'])
-        self.connectPorts(self.inPorts['radio'], self.target_handler.inPorts['radio'])
+        self.connectPorts(self.inPorts['radio'], self.radio_module.inPorts['radio'])
+        self.connectPorts(self.radio_module.outPorts['radio'], self.outPorts['radio'])
 
-        self.connectPorts(self.token_handler.outPorts['radio'], self.outPorts['radio']) 
+        self.connectPorts(self.radio_module.outPorts['token'], self.token_handler.inPorts['token'])
+        self.connectPorts(self.token_handler.outPorts['token'], self.radio_module.inPorts['token'])
+        
+        self.connectPorts(self.radio_module.outPorts['target_position'], self.target_handler.inPorts['target_position'])
+        self.connectPorts(self.target_handler.outPorts['collect'], self.radio_module.inPorts['collect']) 
+
         self.connectPorts(self.token_handler.outPorts['neighbors_positions'], self.kalman_filter.in_handler_extpos)
+        self.connectPorts(self.kalman_filter.outPorts['position'], self.token_handler.inPorts['position'])
+
         self.connectPorts(self.token_handler.outPorts['subframework_positions'], self.controller.in_handler_extpos)
         self.connectPorts(self.token_handler.outPorts['external_action'], self.controller.in_handler_extact)
+        self.connectPorts(self.controller.out_handler_intact, self.token_handler.inPorts['subframework_actions'])        
 
-        # self.connectPorts(self.target_handler.outPorts['collect'], self.outPorts['radio']) 
-
-        self.connectPorts(self.kalman_filter.outPorts['position'], self.token_handler.inPorts['position'])
         self.connectPorts(self.kalman_filter.outPorts['position'], self.target_handler.inPorts['position'])
+
         self.connectPorts(self.kalman_filter.outPorts['position'], self.controller.in_kalman_intpos)
         
-        self.connectPorts(self.controller.out_handler_intact, self.token_handler.inPorts['subframework_actions'])        
         self.connectPorts(self.controller.out_dynamics_intact, self.dynamics.IN_control_input)
+
         self.connectPorts(self.dynamics.OUT_position, self.speed_sensor.input)
         
         self.connectPorts(self.speed_sensor.output, self.kalman_filter.in_dynamics_velmeas)

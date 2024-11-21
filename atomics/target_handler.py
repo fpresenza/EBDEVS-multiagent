@@ -59,12 +59,12 @@ class TargetHandler(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.inPorts = {
-            'radio': self.addInPort(name="in_radio"),
+            'target_position': self.addInPort(name="in_target_position"),
             'position': self.addInPort(name="in_position")
         }
         self.outPorts = {
             'collect': self.addOutPort(name="out_collect"),
-            'goal': self.addOutPort(name="out_goal")
+            'target_position': self.addOutPort(name="out_target_position")
         }
 
         self.outputs_queue = []
@@ -81,11 +81,9 @@ class TargetHandler(AtomicDEVS):
         current_time += self.elapsed
         sigma -= self.elapsed    # holds last status
 
-        if self.inPorts['radio'] in inputs:
-            transmitter, msg = inputs[self.inPorts['radio']]
-            if 'Target' in transmitter:
-                target_position = msg
-                targets[transmitter] = target_position
+        if self.inPorts['target_position'] in inputs:
+            target_id, target_position = inputs[self.inPorts['target_position']]
+            targets[target_id] = target_position
 
         elif self.inPorts['position'] in inputs:   # if data arrives through port in_position
             position = inputs[self.inPorts['position']]
@@ -93,7 +91,7 @@ class TargetHandler(AtomicDEVS):
         if (self.debug):
             print(
                 "t: {} s, Atomic name: {}, External Transition Function, target: {} from Router"
-                .format(current_time, self.name, target_position)
+                .format(current_time, self.name)
             )
 
         return TargetHandlerState(sigma, current_time, targets, position) 
@@ -126,8 +124,8 @@ class TargetHandler(AtomicDEVS):
         """
         if len(self.outputs_queue) == 0:
             _, current_time, targets, position = self.state.get()
-            goal_position = self.allocation(targets, position)
-            self.outputs_queue.append({self.outPorts['goal']: goal_position})
+            target_position = self.allocation(targets, position)
+            self.outputs_queue.append({self.outPorts['target_position']: target_position})
             self.outputs_queue.append({self.outPorts['collect']: None})
         
         return self.outputs_queue.pop()
@@ -139,7 +137,7 @@ class TargetHandler(AtomicDEVS):
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
         sigma, _, _, _ = self.state.get()
-        return sigma
+        return max(sigma, 0.0)
     
     def __lt__(self, other):
         return self.name < other.name
@@ -147,7 +145,7 @@ class TargetHandler(AtomicDEVS):
     def allocation(self, targets, position):
         if len(targets) > 0:
             # distances = position - list(targets.values())
-            _, goal_position = targets.popitem()
+            _, target_position = targets.popitem()
         else:
-            goal_position = None
-        return goal_position
+            target_position = None
+        return target_position

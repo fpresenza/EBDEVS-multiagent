@@ -78,13 +78,13 @@ class TokenHandler(AtomicDEVS):
         #  (usually store returned references in local variables):
         #
         self.inPorts = {
-            'radio': self.addInPort(name="in_radio"),
+            'token': self.addInPort(name="in_token"),
             'subframework_actions': self.addInPort(name="in_subframework_actions"),
             'position': self.addInPort(name="in_position")
         }
 
         self.outPorts = {
-            'radio': self.addOutPort(name="out_radio"),
+            'token': self.addOutPort(name="out_token"),
             'subframework_positions': self.addOutPort(name="out_subframework_positions"),
             'neighbors_positions': self.addOutPort(name="out_neighbors_positions"),
             'external_action': self.addOutPort(name="out_external_action"),
@@ -102,26 +102,23 @@ class TokenHandler(AtomicDEVS):
         sigma, current_time, history, position = self.state.get()
         current_time += self.elapsed
 
-        if self.inPorts['radio'] in inputs:    # if token arrives through port self.inPorts['radio']
-            transmitter, msg = inputs[self.inPorts['radio']]
-            if 'Robot' in transmitter:
-                token, distance_measurement = msg
-                # print(current_time, self.robot_id, transmitter, token, distance_measurement)
-                history, response = self.handle_received_token(
-                    history,
-                    token,
-                    distance_measurement
-                )
+        if self.inPorts['token'] in inputs:    # if token arrives through port self.inPorts['token']
+            token, distance_measurement = inputs[self.inPorts['token']]
+            history, response = self.handle_received_token(
+                history,
+                token,
+                distance_measurement
+            )
 
-                if len(response) > 0:    # else pass, nothing to send
-                    self.outputs_queue += response
-                    sigma = 0.0
-        
-                if (self.debug):
-                    print(
-                        "t: {} s, Atomic name: {}, External Transition Function, token: {} from Router"
-                        .format(current_time, self.name, token)
-                    )
+            if len(response) > 0:    # else pass, nothing to send
+                self.outputs_queue += response
+                sigma = 0.0
+    
+            if (self.debug):
+                print(
+                    "t: {} s, Atomic name: {}, External Transition Function, token: {} from Router"
+                    .format(current_time, self.name, token)
+                )
 
         elif self.inPorts['subframework_actions'] in inputs: # if data arrives through port inPorts['subframework_actions']
             action_token = Token(
@@ -133,7 +130,7 @@ class TokenHandler(AtomicDEVS):
                 hops_travelled=0
             )
             history['out']['action'] += 1
-            self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, action_token)})
+            self.outputs_queue.append({self.outPorts['token']: action_token})
 
             if position is not None:
                 state_token = Token(
@@ -146,7 +143,7 @@ class TokenHandler(AtomicDEVS):
                 )
                 history['out']['state'] += 1
                 position = None
-                self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, state_token)})
+                self.outputs_queue.append({self.outPorts['token']: state_token})
 
             sigma = 0.0
 
@@ -208,7 +205,7 @@ class TokenHandler(AtomicDEVS):
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
         sigma, _, _, _ = self.state.get()
-        return sigma
+        return max(sigma, 0.0)
     
     def __lt__(self, other):
         return self.name < other.name
@@ -227,7 +224,7 @@ class TokenHandler(AtomicDEVS):
 
             # check if retransmission is needed
             if token.hops_travelled < token.hops_to_target:
-                response.append({self.outPorts['radio']: (self.robot_id, token)})
+                response.append({self.outPorts['token']: token})
 
             try:
                 # gets order from received dictionary

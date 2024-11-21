@@ -71,8 +71,7 @@ class Router(AtomicDEVS):
         sigma, current_time = self.state.get()
         current_time += self.elapsed
 
-        _, packet = inputs.popitem()
-        transmitter, msg = packet
+        _, (transmitter, msg) = inputs.popitem()
 
         receivers = self.parent.getContextInformation(transmitter, current_time)
         if len(receivers) > 0:
