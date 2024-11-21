@@ -1,17 +1,6 @@
 import numpy as np
-from dataclasses import dataclass
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
-
-
-@dataclass
-class Token(object):
-    creator: str                # The robot that created it
-    kind: str                   # Whether it is action or state
-    order: int                  # A counter to differentiate tokens
-    data: object                # The data it carries
-    hops_to_target: int         # The number of hops it must travel
-    hops_travelled: int = 0     # The number of hops it has travelled
 
 
 class RouterState:
@@ -19,42 +8,37 @@ class RouterState:
     Encapsulates the system's state
     """
 
-    def __init__(self, sigmaval=0.1, tval=0.0, dataval=[]):
+    def __init__(self, sigma, tvalue):
         """
         Constructor (parameterizable).
         """
-        self.set(sigmaval, tval, dataval)
+        self.set(sigma, tvalue)
 
-    def set(self, sigmavalue, tvalue, datavalue):
-        self._sigma  = sigmavalue
+    def set(self, sigma, tvalue):
+        self._sigma  = sigma
         self._tvalue = tvalue
-        self._data   = datavalue
 
     def get(self):
-        return self._sigma, self._tvalue, self._data
+        return self._sigma, self._tvalue
 
 
 class Router(AtomicDEVS):
-    def __init__(self, agents_ids, targets_ids, name=None, debug=False):
+    def __init__(self, robots_ids, targets_ids, name=None, debug=False):
         """Atomic model for the Router """
 
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
 
         # Parameters
-        # self.agents = range(number_of_robots)
-        self.agents  = agents_ids
+        # self.robots = range(number_of_robots)
+        self.robots  = robots_ids
         self.targets = targets_ids
-        num_agents = len(agents_ids)
         # self.status = []          # TODO
         self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        _time0  = 0.0
-        _sigma0 = INFINITY # waits till firts token
-        _data0  = []
-        self.state = RouterState(_sigma0,_time0,_data0) 
+        self.state = RouterState(sigma=INFINITY, tvalue=0.0) 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -63,21 +47,18 @@ class Router(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.out_agent_token = {
-            agent: self.addOutPort(name="out_agent_token_{}".format(i)) for i, agent in enumerate(self.agents)
-        }
-        self.out_target = {
-            agent: self.addOutPort(name="out_target_{}".format(i)) for i, agent in enumerate(self.targets)
-        }
-        self.in_agent_token = {
-            agent: self.addInPort(name="in_agent_token_{}".format(i)) for i,agent in enumerate(self.agents)
-        }
-        self.in_target = {
-            agent: self.addInPort(name="in_target_{}".format(i)) for i,agent in enumerate(self.targets)
-        }
+        self.inPorts = {}
+        self.outPorts = {}
 
-        self.in_agents_port_mapping  = {"in_agent_token_{}".format(i): agent_id for i, agent_id in enumerate(self.agents)}
-        self.in_targets_port_mapping = {"in_target_{}".format(i): target_id for i, target_id in enumerate(self.targets)}
+        for robot_id in self.robots:
+            self.inPorts[robot_id] = self.addInPort(name="in_{}".format(robot_id))
+            self.outPorts[robot_id] = self.addOutPort(name="out_{}".format(robot_id))
+
+        for target_id in self.targets:
+            self.inPorts[target_id] = self.addInPort(name="in_{}".format(target_id))
+            self.outPorts[target_id] = self.addOutPort(name="out_{}".format(target_id))
+
+        self.outputs_queue = []
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -87,43 +68,43 @@ class Router(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, data = self.state.get()
+        sigma, current_time = self.state.get()
         current_time += self.elapsed
 
-        port, token = list(inputs.items())[0]
-        if 'agent' in port.name:
-            transmitter = self.in_agents_port_mapping[port.name]
-            receivers = self.parent.getContextInformation(transmitter, current_time)
-            if len(receivers) > 0:
-                data += [
-                    {self.out_agent_token[receiver_id]: (token, distance_meas)} 
+        _, packet = inputs.popitem()
+        transmitter, msg = packet
+
+        receivers = self.parent.getContextInformation(transmitter, current_time)
+        if len(receivers) > 0:
+            if transmitter.startswith('Robot'):
+                self.outputs_queue += [
+                    {self.outPorts[receiver_id]: (transmitter, (msg, distance_meas))} 
                     for receiver_id, distance_meas in receivers
                 ]
+                sigma = 0.0    # holds last status
 
-        elif 'target' in port.name:
-            transmitter = self.in_targets_port_mapping[port.name]
-            receivers = self.parent.getContextInformation(transmitter, current_time)
-            print(f'token: {token}')
-            if len(receivers) > 0:
-                data += [
-                    {self.out_agent_token[receiver_id]: (token, distance_meas)} 
-                    for receiver_id, distance_meas in receivers
+            elif transmitter.startswith('Target'):
+                self.outputs_queue += [
+                    {self.outPorts[receiver_id]: (transmitter, msg)} 
+                    for receiver_id, _ in receivers
                 ]
-
-        sigma = 0 # holds last status
+                sigma = 0.0    # holds last status
 
         if (self.debug):
-                print("t: {} s, Atomic name: {}, External Transition Function, transmitter: {} -> receivers: {}".format(current_time,self.name,transmitter,receivers))
+            print(
+                "t: {} s, Atomic name: {}, External Transition Function, transmitter: {} -> receivers: {}"
+                .format(current_time, self.name, transmitter, receivers)
+            )
 
-        return RouterState(sigma, current_time, data) 
+        return RouterState(sigma, current_time) 
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, data = self.state.get()
-        data.pop(0)
-        if len(data) == 0:
+        _, current_time = self.state.get()
+
+        if len(self.outputs_queue) == 0:
             sigma = INFINITY
         else:
             sigma = 0.0
@@ -131,17 +112,21 @@ class Router(AtomicDEVS):
         if (self.debug):
             print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
-        return RouterState(sigma,current_time,data) 
+        return RouterState(sigma, current_time) 
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        sigma, current_time, data = self.state.get()
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, Output Function, data: {}".format(current_time,self.name,data[0]))
+        _, current_time = self.state.get()
 
-        return data[0]
+        if (self.debug):
+            print(
+                "t: {} s, Atomic name: {}, Output Function, data: {}"
+                .format(current_time, self.name, self.outputs_queue[0])
+            )
+
+        return self.outputs_queue.pop(0)
 
     def timeAdvance(self):
         """
@@ -149,7 +134,7 @@ class Router(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _ = self.state.get()
+        sigma, _ = self.state.get()
         return sigma
     
     def __lt__(self, other):

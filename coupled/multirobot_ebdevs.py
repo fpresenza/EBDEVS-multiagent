@@ -50,7 +50,7 @@ class MultiRobotSystem(CoupledDEVS):
         targets_config = read_json_file('targets.json')
 
         self.router = self.addSubModel(
-            Router(agents_ids=list(robots_config.keys()),
+            Router(robots_ids=list(robots_config.keys()),
                    targets_ids=list(targets_config.keys()), 
                    name='Router',
                    debug=self.debug
@@ -68,8 +68,8 @@ class MultiRobotSystem(CoupledDEVS):
                     debug=self.debug
                 )
             )
-            self.connectPorts(self.robots[robot_id].OUT_router_token, self.router.in_agent_token[robot_id])
-            self.connectPorts(self.router.out_agent_token[robot_id], self.robots[robot_id].IN_router_token)
+            self.connectPorts(self.robots[robot_id].outPorts['radio'], self.router.inPorts[robot_id])
+            self.connectPorts(self.router.outPorts[robot_id], self.robots[robot_id].inPorts['radio'])
 
         self.targets_states = {}
         self.targets = {}
@@ -81,8 +81,8 @@ class MultiRobotSystem(CoupledDEVS):
                     debug=self.debug
                 )
             )
-            self.connectPorts(self.targets[target_id].OUT_router_target, self.router.in_target[target_id]) # target -> router
-            self.connectPorts(self.router.out_target[target_id], self.targets[target_id].IN_router_target) # router -> target
+            self.connectPorts(self.targets[target_id].outPorts['radio'], self.router.inPorts[target_id]) # target -> router
+            self.connectPorts(self.router.outPorts[target_id], self.targets[target_id].inPorts['radio']) # router -> target
 
         # targets_states must be initialized at the very beginning
         for target_id in targets_config:

@@ -45,7 +45,7 @@ class TargetHandler(AtomicDEVS):
         # STATE:
         #  Define 'state' attribute (initial sate):
         self.state = TargetHandlerState(
-            sigma=INFINITY, 
+            sigma=self.period, 
             tvalue=0.0, 
             targets={},
             position=None
@@ -59,13 +59,12 @@ class TargetHandler(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.inPorts = {
-            'router': self.addInPort(name="in_router"),
-            'kalman': self.addInPort(name="in_kalman")
+            'radio': self.addInPort(name="in_radio"),
+            'position': self.addInPort(name="in_position")
         }
         self.outPorts = {
-            'router': self.addOutPort(name="out_router"),
-            'controller': self.addOutPort(name="out_controller")
-        
+            'collect': self.addOutPort(name="out_collect"),
+            'goal': self.addOutPort(name="out_goal")
         }
 
         self.outputs_queue = []
@@ -78,15 +77,18 @@ class TargetHandler(AtomicDEVS):
         External Transition Function.
         """
         sigma, current_time, targets, position = self.state.get()
+
         current_time += self.elapsed
         sigma -= self.elapsed    # holds last status
-        print(self.parent.name)
-        
-        if self.inPorts['router'] in inputs:
-            target_id, target_position = inputs[self.inPorts['router']]
-            targets[target_id] = target_position
-        elif self.inPorts['kalman'] in inputs:   # if data arrives through port in_kalman
-            position = inputs[self.inPorts['kalman']]
+
+        if self.inPorts['radio'] in inputs:
+            transmitter, msg = inputs[self.inPorts['radio']]
+            if 'Target' in transmitter:
+                target_position = msg
+                targets[transmitter] = target_position
+
+        elif self.inPorts['position'] in inputs:   # if data arrives through port in_position
+            position = inputs[self.inPorts['position']]
     
         if (self.debug):
             print(
@@ -100,7 +102,8 @@ class TargetHandler(AtomicDEVS):
         """
         Internal Transition Function.
         """
-        _, current_time, targets, position = self.state.get()
+        sigma, current_time, targets, position = self.state.get()
+        current_time += sigma
         
         if len(self.outputs_queue) == 0:
             sigma = self.period
@@ -124,12 +127,11 @@ class TargetHandler(AtomicDEVS):
         if len(self.outputs_queue) == 0:
             _, current_time, targets, position = self.state.get()
             goal_position = self.allocation(targets, position)
-            self.outputs_queue.append({self.outPorts['controller']: goal_position})
-            self.outputs_queue.append({self.outPorts['router']: None})
+            self.outputs_queue.append({self.outPorts['goal']: goal_position})
+            self.outputs_queue.append({self.outPorts['collect']: None})
         
         return self.outputs_queue.pop()
     
-
     def timeAdvance(self):
         """
         Time-Advance Function.
@@ -141,3 +143,11 @@ class TargetHandler(AtomicDEVS):
     
     def __lt__(self, other):
         return self.name < other.name
+
+    def allocation(self, targets, position):
+        if len(targets) > 0:
+            # distances = position - list(targets.values())
+            _, goal_position = targets.popitem()
+        else:
+            goal_position = None
+        return goal_position

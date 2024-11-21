@@ -78,20 +78,24 @@ class Robot(CoupledDEVS):
         self.speed_sensor = self.addSubModel(speed_sensor)
 
         # Declare the coupled model's output ports:
-        self.OUT_router_token = self.addOutPort(name="out_router")
-        self.IN_router_token  = self.addInPort(name="in_router")
+        self.outPorts = {'radio': self.addOutPort(name="out_radio")}
+        self.inPorts  = {'radio': self.addInPort(name="in_radio")}
 
-        self.connectPorts(self.IN_router_token, self.token_handler.in_router_token)
+        self.connectPorts(self.inPorts['radio'], self.token_handler.inPorts['radio'])
+        self.connectPorts(self.inPorts['radio'], self.target_handler.inPorts['radio'])
 
-        self.connectPorts(self.token_handler.out_router_token, self.OUT_router_token) 
-        self.connectPorts(self.token_handler.out_kalman_extpos, self.kalman_filter.in_handler_extpos)
-        self.connectPorts(self.token_handler.out_controller_extpos, self.controller.in_handler_extpos)
-        self.connectPorts(self.token_handler.out_controller_extact, self.controller.in_handler_extact)
+        self.connectPorts(self.token_handler.outPorts['radio'], self.outPorts['radio']) 
+        self.connectPorts(self.token_handler.outPorts['neighbors_positions'], self.kalman_filter.in_handler_extpos)
+        self.connectPorts(self.token_handler.outPorts['subframework_positions'], self.controller.in_handler_extpos)
+        self.connectPorts(self.token_handler.outPorts['external_action'], self.controller.in_handler_extact)
 
-        self.connectPorts(self.kalman_filter.out_handler_intpos, self.token_handler.in_kalman_intpos)
-        self.connectPorts(self.kalman_filter.out_control_intpos, self.controller.in_kalman_intpos)
+        # self.connectPorts(self.target_handler.outPorts['collect'], self.outPorts['radio']) 
+
+        self.connectPorts(self.kalman_filter.outPorts['position'], self.token_handler.inPorts['position'])
+        self.connectPorts(self.kalman_filter.outPorts['position'], self.target_handler.inPorts['position'])
+        self.connectPorts(self.kalman_filter.outPorts['position'], self.controller.in_kalman_intpos)
         
-        self.connectPorts(self.controller.out_handler_intact, self.token_handler.in_controller_intact)        
+        self.connectPorts(self.controller.out_handler_intact, self.token_handler.inPorts['subframework_actions'])        
         self.connectPorts(self.controller.out_dynamics_intact, self.dynamics.IN_control_input)
         self.connectPorts(self.dynamics.OUT_position, self.speed_sensor.input)
         

@@ -54,9 +54,10 @@ class Target(AtomicDEVS):
         AtomicDEVS.__init__(self, name)
     
         # PARAMETERS
-        self.position  = config['position']
-        self.comm_range = config['comm_range']
+        self.position = config['position']
         self.period = config['period']
+        self.comm_range = config['comm_range']
+        self.collect_range = config['collect_range']
         self.debug = debug
 
         # STATE:
@@ -86,11 +87,35 @@ class Target(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.OUT_router_target = self.addOutPort(name="OUT_router_target")
-        self.IN_router_target  = self.addInPort(name="IN_router_target")
+        self.inPorts = {'radio': self.addInPort(name="in_radio")}
+        self.outPorts = {'radio': self.addOutPort(name="out_radio")}
 
     def __lt__(self, other):
         return self.name < other.name
+
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        sigma, current_time, _ = self.state.get()
+        current_time += self.elapsed
+        sigma -= self.elapsed    # holds last status
+
+        distance_measurement = inputs[self.inPorts['radio']]
+        if distance_measurement < self.collect_range:
+            status = 'Passive'
+            sigma = INFINITY
+            self.y_up[1]['status'] = 'Passive'
+
+        if (self.debug):
+            print(
+                "t: {:.2f} s, Atomic name: {}, External Transition Function, Status: {}"
+                .format(current_time, self.name, status)
+            )
+
+        return TargetState(sigma, current_time, status)
+
 
     def intTransition(self):
         """
@@ -99,11 +124,7 @@ class Target(AtomicDEVS):
         sigma, current_time, status = self.state.get()
         current_time += sigma
 
-        if status == 'Passive':
-            sigma = INFINITY
-            self.y_up[1]['status'] = 'Passive'
-        else:
-            sigma = self.period
+        sigma = self.period
 
         if (self.debug):
             print(
@@ -113,24 +134,6 @@ class Target(AtomicDEVS):
             
         return TargetState(sigma, current_time, status) 
     
-    def extTransition(self, inputs):
-        """
-        External Transition Function.
-        """
-        sigma, current_time, _ = self.state.get()
-        current_time += self.elapsed
-
-        if self.IN_router_target in inputs: # external events turn off the target
-            status = 'Passive' # target passivated
-            sigma  = 0.0
-
-        if (self.debug):
-            print(
-                "t: {:.2f} s, Atomic name: {}, External Transition Function, Status: {}"
-                .format(current_time, self.name, status)
-            )
-
-        return TargetState(sigma, current_time, status)
 
     def outputFnc(self):
         """
@@ -153,10 +156,10 @@ class Target(AtomicDEVS):
         if (self.debug):
             print(
                 "t: {:.2f} s, Parent name: {}, Atomic name: {}, Output Function, Status: {}"
-                .format(current_time,self.parent.parent.name,self.name,status)
+                .format(current_time,self.parent.parent.name, self.name, status)
             )
 
-        return {self.OUT_router_target: status}
+        return {self.outPorts['radio']: (self.name, self.position)}
     
     def timeAdvance(self):
         """

@@ -76,14 +76,19 @@ class TokenHandler(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.out_router_token      = self.addOutPort(name="out_router_token")
-        self.out_controller_extpos = self.addOutPort(name="out_controller_extpos")
-        self.out_controller_extact = self.addOutPort(name="out_controller_extact")
-        self.out_kalman_extpos     = self.addOutPort(name="out_kalman_extpos")
         #
-        self.in_router_token       = self.addInPort(name="in_router_token")
-        self.in_controller_intact  = self.addInPort(name="in_controller_intact")
-        self.in_kalman_intpos      = self.addInPort(name="in_kalman_intpos")
+        self.inPorts = {
+            'radio': self.addInPort(name="in_radio"),
+            'subframework_actions': self.addInPort(name="in_subframework_actions"),
+            'position': self.addInPort(name="in_position")
+        }
+
+        self.outPorts = {
+            'radio': self.addOutPort(name="out_radio"),
+            'subframework_positions': self.addOutPort(name="out_subframework_positions"),
+            'neighbors_positions': self.addOutPort(name="out_neighbors_positions"),
+            'external_action': self.addOutPort(name="out_external_action"),
+        }
 
         self.outputs_queue = []
 
@@ -97,35 +102,38 @@ class TokenHandler(AtomicDEVS):
         sigma, current_time, history, position = self.state.get()
         current_time += self.elapsed
 
-        if self.in_router_token in inputs:    # if token arrives through port in_router_token
-            token, distance_measurement = inputs[self.in_router_token]
-            history, msgs = self.handle_received_token(
-                history,
-                token,
-                distance_measurement
-            )
-
-            if len(msgs) > 0:    # else pass, nothing to send
-                self.outputs_queue += msgs
-                sigma = 0.0
-    
-            if (self.debug):
-                print(
-                    "t: {} s, Atomic name: {}, External Transition Function, token: {} from Router"
-                    .format(current_time, self.name, token)
+        if self.inPorts['radio'] in inputs:    # if token arrives through port self.inPorts['radio']
+            transmitter, msg = inputs[self.inPorts['radio']]
+            if 'Robot' in transmitter:
+                token, distance_measurement = msg
+                # print(current_time, self.robot_id, transmitter, token, distance_measurement)
+                history, response = self.handle_received_token(
+                    history,
+                    token,
+                    distance_measurement
                 )
 
-        elif self.in_controller_intact in inputs: # if data arrives through port in_controller_intact
+                if len(response) > 0:    # else pass, nothing to send
+                    self.outputs_queue += response
+                    sigma = 0.0
+        
+                if (self.debug):
+                    print(
+                        "t: {} s, Atomic name: {}, External Transition Function, token: {} from Router"
+                        .format(current_time, self.name, token)
+                    )
+
+        elif self.inPorts['subframework_actions'] in inputs: # if data arrives through port inPorts['subframework_actions']
             action_token = Token(
                 creator=self.parent.name,
                 kind='action',
                 order=history['out']['action'],
-                data=inputs[self.in_controller_intact],
+                data=inputs[self.inPorts['subframework_actions']],
                 hops_to_target=self.action_extent,
                 hops_travelled=0
             )
             history['out']['action'] += 1
-            self.outputs_queue.append({self.out_router_token: action_token})
+            self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, action_token)})
 
             if position is not None:
                 state_token = Token(
@@ -138,7 +146,7 @@ class TokenHandler(AtomicDEVS):
                 )
                 history['out']['state'] += 1
                 position = None
-                self.outputs_queue.append({self.out_router_token: state_token})
+                self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, state_token)})
 
             sigma = 0.0
 
@@ -148,8 +156,8 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, self.parent.name, action_token)
                 )
 
-        elif self.in_kalman_intpos in inputs:   # if data arrives through port in_kalman_intpos
-            position = inputs[self.in_kalman_intpos]
+        elif self.inPorts['position'] in inputs:   # if data arrives through port inPorts['position']
+            position = inputs[self.inPorts['position']]
 
             if (self.debug):
                 print(
@@ -207,7 +215,7 @@ class TokenHandler(AtomicDEVS):
 
     def handle_received_token(self, history, token, distance):
         """Decide what to do with the received token"""
-        msgs = []
+        response = []
 
         if token.creator == self.robot_id:
             # do nothing if this robot is the creator
@@ -219,7 +227,7 @@ class TokenHandler(AtomicDEVS):
 
             # check if retransmission is needed
             if token.hops_travelled < token.hops_to_target:
-                msgs.append({self.out_router_token: token})
+                response.append({self.outPorts['radio']: (self.robot_id, token)})
 
             try:
                 # gets order from received dictionary
@@ -237,7 +245,7 @@ class TokenHandler(AtomicDEVS):
                         # check if there is data for this robot
                         data = (token.creator, token.data[self.robot_id])
                         # send data to controller
-                        msgs.append({self.out_controller_extact: data})
+                        response.append({self.outPorts['external_action']: data})
                     except KeyError:
                         pass
                 # check if token is of kind state
@@ -246,11 +254,11 @@ class TokenHandler(AtomicDEVS):
                     if token.hops_travelled <= self.action_extent:
                         # send data to controller
                         data = (token.creator, token.data)
-                        msgs.append({self.out_controller_extpos: data + (token.hops_travelled, )})
+                        response.append({self.outPorts['subframework_positions']: data + (token.hops_travelled, )})
                         if token.hops_travelled == 1:
                             # send data to positioning system
-                            msgs.append({self.out_kalman_extpos: data + (distance, )})
+                            response.append({self.outPorts['neighbors_positions']: data + (distance, )})
 
-        return history, msgs
+        return history, response
 
 
