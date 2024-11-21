@@ -19,20 +19,21 @@ class TokenHandlerState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, history, position):
+    def __init__(self, sigma, tvalue, history, token_queue, position):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, history, position)
+        self.set(sigma, tvalue, history, token_queue, position)
 
-    def set(self, sigma, tvalue, history, position):
+    def set(self, sigma, tvalue, history, token_queue, position):
         self._sigma = sigma
         self._tvalue = tvalue
         self._history = history
+        self._tokens = token_queue
         self._state = position
 
     def get(self):
-        return self._sigma, self._tvalue, self._history, self._state
+        return self._sigma, self._tvalue, self._history, self._tokens, self._state
 
 
 class TokenHandler(AtomicDEVS):
@@ -66,6 +67,7 @@ class TokenHandler(AtomicDEVS):
                 'out': {'action': 0, 'state': 0}, 
                 'in': {'action': {}, 'state': {}}
             },
+            token_queue=[],
             position=None,
         ) 
         # ELAPSED TIME:
@@ -99,20 +101,23 @@ class TokenHandler(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, history, position = self.state.get()
+        sigma, current_time, history, token_queue, position = self.state.get()
         current_time += self.elapsed
 
         if self.inPorts['token'] in inputs:    # if token arrives through port self.inPorts['token']
-            token, distance_measurement = inputs[self.inPorts['token']]
-            history, response = self.handle_received_token(
-                history,
-                token,
-                distance_measurement
-            )
+            token_list, distance_measurement = inputs[self.inPorts['token']]
 
-            if len(response) > 0:    # else pass, nothing to send
-                self.outputs_queue += response
-                sigma = 0.0
+            for token in token_list:
+                history, broadcast, response = self.handle_received_token(
+                    history,
+                    token,
+                    distance_measurement
+                )
+                token_queue += broadcast
+
+                if len(response) > 0:    # else pass, nothing to send
+                    self.outputs_queue += response
+                    sigma = 0.0
     
             if (self.debug):
                 print(
@@ -130,7 +135,7 @@ class TokenHandler(AtomicDEVS):
                 hops_travelled=0
             )
             history['out']['action'] += 1
-            self.outputs_queue.append({self.outPorts['token']: action_token})
+            token_queue += [action_token]
 
             if position is not None:
                 state_token = Token(
@@ -143,8 +148,10 @@ class TokenHandler(AtomicDEVS):
                 )
                 history['out']['state'] += 1
                 position = None
-                self.outputs_queue.append({self.outPorts['token']: state_token})
+                token_queue += [state_token]
 
+            self.outputs_queue.append({self.outPorts['token']: token_queue})
+            token_queue = []
             sigma = 0.0
 
             if (self.debug):
@@ -162,13 +169,13 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, self.parent.name, token)
                 )
 
-        return TokenHandlerState(sigma, current_time, history, position) 
+        return TokenHandlerState(sigma, current_time, history, token_queue, position) 
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, history, position = self.state.get()
+        _, current_time, history, token_queue, position = self.state.get()
         
         if len(self.outputs_queue) == 0:
             sigma = INFINITY
@@ -181,13 +188,13 @@ class TokenHandler(AtomicDEVS):
                 .format(current_time, self.name, self.parent.name)
             )
 
-        return TokenHandlerState(sigma, current_time, history, position)
+        return TokenHandlerState(sigma, current_time, history, token_queue, position)
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        _, current_time, _, _ = self.state.get()
+        _, current_time, _, _, _ = self.state.get()
 
         if (self.debug):
             print(
@@ -204,7 +211,7 @@ class TokenHandler(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _, _ = self.state.get()
+        sigma, _, _, _, _ = self.state.get()
         return max(sigma, 0.0)
     
     def __lt__(self, other):
@@ -213,7 +220,8 @@ class TokenHandler(AtomicDEVS):
     def handle_received_token(self, history, token, distance):
         """Decide what to do with the received token"""
         response = []
-
+        broadcast = []
+        
         if token.creator == self.robot_id:
             # do nothing if this robot is the creator
             pass
@@ -224,7 +232,7 @@ class TokenHandler(AtomicDEVS):
 
             # check if retransmission is needed
             if token.hops_travelled < token.hops_to_target:
-                response.append({self.outPorts['token']: token})
+                broadcast = [token]
 
             try:
                 # gets order from received dictionary
@@ -256,6 +264,6 @@ class TokenHandler(AtomicDEVS):
                             # send data to positioning system
                             response.append({self.outPorts['neighbors_positions']: data + (distance, )})
 
-        return history, response
+        return history, broadcast, response
 
 
