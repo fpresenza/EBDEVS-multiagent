@@ -92,7 +92,7 @@ class RadioModule(AtomicDEVS):
             sigma = 0.0
 
         elif self.inPorts['collect'] in inputs:
-            msg = inputs[self.inPorts['token']]
+            msg = inputs[self.inPorts['collect']]
             self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, msg)})
             sigma = 0.0
 
