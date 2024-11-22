@@ -28,16 +28,18 @@ class DevsAnimate(Animate2):
         super(DevsAnimate, self).__init__(*args, **kwargs)
 
     def set_xlim(self, t):
-        return (0.0, 250.0 + t)
+        return (0.0, min(250.0 + 10*t, 1000.0))
 
     def set_ylim(self, t):
-        return (0.0, 250.0 + t)
+        return (0.0, min(250.0 + 10*t, 1000.0))
 
     def _update_extra_artists(self, frame):
-        positions = frame[1]
-        n = int(len(positions))
-        for i in range(n):
-            self._extra_artists[i].center = positions[i]
+        for i, target in enumerate(frame[4]):
+            if (target[1] == 'Passive'):
+                try:
+                    self._extra_artists[i].remove()
+                except ValueError:
+                    pass
 
 
 # ------------------------------------------------------------------
@@ -61,9 +63,12 @@ arg = parser.parse_args()
 experiment_directory = find_latest_timestamp('output/')
 robots_config = read_json_file(experiment_directory + 'robots.json')
 robot_ids = list(robots_config)
-n = len(robot_ids)
+n_robots = len(robot_ids)
+targets_config = read_json_file(experiment_directory + 'targets.json')
+target_ids = list(targets_config)
+n_targets = len(target_ids)
 print('Experiment located in: {}'.format(experiment_directory))
-print('Number of robots: {}'.format(n))
+print('Number of robots: {}'.format(n_robots))
 
 # ------------------------------------------------------------------
 # Create Frames
@@ -75,22 +80,28 @@ with open(experiment_directory + 'global.csv', 'r') as file:
         data.append(row)
 
 frames = []
-positions = np.zeros((n, 2), dtype=float)
+positions = np.zeros((n_robots, 2), dtype=float)
+targets = ['Active' for _ in range(n_targets)]
 edges = []
+teams = np.arange(n_robots)
 last_time = -1e-3
 for step, step_data in enumerate(data[1:]):
-    robot_index = robot_ids.index(step_data[0])
     time = float(step_data[1])
-    positions[robot_index] = step_data[2:4]
-    neighbors = [int(r[-1]) for r in step_data[5:]]
+    if step_data[0].startswith('Robot'):
+        robot_index = robot_ids.index(step_data[0])
+        positions[robot_index] = step_data[2:4]
+        neighbors = [int(r[-1]) for r in step_data[5:]]
 
-    edges = [e for e in edges if robot_index not in e] + \
-        [[robot_index, neighbor] for neighbor in neighbors]
+        edges = [e for e in edges if robot_index not in e] + \
+            [[robot_index, neighbor] for neighbor in neighbors]
+    
+    elif step_data[0].startswith('Target'):
+        target_index = target_ids.index(step_data[0])
+        targets[target_index] = step_data[5]
 
     if time > last_time + 1e-3:
         last_time = time
-        teams = np.arange(n)
-        frames.append([time, positions.copy(), edges, teams])
+        frames.append([time, positions.copy(), edges, teams, targets.copy()])
 
 print('Total number of frames: {}'.format(len(frames)))
 frames = frames[::arg.skip]
@@ -134,29 +145,23 @@ anim.set_teams({
         'id': i,
         'tail': False,
         'style': {
-            'color': 'k',
-            'marker': f'${i}$',
+            'color': 'C0',
+            'marker': 'o',
             'markersize': 5,
             'markeredgewidth': 0.5,
             'zorder': 20
         }
     }
-for i in range(n)})
+    for i in range(n_robots)
+})
+
 anim.set_edgestyle(color='k', lw=0.5, zorder=10)
 
-circles = []
-for p in frames[0][1]:
-    circle = plt.Circle(p, 90.0, alpha=0.1)
-    circles.append(circle)
+for target in targets_config.values():
+    circle = plt.Circle(np.array(target['position'], dtype=float), target['collect_range'], color='r', alpha=0.3)
     ax.add_artist(circle)
     anim.add_extra_artists(circle)
 
-anim.ax.legend(
-    ncol=4,
-    loc='upper center',
-    fontsize='small',
-    handletextpad=1
-)
 video_path = experiment_directory + 'xy_animation.mp4'
 anim.run(video_path)
 
