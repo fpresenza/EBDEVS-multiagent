@@ -59,7 +59,8 @@ data = []
 with open(experiment_directory + 'global.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
-        data.append(row)
+        if row[0].startswith('Robot'):
+            data.append(row)
 
 time = {robot: [] for robot in robot_ids}
 position_x = {robot: [] for robot in robot_ids}
