@@ -79,7 +79,7 @@ class RadioModule(AtomicDEVS):
         if self.inPorts['radio'] in inputs:
             transmitter, msg = inputs[self.inPorts['radio']]
 
-            if transmitter.startswith('Robot'):
+            if transmitter.startswith('Robot') and (msg[0] is not None):
                 self.outputs_queue.append({self.outPorts['token']: msg})
                 sigma = 0.0
             elif transmitter.startswith('Target'):
