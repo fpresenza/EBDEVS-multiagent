@@ -112,11 +112,13 @@ class Controller(AtomicDEVS):
         if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
             position = inputs[self.in_kalman_intpos]
             subframework[self.robot_id] = position.ravel()
+       
         elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
             node_id, external_position, hops = inputs[self.in_handler_extpos]
             subframework[node_id] = external_position.ravel()
             if hops == 1:
                 obstacles.append(external_position.ravel())
+        
         elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
             _, external_action_term = inputs[self.in_handler_extact]
             external_action += external_action_term
@@ -154,12 +156,12 @@ class Controller(AtomicDEVS):
         Output Funtion.
         """
         if len(self.outputs_queue) == 0:
-            _, current_time, subframework, external_action, obstacles = self.state.get()
+            sigma, current_time, subframework, external_action, obstacles = self.state.get()
             own_action, others_actions = self.control_action(subframework, external_action, obstacles)
             self.outputs_queue.append({self.out_handler_intact: others_actions})
             self.outputs_queue.append({self.out_dynamics_intact: own_action})
 
-            log = [current_time, own_action[0][0], own_action[1][0]]
+            log = [current_time + sigma, own_action[0][0], own_action[1][0]]
             append_csv_file(self.logpath + 'controller_{}.csv'.format(self.robot_id), log)
 
         return self.outputs_queue.pop()
@@ -195,6 +197,7 @@ class Controller(AtomicDEVS):
             # rigidity maintenance
             own_rigidity = external_action
             others_rigidity = {}
+
             if len(subframework) > 1:
                 subframework_ids, subframework_positions = list(zip(*subframework.items()))
                 subframework_actions = 5.0 * self.rigidity.update(np.array(subframework_positions))
