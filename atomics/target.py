@@ -98,15 +98,16 @@ class Target(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, _ = self.state.get()
+        sigma, current_time, status = self.state.get()
         current_time += self.elapsed
         sigma -= self.elapsed    # holds last status
 
-        distance_measurement = inputs[self.inPorts['radio']]
-        if distance_measurement < self.collect_range:
-            status = 'Passive'
-            sigma = INFINITY
-            self.y_up[1]['status'] = 'Passive'
+        transmitter, (_, distance_measurement) = inputs[self.inPorts['radio']]
+        if transmitter.startswith('Robot'):
+            if (status == 'Active') and  (distance_measurement < self.collect_range * 0.9):
+                status = 'Passive'
+                sigma = INFINITY
+                self.y_up[1]['status'] = 'Passive'
 
         if (self.debug):
             print(
