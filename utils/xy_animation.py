@@ -35,7 +35,7 @@ class DevsAnimate(Animate2):
 
     def _update_extra_artists(self, frame):
         for i, target in enumerate(frame[4]):
-            if (target[1] == 'Passive'):
+            if (target == 'Passive'):
                 try:
                     self._extra_artists[i].remove()
                 except ValueError:
@@ -90,7 +90,7 @@ for step, step_data in enumerate(data[1:]):
     if step_data[0].startswith('Robot'):
         robot_index = robot_ids.index(step_data[0])
         positions[robot_index] = step_data[2:4]
-        neighbors = [int(r[-1]) for r in step_data[5:]]
+        neighbors = [int(r[-1]) for r in step_data[5:] if r.startswith('Robot')]
 
         edges = [e for e in edges if robot_index not in e] + \
             [[robot_index, neighbor] for neighbor in neighbors]
