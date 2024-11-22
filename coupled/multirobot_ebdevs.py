@@ -57,7 +57,7 @@ class MultiRobotSystem(CoupledDEVS):
                    )
         )
 
-        self.robots_states = {}
+        self.agents_states = {}
         self.robots = {}
         for robot_id, config in robots_config.items():
             self.robots[robot_id] = self.addSubModel(
@@ -71,7 +71,7 @@ class MultiRobotSystem(CoupledDEVS):
             self.connectPorts(self.robots[robot_id].outPorts['radio'], self.router.inPorts[robot_id])
             self.connectPorts(self.router.outPorts[robot_id], self.robots[robot_id].inPorts['radio'])
 
-        self.targets_states = {}
+        self.agents_states = {}
         self.targets = {}
         for target_id, config in targets_config.items():
             self.targets[target_id] = self.addSubModel(
@@ -92,18 +92,7 @@ class MultiRobotSystem(CoupledDEVS):
                 'comm_range': targets_config[target_id]["comm_range"],
                 'status': "Active",
             }
-            self.targets_states[target_id] = data
-            # log new value of micro_states
-            log = [target_id, data['time']]
-            log += [data['pose'][0][0], data['pose'][1][0]]
-            log += [data['comm_range']]
-            log += [data['status']]
-            log += [
-                neighbor_id
-                for neighbor_id in self.robots_states.keys()
-                if self.connected(target_id, neighbor_id, 0.0) # checks and registers current neighboring robots
-            ]
-            append_csv_file(self.logpath + 'targets.csv', log)
+            self.agents_states[target_id] = data
 
         self.distance_measurement_stddev = 10.0
 
@@ -117,51 +106,38 @@ class MultiRobotSystem(CoupledDEVS):
         else:
             micro_id, data = x_b_micro
 
-        if 'Robot' in micro_id:
-            self.robots_states[micro_id] = data.copy()
+        self.agents_states[micro_id] = data.copy()
 
-            # log new value of micro_states
-            log = [micro_id, data['time']]
-            log += [data['pose'][0][0],data['pose'][1][0]]
-            log += [data['comm_range']]
+        # log new value of micro_states
+        log = [micro_id, data['time']]
+        log += [data['pose'][0][0],data['pose'][1][0]]
+        log += [data['comm_range']]
+
+        if micro_id.startswith('Robot'):
             log += [
                 neighbor_id
-                for neighbor_id in self.robots_states.keys()
-                if self.connected(micro_id, neighbor_id, 0.0) # checks and registers current neighboring robots
+                for neighbor_id in self.agents_states.keys()
+                if self.in_range(micro_id, neighbor_id, 0.0) # checks and registers current neighboring robots
             ]
-            append_csv_file(self.logpath + 'global.csv', log)
-        elif 'Target' in micro_id:
-            self.targets_states[micro_id] = data.copy()
-
-            # log new value of micro_states
-            log = [micro_id, data['time']]
-            log += [data['pose'][0][0],data['pose'][1][0]]
-            log += [data['comm_range']]
+        elif micro_id.startswith('Target'):
             log += [data['status']]
-            log += [
-                neighbor_id
-                for neighbor_id in self.robots_states.keys()
-                if self.connected(micro_id, neighbor_id, 0.0) # checks and registers current neighboring robots
-            ]
-            append_csv_file(self.logpath + 'targets.csv', log)
+
+        append_csv_file(self.logpath + 'global.csv', log)
 
         if (self.debug):
             print(
                  "t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"
-                 .format(data['time'], self.name, x_b_micro, self.robots_states, self.targets_states)
+                 .format(data['time'], self.name, x_b_micro, self.agents_states)
                  )
 
     def getContextInformation(self, agent_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
-        if 'Robot' in agent_1_id:
-            previous_time = self.robots_states[agent_1_id]['time']
-        else: # 'Token'
-            previous_time = self.targets_states[agent_1_id]['time']
+        previous_time = self.agents_states[agent_1_id]['time']
         delta_time = current_time - previous_time
         return [
-            (robot_2_id, self.distance_measurement(agent_1_id, robot_2_id, delta_time))
-            for robot_2_id in self.robots_states.keys()
-            if self.connected(agent_1_id, robot_2_id, delta_time)
+            (agent_2_id, self.distance_measurement(agent_1_id, agent_2_id, delta_time))
+            for agent_2_id in self.agents_states.keys()
+            if self.in_range(agent_1_id, agent_2_id, delta_time)
         ]
 
     def select(self, immChildren):
@@ -171,35 +147,28 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def distance(self, agent_1_id, robot_2_id, delta_time): # agent_1_id might be robot or target
-        if 'Robot' in agent_1_id:
-            agent_1_pose = self.robots_states[agent_1_id]['pose']
-        else: # 'Target'
-            agent_1_pose = self.targets_states[agent_1_id]['pose']
-        robot_2_pose = self.robots_states[robot_2_id]['pose']
+    def distance(self, agent_1_id, agent_2_id, delta_time): # agent_1_id might be robot or target
+        agent_1_pose = self.agents_states[agent_1_id]['pose']
+        agent_2_pose = self.agents_states[agent_2_id]['pose']
 
         x1 = evaluate_poly(agent_1_pose[0], delta_time)
         y1 = evaluate_poly(agent_1_pose[1], delta_time)
-        x2 = evaluate_poly(robot_2_pose[0], delta_time)
-        y2 = evaluate_poly(robot_2_pose[1], delta_time)
+        x2 = evaluate_poly(agent_2_pose[0], delta_time)
+        y2 = evaluate_poly(agent_2_pose[1], delta_time)
 
         return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
-    def distance_measurement(self, robot_1_id, robot_2_id, delta_time):
+    def distance_measurement(self, agent_1_id, agent_2_id, delta_time):
         return np.random.normal(
-            loc=self.distance(robot_1_id, robot_2_id, delta_time),
+            loc=self.distance(agent_1_id, agent_2_id, delta_time),
             scale=self.distance_measurement_stddev    
         ) 
 
-    def connected(self, agent_1_id, robot_2_id, delta_time): # agent_1_id might be robot or target
-        if agent_1_id == robot_2_id:
+    def in_range(self, agent_1_id, agent_2_id, delta_time): # agent_1_id might be robot or target
+        if agent_1_id == agent_2_id:
             return False
 
-        distance = self.distance(agent_1_id, robot_2_id, delta_time)
-
-        if 'Robot' in agent_1_id:
-            trasmitter_range = self.robots_states[agent_1_id]['comm_range']
-        else: # 'Target'
-            trasmitter_range = self.targets_states[agent_1_id]['comm_range']
+        distance = self.distance(agent_1_id, agent_2_id, delta_time)
+        trasmitter_range = self.agents_states[agent_1_id]['comm_range']
 
         return distance < trasmitter_range
