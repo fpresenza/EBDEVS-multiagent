@@ -54,8 +54,7 @@ class RadioModule(AtomicDEVS):
         #
         self.inPorts = {
             'radio': self.addInPort(name="in_radio"),
-            'token': self.addInPort(name="in_token"),
-            'collect': self.addInPort(name="in_collect"),
+            'token': self.addInPort(name="in_token")
         }
 
         self.outPorts = {
@@ -92,11 +91,6 @@ class RadioModule(AtomicDEVS):
             if token_list != []:
                 self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, token_list)})
                 sigma = 0.0
-
-        elif self.inPorts['collect'] in inputs:
-            msg = inputs[self.inPorts['collect']]
-            self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, msg)})
-            sigma = 0.0
 
         if (self.debug):
             print(

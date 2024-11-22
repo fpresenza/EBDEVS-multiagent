@@ -94,7 +94,6 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.token_handler.outPorts['token'], self.radio_module.inPorts['token'])
         
         self.connectPorts(self.radio_module.outPorts['target_position'], self.target_handler.inPorts['target_position'])
-        self.connectPorts(self.target_handler.outPorts['collect'], self.radio_module.inPorts['collect']) 
 
         self.connectPorts(self.token_handler.outPorts['neighbors_positions'], self.kalman_filter.in_handler_extpos)
         self.connectPorts(self.kalman_filter.outPorts['position'], self.token_handler.inPorts['position'])
