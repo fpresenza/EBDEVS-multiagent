@@ -101,7 +101,9 @@ class Robot(CoupledDEVS):
 
         self.connectPorts(self.token_handler.outPorts['subframework_positions'], self.controller.in_handler_extpos)
         self.connectPorts(self.token_handler.outPorts['external_action'], self.controller.in_handler_extact)
-        self.connectPorts(self.controller.out_handler_intact, self.token_handler.inPorts['subframework_actions'])        
+        self.connectPorts(self.controller.out_handler_intact, self.token_handler.inPorts['subframework_actions'])
+
+        self.connectPorts(self.target_handler.outPorts['target_position'], self.controller.inPorts['target_position'])
 
         self.connectPorts(self.kalman_filter.outPorts['position'], self.target_handler.inPorts['position'])
 
