@@ -84,12 +84,11 @@ class MultiRobotSystem(CoupledDEVS):
             self.connectPorts(self.targets[target_id].outPorts['radio'], self.router.inPorts[target_id]) # target -> router
             self.connectPorts(self.router.outPorts[target_id], self.targets[target_id].inPorts['radio']) # router -> target
 
-        # targets_states must be initialized at the very beginning
-        for target_id in targets_config:
+            # targets_states must be initialized at the very beginning
             data = {
                 'time': 0.0, 
-                'pose': [coord + [0.0] * 9 for coord in targets_config[target_id]["position"]], # 10-tuple
-                'comm_range': targets_config[target_id]["comm_range"],
+                'pose': [coord + [0.0] * 9 for coord in config["position"]], # 10-tuple
+                'comm_range': config["comm_range"],
                 'status': "Active",
             }
             self.agents_states[target_id] = data
