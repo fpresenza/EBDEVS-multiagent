@@ -102,6 +102,7 @@ class Target(AtomicDEVS):
         current_time += self.elapsed
         sigma -= self.elapsed    # holds last status
 
+        self.y_up[1]['time'] = current_time
         transmitter, (_, distance_measurement) = inputs[self.inPorts['radio']]
         if transmitter.startswith('Robot'):
             if (status == 'Active') and  (distance_measurement < self.collect_range * 0.9):
@@ -124,8 +125,9 @@ class Target(AtomicDEVS):
         """
         sigma, current_time, status = self.state.get()
         current_time += sigma
-
         sigma = self.period
+
+        self.y_up[1]['time'] = current_time
 
         if (self.debug):
             print(
