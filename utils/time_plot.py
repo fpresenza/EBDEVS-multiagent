@@ -86,14 +86,14 @@ for i, robot in enumerate(robot_ids):
     ax[0].plot(
         time[robot], position_x[robot],
         color='C{}'.format(i),
-        marker='.',
+        # marker='.',
         ds='steps-post',
         label='{}'.format(i)
     )
     ax[1].plot(
         time[robot], position_y[robot],
         color='C{}'.format(i),
-        marker='.',
+        # marker='.',
         ds='steps-post',
         label='{}'.format(i)
     )

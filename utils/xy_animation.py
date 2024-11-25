@@ -28,10 +28,10 @@ class DevsAnimate(Animate2):
         super(DevsAnimate, self).__init__(*args, **kwargs)
 
     def set_xlim(self, t):
-        return (0.0, min(250.0 + 10*t, 1000.0))
+        return (0.0, max(500.0, 5.0 * t))
 
     def set_ylim(self, t):
-        return (0.0, min(250.0 + 10*t, 1000.0))
+        return (0.0, max(500.0, 5.0 * t))
 
     def _update_extra_artists(self, frame):
         for i, target in enumerate(frame[4]):
@@ -146,7 +146,7 @@ anim.set_teams({
         'tail': False,
         'style': {
             'color': 'C0',
-            'marker': 'o',
+            'marker': f'${i}$',
             'markersize': 5,
             'markeredgewidth': 0.5,
             'zorder': 20
