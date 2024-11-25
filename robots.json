@@ -21,7 +21,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -119,7 +119,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -217,7 +217,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -315,7 +315,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -413,7 +413,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -511,7 +511,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -609,7 +609,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -707,7 +707,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -805,7 +805,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
@@ -903,7 +903,7 @@
             }
         },
         "controller": {
-            "period": 0.1,
+            "period": 0.25,
             "dmax": 85.5,
             "steepness": 0.55
         },
