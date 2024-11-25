@@ -190,8 +190,8 @@ class PositioningSystem(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.output = self.addOutPort(name="output")
-        self.input = self.addInPort(name="input")
+        self.inPorts = {'position_polynomial': self.addInPort(name="in_position_polynomial")}
+        self.outPorts = {'position_measurement': self.addOutPort(name="out_position_measurement")}
         
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -203,7 +203,7 @@ class PositioningSystem(AtomicDEVS):
         sigma, current_time, _ = self.state.get()
         current_time += self.elapsed    # NOTE: self.elapsed is always zero
 
-        position = inputs[self.input]
+        position = inputs[self.inPorts['position_polynomial']]
         sigma = sigma - self.elapsed # holds last status
 
         if (self.debug):
@@ -243,9 +243,9 @@ class PositioningSystem(AtomicDEVS):
             mean=self.noise_mean.ravel(),
             cov=self.noise_covariance
         )
-        output = np.array([px, py]) + noise_sample
+        measurement = np.array([px, py]) + noise_sample
 
-        return {self.output: output}
+        return {self.outPorts['position_measurement']: measurement}
 
     def timeAdvance(self):
         """

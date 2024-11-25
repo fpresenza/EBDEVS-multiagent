@@ -83,14 +83,17 @@ class Controller(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.out_handler_intact  = self.addOutPort(name="out_handler_intact")
-        self.out_dynamics_intact = self.addOutPort(name="out_dynamics_intact")
-        
-        self.in_kalman_intpos   = self.addInPort(name="in_kalman_intpos")
-        self.in_handler_extpos  = self.addInPort(name="in_handler_extpos")
-        self.in_handler_extact  = self.addInPort(name="in_handler_extact")
-        self.inPorts = {'target_position': self.addInPort(name="in_target_position")}
-        
+        self.inPorts = {
+            'position': self.addInPort(name="in_position"),
+            'other_position': self.addInPort(name="in_other_position"),
+            'external_action': self.addInPort(name="in_external_action"),
+            'target_position': self.addInPort(name="in_target_position")
+        }        
+        self.outPorts = {
+            'own_action': self.addOutPort(name="out_own_action"),
+            'others_actions': self.addOutPort(name="out_others_actions")
+        }
+            
         self.outputs_queue = []
 
         self.collision = CollisionAvoidance(power=2.0)
@@ -113,18 +116,18 @@ class Controller(AtomicDEVS):
         current_time += self.elapsed    # NOTE: self.elapsed is always zero
         sigma -= self.elapsed    # holds last status
 
-        if self.in_kalman_intpos in inputs: # if data arrives through port in_kalman_intpos
-            position = inputs[self.in_kalman_intpos]
+        if self.inPorts['position'] in inputs: # if data arrives through port inPorts['position']
+            position = inputs[self.inPorts['position']]
             subframework[self.robot_id] = position.ravel()
        
-        elif self.in_handler_extpos in inputs: # if ext pos arrives through port IN_handler
-            node_id, external_position, hops = inputs[self.in_handler_extpos]
-            subframework[node_id] = external_position.ravel()
+        elif self.inPorts['other_position'] in inputs: # if ext pos arrives through port IN_handler
+            node_id, other_position, hops = inputs[self.inPorts['other_position']]
+            subframework[node_id] = other_position.ravel()
             if hops == 1:
-                obstacles.append(external_position.ravel())
+                obstacles.append(other_position.ravel())
         
-        elif self.in_handler_extact in inputs: # if ext action arrives through port IN_handler
-            _, external_action_term = inputs[self.in_handler_extact]
+        elif self.inPorts['external_action'] in inputs: # if ext action arrives through port IN_handler
+            _, external_action_term = inputs[self.inPorts['external_action']]
             external_action += external_action_term
 
         elif self.inPorts['target_position'] in inputs:
@@ -166,8 +169,8 @@ class Controller(AtomicDEVS):
         if len(self.outputs_queue) == 0:
             sigma, current_time, subframework, external_action, obstacles, target_position = self.state.get()
             own_action, others_actions = self.control_action(subframework, external_action, obstacles, target_position)
-            self.outputs_queue.append({self.out_handler_intact: others_actions})
-            self.outputs_queue.append({self.out_dynamics_intact: own_action})
+            self.outputs_queue.append({self.outPorts['own_action']: own_action})
+            self.outputs_queue.append({self.outPorts['others_actions']: others_actions})
 
             log = [current_time + sigma, own_action[0][0], own_action[1][0]]
             append_csv_file(self.logpath + 'controller_{}.csv'.format(self.robot_id), log)
@@ -212,7 +215,6 @@ class Controller(AtomicDEVS):
 
             # obstacle avoidance
             if len(obstacles) > 0:
-                print(1)
                 collision_action = 20000.0 * self.collision.update(
                     position, obstacles
                 ).reshape(-1, 1)
@@ -224,7 +226,6 @@ class Controller(AtomicDEVS):
             others_rigidity = {}
 
             if len(subframework) > 1:
-                print(2)
                 subframework_ids, subframework_positions = list(zip(*subframework.items()))
                 subframework_actions = 5.0 * self.rigidity.update(np.array(subframework_positions))
                 others_rigidity = {
@@ -232,7 +233,7 @@ class Controller(AtomicDEVS):
                     for node_id, action in zip(subframework_ids, subframework_actions)
                 }
                 rigidity_action += others_rigidity.pop(self.robot_id)
-            
+
             own_action = target_action + collision_action + rigidity_action
             others_actions = others_rigidity
         else:

@@ -81,13 +81,13 @@ class TokenHandler(AtomicDEVS):
         #
         self.inPorts = {
             'token': self.addInPort(name="in_token"),
-            'subframework_actions': self.addInPort(name="in_subframework_actions"),
+            'others_actions': self.addInPort(name="in_others_actions"),
             'position': self.addInPort(name="in_position")
         }
 
         self.outPorts = {
             'token': self.addOutPort(name="out_token"),
-            'subframework_positions': self.addOutPort(name="out_subframework_positions"),
+            'other_position': self.addOutPort(name="out_other_position"),
             'neighbors_positions': self.addOutPort(name="out_neighbors_positions"),
             'external_action': self.addOutPort(name="out_external_action"),
         }
@@ -125,12 +125,12 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, token)
                 )
 
-        elif self.inPorts['subframework_actions'] in inputs: # if data arrives through port inPorts['subframework_actions']
+        elif self.inPorts['others_actions'] in inputs: # if data arrives through port inPorts['others_actions']
             action_token = Token(
                 creator=self.parent.name,
                 kind='action',
                 order=history['out']['action'],
-                data=inputs[self.inPorts['subframework_actions']],
+                data=inputs[self.inPorts['others_actions']],
                 hops_to_target=self.action_extent,
                 hops_travelled=0
             )
@@ -261,7 +261,7 @@ class TokenHandler(AtomicDEVS):
                     if token.hops_travelled <= self.action_extent:
                         # send data to controller
                         data = (token.creator, token.data)
-                        response.append({self.outPorts['subframework_positions']: data + (token.hops_travelled, )})
+                        response.append({self.outPorts['other_position']: data + (token.hops_travelled, )})
                         if token.hops_travelled == 1:
                             # send data to positioning system
                             response.append({self.outPorts['neighbors_positions']: data + (distance, )})
