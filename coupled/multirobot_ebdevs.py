@@ -71,7 +71,6 @@ class MultiRobotSystem(CoupledDEVS):
             self.connectPorts(self.robots[robot_id].outPorts['radio'], self.router.inPorts[robot_id])
             self.connectPorts(self.router.outPorts[robot_id], self.robots[robot_id].inPorts['radio'])
 
-        self.agents_states = {}
         self.targets = {}
         for target_id, config in targets_config.items():
             self.targets[target_id] = self.addSubModel(
@@ -85,13 +84,12 @@ class MultiRobotSystem(CoupledDEVS):
             self.connectPorts(self.router.outPorts[target_id], self.targets[target_id].inPorts['radio']) # router -> target
 
             # targets_states must be initialized at the very beginning
-            data = {
+            self.agents_states[target_id] = {
                 'time': 0.0, 
                 'pose': [coord + [0.0] * 9 for coord in config["position"]], # 10-tuple
                 'comm_range': config["comm_range"],
                 'status': "Active",
             }
-            self.agents_states[target_id] = data
 
         self.distance_measurement_stddev = 10.0
 
