@@ -86,16 +86,14 @@ class RadioModule(AtomicDEVS):
                 sigma = 0.0
 
         elif self.inPorts['token'] in inputs:
-            token_list = inputs[self.inPorts['token']]
-            # print(inputs)
-            if token_list != []:
-                self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, token_list)})
-                sigma = 0.0
+            token = inputs[self.inPorts['token']]
+            self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, token_list)})
+            sigma = 0.0
 
         if (self.debug):
             print(
                 "t: {} s, Atomic name: {}, External Transition Function, token: {} from Router"
-                .format(current_time, self.name, token_list)
+                .format(current_time, self.name, token)
             )
 
         return RadioModuleState(sigma, current_time) 

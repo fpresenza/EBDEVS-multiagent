@@ -19,21 +19,20 @@ class TokenHandlerState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, history, token_queue, position):
+    def __init__(self, sigma, tvalue, history, position):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, history, token_queue, position)
+        self.set(sigma, tvalue, history, position)
 
-    def set(self, sigma, tvalue, history, token_queue, position):
+    def set(self, sigma, tvalue, history, position):
         self._sigma = sigma
         self._tvalue = tvalue
         self._history = history
-        self._tokens = token_queue
         self._state = position
 
     def get(self):
-        return self._sigma, self._tvalue, self._history, self._tokens, self._state
+        return self._sigma, self._tvalue, self._history, self._state
 
 
 class TokenHandler(AtomicDEVS):
@@ -67,7 +66,6 @@ class TokenHandler(AtomicDEVS):
                 'out': {'action': 0, 'state': 0}, 
                 'in': {'action': {}, 'state': {}}
             },
-            token_queue=[],
             position=None,
         ) 
         # ELAPSED TIME:
@@ -101,7 +99,7 @@ class TokenHandler(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, history, token_queue, position = self.state.get()
+        sigma, current_time, history, position = self.state.get()
         current_time += self.elapsed
 
         if self.inPorts['token'] in inputs:    # if token arrives through port self.inPorts['token']
