@@ -22,7 +22,7 @@ from pypdevs.infinity import INFINITY
 # Import all models to couple
 from atomics.qsstools import evaluate_poly
 from atomics.router import Router
-from atomics.target import Target
+# from atomics.target import Target
 
 # our coupled models
 from coupled.robot import Robot
@@ -47,11 +47,12 @@ class MultiRobotSystem(CoupledDEVS):
         self.current_time = 0.0 # TODO: time cannot be managed as in the other coupled/atomic models
 
         robots_config  = read_json_file('robots.json')
-        targets_config = read_json_file('targets.json')
+        # targets_config = read_json_file('targets.json')
 
         self.router = self.addSubModel(
             Router(robots_ids=list(robots_config.keys()),
-                   targets_ids=list(targets_config.keys()), 
+                   # targets_ids=list(targets_config.keys()), 
+                   targets_ids=[],
                    name='Router',
                    debug=self.debug
                    )
@@ -71,27 +72,27 @@ class MultiRobotSystem(CoupledDEVS):
             self.connectPorts(self.robots[robot_id].outPorts['radio'], self.router.inPorts[robot_id])
             self.connectPorts(self.router.outPorts[robot_id], self.robots[robot_id].inPorts['radio'])
 
-        self.targets = {}
-        for target_id, config in targets_config.items():
-            self.targets[target_id] = self.addSubModel(
-                Target(
-                    config,
-                    name=target_id,
-                    debug=self.debug
-                )
-            )
-            self.connectPorts(self.targets[target_id].outPorts['radio'], self.router.inPorts[target_id]) # target -> router
-            self.connectPorts(self.router.outPorts[target_id], self.targets[target_id].inPorts['radio']) # router -> target
+        # self.targets = {}
+        # for target_id, config in targets_config.items():
+        #     self.targets[target_id] = self.addSubModel(
+        #         Target(
+        #             config,
+        #             name=target_id,
+        #             debug=self.debug
+        #         )
+        #     )
+        #     self.connectPorts(self.targets[target_id].outPorts['radio'], self.router.inPorts[target_id]) # target -> router
+        #     self.connectPorts(self.router.outPorts[target_id], self.targets[target_id].inPorts['radio']) # router -> target
 
             # targets_states must be initialized at the very beginning
-            self.agents_states[target_id] = {
-                'time': 0.0, 
-                'pose': [coord + [0.0] * 9 for coord in config["position"]], # 10-tuple
-                'comm_range': config["comm_range"],
-                'status': "Active",
-            }
+            # self.agents_states[target_id] = {
+            #     'time': 0.0, 
+            #     'pose': [coord + [0.0] * 9 for coord in config["position"]], # 10-tuple
+            #     'comm_range': config["comm_range"],
+            #     'status': "Active",
+            # }
 
-        self.distance_measurement_stddev = 10.0
+        self.distance_measurement_stddev = 1.0
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
@@ -116,8 +117,8 @@ class MultiRobotSystem(CoupledDEVS):
                 for neighbor_id in self.agents_states.keys()
                 if self.in_range(micro_id, neighbor_id, 0.0) # checks and registers current neighboring robots
             ]
-        elif micro_id.startswith('Target'):
-            log += [data['status']]
+        # elif micro_id.startswith('Target'):
+        #     log += [data['status']]
 
         append_csv_file(self.logpath + 'global.csv', log)
 

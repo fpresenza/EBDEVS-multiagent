@@ -1,6 +1,5 @@
 import numpy as np
 from dataclasses import dataclass
-import copy
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
@@ -19,20 +18,20 @@ class TokenHandlerState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, history, position):
+    def __init__(self, sigma, tvalue, record, position):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, history, position)
+        self.set(sigma, tvalue, record, position)
 
-    def set(self, sigma, tvalue, history, position):
+    def set(self, sigma, tvalue, record, position):
         self._sigma = sigma
         self._tvalue = tvalue
-        self._history = history
+        self._record = record
         self._state = position
 
     def get(self):
-        return self._sigma, self._tvalue, self._history, self._state
+        return self._sigma, self._tvalue, self._record, self._state
 
 
 class TokenHandler(AtomicDEVS):
@@ -62,10 +61,7 @@ class TokenHandler(AtomicDEVS):
         self.state = TokenHandlerState(
             sigma=INFINITY, 
             tvalue=0.0, 
-            history={
-                'out': {'action': 0, 'state': 0}, 
-                'in': {'action': {}, 'state': {}}
-            },
+            record={'action': 0, 'state': 0},
             position=None,
         ) 
         # ELAPSED TIME:
@@ -99,23 +95,19 @@ class TokenHandler(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, history, position = self.state.get()
+        sigma, current_time, record, position = self.state.get()
         current_time += self.elapsed
 
         if self.inPorts['token'] in inputs:    # if token arrives through port self.inPorts['token']
-            token_list, distance_measurement = inputs[self.inPorts['token']]
+            token, distance_meas = inputs[self.inPorts['token']]
+            # if self.robot_id == 'Robot_0' and token.kind == 'state':
+            #     print(current_time, token.creator, token.order)
 
-            for token in token_list:
-                history, broadcast, response = self.handle_received_token(
-                    history,
-                    token,
-                    distance_measurement
-                )
-                token_queue += broadcast
+            response = self.handle_received_token(token, distance_meas)
 
-                if len(response) > 0:    # else pass, nothing to send
-                    self.outputs_queue += response
-                    sigma = 0.0
+            if len(response) > 0:    # else pass, nothing to send
+                self.outputs_queue += response
+                sigma = 0.0
     
             if (self.debug):
                 print(
@@ -127,29 +119,27 @@ class TokenHandler(AtomicDEVS):
             action_token = Token(
                 creator=self.parent.name,
                 kind='action',
-                order=history['out']['action'],
+                order=record['action'],
                 data=inputs[self.inPorts['others_actions']],
                 hops_to_target=self.action_extent,
                 hops_travelled=0
             )
-            history['out']['action'] += 1
-            token_queue += [action_token]
+            record['action'] += 1
+            self.outputs_queue.append({self.outPorts['token']: action_token})
 
             if position is not None:
                 state_token = Token(
                     creator=self.parent.name,
                     kind='state',
-                    order=history['out']['state'],
+                    order=record['state'],
                     data=position,
                     hops_to_target=self.state_extent,
                     hops_travelled=0
                 )
-                history['out']['state'] += 1
+                record['state'] += 1
                 position = None
-                token_queue += [state_token]
+                self.outputs_queue.append({self.outPorts['token']: state_token})
 
-            self.outputs_queue.append({self.outPorts['token']: token_queue})
-            token_queue = []
             sigma = 0.0
 
             if (self.debug):
@@ -167,13 +157,13 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, self.parent.name, token)
                 )
 
-        return TokenHandlerState(sigma, current_time, history, token_queue, position) 
+        return TokenHandlerState(sigma, current_time, record, position) 
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, history, token_queue, position = self.state.get()
+        _, current_time, record, position = self.state.get()
         
         if len(self.outputs_queue) == 0:
             sigma = INFINITY
@@ -186,13 +176,13 @@ class TokenHandler(AtomicDEVS):
                 .format(current_time, self.name, self.parent.name)
             )
 
-        return TokenHandlerState(sigma, current_time, history, token_queue, position)
+        return TokenHandlerState(sigma, current_time, record, position)
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        _, current_time, _, _, _ = self.state.get()
+        _, current_time, _, _ = self.state.get()
 
         if (self.debug):
             print(
@@ -209,61 +199,37 @@ class TokenHandler(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _, _, _ = self.state.get()
+        sigma, _, _, _ = self.state.get()
         return max(sigma, 0.0)
     
     def __lt__(self, other):
         return self.name < other.name
 
-    def handle_received_token(self, history, token, distance):
+    def handle_received_token(self, token, distance):
         """Decide what to do with the received token"""
         response = []
-        broadcast = []
-        
-        if token.creator == self.robot_id:
-            # do nothing if this robot is the creator
-            pass
-        else:
-            # update the number of traversed hops
-            token = copy.deepcopy(token)
-            token.hops_travelled += 1
 
+        # check if token is of kind action
+        if token.kind == 'action':
             try:
-                # gets order from received dictionary
-                last_order = history['in'][token.kind][token.creator]
+                # check if there is data for this robot
+                data = (token.creator, token.data[self.robot_id])
+                # send data to controller
+                response.append({self.outPorts['external_action']: data})
             except KeyError:
-                # first time received
-                last_order = -1
+                pass
 
-            # check if token is newer than last received
-            if token.order > last_order:
-                history['in'][token.kind][token.creator] = token.order
+        # check if token is of kind state
+        elif token.kind == 'state':
+            # check if token creator is within action extent
+            if token.hops_travelled <= self.action_extent:
+                # send data to controller
+                data = (token.creator, token.data)
+                response.append({self.outPorts['other_position']: data + (token.hops_travelled, )})
+                if token.hops_travelled == 1:
+                    # send data to positioning system
+                    response.append({self.outPorts['neighbors_positions']: data + (distance, )})
 
-                # check if retransmission is needed
-                if token.hops_travelled < token.hops_to_target:
-                    broadcast += [token]
-
-                # check if token is of kind action
-                if token.kind == 'action':
-                    try:
-                        # check if there is data for this robot
-                        data = (token.creator, token.data[self.robot_id])
-                        # send data to controller
-                        response.append({self.outPorts['external_action']: data})
-                    except KeyError:
-                        pass
-
-                # check if token is of kind state
-                elif token.kind == 'state':
-                    # check if token creator is within action extent
-                    if token.hops_travelled <= self.action_extent:
-                        # send data to controller
-                        data = (token.creator, token.data)
-                        response.append({self.outPorts['other_position']: data + (token.hops_travelled, )})
-                        if token.hops_travelled == 1:
-                            # send data to positioning system
-                            response.append({self.outPorts['neighbors_positions']: data + (distance, )})
-
-        return history, broadcast, response
+        return response
 
 

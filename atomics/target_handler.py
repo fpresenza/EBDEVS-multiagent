@@ -81,7 +81,7 @@ class TargetHandler(AtomicDEVS):
         sigma -= self.elapsed    # holds last status
 
         if self.inPorts['target_position'] in inputs:
-            target_id, target_position = inputs[self.inPorts['target_position']]
+            token, _ = inputs[self.inPorts['target_position']]
             targets[target_id] = target_position
 
         elif self.inPorts['position'] in inputs:   # if data arrives through port in_position
