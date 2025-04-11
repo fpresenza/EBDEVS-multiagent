@@ -2,8 +2,6 @@ import numpy as np
 import argparse
 
 from files import write_json_file
-from core import target_id_to_index
-
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument(
