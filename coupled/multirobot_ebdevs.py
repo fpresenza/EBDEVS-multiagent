@@ -146,15 +146,19 @@ class MultiRobotSystem(CoupledDEVS):
         ]
 
     def getRobotPositions(self, current_time):
-        positions = {}
+        ids = []
+        positions = []
+        comm_ranges = []
         for robot, state in self.agents_states.items():
+            ids.append(robot)
+            comm_ranges.append(state['comm_range'])
             previous_time = state['time']
             delta_time = current_time - previous_time
             position_poly = state['pose']
             x = evaluate_poly(position_poly[0], delta_time)
             y = evaluate_poly(position_poly[1], delta_time)
-            positions[robot] = np.array([x, y])
-        return positions
+            positions += [x, y]
+        return ids, positions, comm_ranges
             
 
     def select(self, immChildren):
