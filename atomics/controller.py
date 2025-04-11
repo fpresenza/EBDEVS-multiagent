@@ -3,10 +3,8 @@ import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
-from uvnpy.distances.control import (
-    RigidityMaintenance,
-    CollisionAvoidance
-)
+from uvnpy.distances.control import RigidityMaintenance
+from uvnpy.control.core import CollisionAvoidanceVanishing
 
 from utils.files import append_csv_file
 
@@ -96,13 +94,18 @@ class Controller(AtomicDEVS):
             
         self.outputs_queue = []
 
-        self.collision = CollisionAvoidance(power=2.0)
         self.rigidity = RigidityMaintenance(
             dim=2,
-            dmax=config['dmax'],
+            dmax=config['dmax'][0],
             steepness=config['steepness'],
+            threshold=1e-4,
             eigenvalues='all',
             functional='log'
+        )
+        self.collision = CollisionAvoidanceVanishing(
+            power=2.0,
+            dmin=1.0,
+            dmax=config['dmax'][1]
         )
 
         if (self.debug):
@@ -125,7 +128,7 @@ class Controller(AtomicDEVS):
             subframework[node_id] = other_position.ravel()
             if hops == 1:
                 obstacles.append(other_position.ravel())
-        
+
         elif self.inPorts['external_action'] in inputs: # if ext action arrives through port IN_handler
             _, external_action_term = inputs[self.inPorts['external_action']]
             external_action += external_action_term
@@ -198,14 +201,13 @@ class Controller(AtomicDEVS):
             if target_position is not None:
                 r = position.reshape(-1, 1) - target_position
                 d = np.sqrt(np.square(r).sum())
-                tracking_radius = 100.0    # radius
-                forget_radius = 800.0      # radius
-                v_collect_max = 2.5
+                tracking_radius = 20.0    # radius
+                forget_radius = 100.0     # radius
+                v_collect_max = 2.0
                 if d < tracking_radius:
                     v_collect = v_collect_max
                 elif d < forget_radius:
-                    fade = (d - tracking_radius) / (forget_radius - tracking_radius)
-                    factor = 1.0 - fade
+                    factor = (forget_radius - d)/(forget_radius - tracking_radius)
                     v_collect = v_collect_max * factor
                 else:
                     v_collect = 0.0
@@ -215,7 +217,7 @@ class Controller(AtomicDEVS):
 
             # obstacle avoidance
             if len(obstacles) > 0:
-                collision_action = 20000.0 * self.collision.update(
+                collision_action = 0.5 * self.collision.update(
                     position, obstacles
                 ).reshape(-1, 1)
             else:
@@ -227,14 +229,14 @@ class Controller(AtomicDEVS):
 
             if len(subframework) > 1:
                 subframework_ids, subframework_positions = list(zip(*subframework.items()))
-                subframework_actions = 5.0 * self.rigidity.update(np.array(subframework_positions))
+                subframework_actions = 0.75 * self.rigidity.update(np.array(subframework_positions))
                 others_rigidity = {
                     node_id: action.reshape(-1, 1)
                     for node_id, action in zip(subframework_ids, subframework_actions)
                 }
                 rigidity_action += others_rigidity.pop(self.robot_id)
 
-            own_action = target_action + collision_action + rigidity_action
+            own_action = (target_action + collision_action + rigidity_action) * 0.5
             others_actions = others_rigidity
         else:
             own_action = np.zeros((2, 1), dtype=float)
