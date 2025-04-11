@@ -22,6 +22,7 @@ from pypdevs.infinity import INFINITY
 # Import all models to couple
 from atomics.qsstools import evaluate_poly
 from atomics.router import Router
+from atomics.logger import Logger
 # from atomics.target import Target
 
 # our coupled models
@@ -57,6 +58,12 @@ class MultiRobotSystem(CoupledDEVS):
                    debug=self.debug
                    )
         )
+        self.logger = self.addSubModel(Logger(
+            period=0.1,
+            name='Logger',
+            logpath=self.logpath,
+            debug=self.debug
+        ))
 
         self.agents_states = {}
         self.robots = {}
@@ -128,7 +135,7 @@ class MultiRobotSystem(CoupledDEVS):
                  .format(data['time'], self.name, x_b_micro, self.agents_states)
                  )
 
-    def getContextInformation(self, agent_1_id, current_time):
+    def getNeighbors(self, agent_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
         previous_time = self.agents_states[agent_1_id]['time']
         delta_time = current_time - previous_time
@@ -137,6 +144,18 @@ class MultiRobotSystem(CoupledDEVS):
             for agent_2_id in self.agents_states.keys()
             if self.in_range(agent_1_id, agent_2_id, delta_time)
         ]
+
+    def getRobotPositions(self, current_time):
+        positions = {}
+        for robot, state in self.agents_states.items():
+            previous_time = state['time']
+            delta_time = current_time - previous_time
+            position_poly = state['pose']
+            x = evaluate_poly(position_poly[0], delta_time)
+            y = evaluate_poly(position_poly[1], delta_time)
+            positions[robot] = np.array([x, y])
+        return positions
+            
 
     def select(self, immChildren):
         """

@@ -73,7 +73,7 @@ class Router(AtomicDEVS):
 
         _, (transmitter, token) = inputs.popitem()
 
-        receivers = self.parent.getContextInformation(transmitter, current_time)
+        receivers = self.parent.getNeighbors(transmitter, current_time)
         if len(receivers) > 0:
             # if transmitter.startswith('Robot'):
             self.outputs_queue += [
