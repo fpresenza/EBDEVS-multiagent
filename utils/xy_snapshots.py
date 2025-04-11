@@ -58,6 +58,7 @@ k_i = int(np.argmin(np.abs(t - arg.init)))
 k_e = int(np.argmin(np.abs(t - arg.end)))
 
 time_reader = csv.reader(open(experiment_directory + 'logger_time.csv', newline=''))
+ids_reader = csv.reader(open(experiment_directory + 'logger_ids.csv', newline=''))
 positions_reader = csv.reader(open(experiment_directory + 'logger_positions.csv', newline=''))
 comm_ranges_reader = csv.reader(open(experiment_directory + 'logger_comm_ranges.csv', newline=''))
 
@@ -75,6 +76,7 @@ while k < k_e:
     try:
         # Read one row from each file
         time = float(next(time_reader)[0])
+        ids = list(next(ids_reader))
         positions = np.array(next(positions_reader), dtype=float).reshape(-1, 2)
         comm_ranges = np.array(next(comm_ranges_reader), dtype=float).reshape(-1, 1)
 
@@ -98,19 +100,30 @@ while k < k_e:
                 verticalalignment='bottom', horizontalalignment='left',
                 transform=ax.transAxes, color='r', fontsize=8
         )
-
+    
+        robots = [i for i, id in enumerate(ids) if id.startswith('Robot')]
+        targets = [i for i, id in enumerate(ids) if id.startswith('Target')]
+     
         plot.nodes(
-            ax, positions,
+            ax, positions[robots],
             color='b',
             marker='o',
             s=20,
             lw=0.2
         )
 
-        edges = disk_graph.edges_from_positions(positions, dmax=comm_ranges)
+        plot.nodes(
+            ax, positions[targets],
+            color='k',
+            marker='d',
+            s=20,
+            lw=0.2
+        )
+
+        edges = disk_graph.edges_from_positions(positions[robots], dmax=comm_ranges[robots])
         plot.edges(
             ax,
-            positions,
+            positions[robots],
             edges,
             color='0.0',
             alpha=0.5,
