@@ -40,10 +40,18 @@ for k, p in enumerate(target_positions):
                 "gain": 1.0
             }
         },
-        "controller": {
+        "control": {
             "period": 0.1,
         },
-        "token_handler": {
+        "coordination": {
+            "position": [
+                [
+                    float(p[0])
+                ],
+                [
+                    float(p[1])
+                ]
+            ],
             "collect_range": 5.0
         },
         "comm_range": 1e6,
