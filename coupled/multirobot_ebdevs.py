@@ -93,8 +93,6 @@ class MultiRobotSystem(CoupledDEVS):
                 'status': 'active',
             }
 
-        self.distance_measurement_stddev = 0.0
-
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
 
@@ -131,12 +129,10 @@ class MultiRobotSystem(CoupledDEVS):
 
     def getNeighbors(self, agent_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
-        previous_time = self.agents_states[agent_1_id]['time']
-        delta_time = current_time - previous_time
         return [
-            (agent_2_id, self.distance_measurement(agent_1_id, agent_2_id, delta_time))
+            agent_2_id
             for agent_2_id in self.agents_states.keys()
-            if self.in_range(agent_1_id, agent_2_id, delta_time)
+            if self.in_range(agent_1_id, agent_2_id, current_time)
         ]
 
     def getRobotPositions(self, current_time):
@@ -158,7 +154,19 @@ class MultiRobotSystem(CoupledDEVS):
             y = evaluate_poly(position_poly[1], delta_time)
             positions += [x, y]
         return ids, positions, comm_ranges, status
-            
+
+    def getRobotDistances(self, robot_1, robot_2, current_time):
+        pose = self.agents_states[robot_1]['pose']
+        delta_time = current_time - self.agents_states[robot_1]['time']
+        x1 = evaluate_poly(pose[0], delta_time)
+        y1 = evaluate_poly(pose[1], delta_time)
+
+        pose = self.agents_states[robot_2]['pose']
+        delta_time = current_time - self.agents_states[robot_2]['time']
+        x2 = evaluate_poly(pose[0], delta_time)
+        y2 = evaluate_poly(pose[1], delta_time)
+
+        return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
     def select(self, immChildren):
         """
@@ -167,24 +175,7 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def distance(self, agent_1_id, agent_2_id, delta_time): # agent_1_id might be robot or target
-        agent_1_pose = self.agents_states[agent_1_id]['pose']
-        agent_2_pose = self.agents_states[agent_2_id]['pose']
-
-        x1 = evaluate_poly(agent_1_pose[0], delta_time)
-        y1 = evaluate_poly(agent_1_pose[1], delta_time)
-        x2 = evaluate_poly(agent_2_pose[0], delta_time)
-        y2 = evaluate_poly(agent_2_pose[1], delta_time)
-
-        return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-
-    def distance_measurement(self, agent_1_id, agent_2_id, delta_time):
-        return np.random.normal(
-            loc=self.distance(agent_1_id, agent_2_id, delta_time),
-            scale=self.distance_measurement_stddev    
-        ) 
-
-    def in_range(self, agent_1_id, agent_2_id, delta_time): # agent_1_id might be robot or target
+    def in_range(self, agent_1_id, agent_2_id, current_time): # agent_1_id might be robot or target
         if agent_1_id == agent_2_id:
             return False
 
@@ -192,7 +183,7 @@ class MultiRobotSystem(CoupledDEVS):
         if agent_1_id.startswith('Target') and agent_2_id.startswith('Target'):
             return False
 
-        distance = self.distance(agent_1_id, agent_2_id, delta_time)
+        distance = self.getRobotDistances(agent_1_id, agent_2_id, current_time)
         trasmitter_range = self.agents_states[agent_1_id]['comm_range']
 
         return distance < trasmitter_range

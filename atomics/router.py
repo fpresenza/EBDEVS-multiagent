@@ -76,8 +76,8 @@ class Router(AtomicDEVS):
         receivers = self.parent.getNeighbors(transmitter, current_time)
         if len(receivers) > 0:
             self.outputs_queue += [
-                {self.outPorts[receiver_id]: (transmitter, token, distance_meas)} 
-                for receiver_id, distance_meas in receivers
+                {self.outPorts[receiver_id]: (transmitter, token)} 
+                for receiver_id in receivers
             ]
             sigma = 0.0    # holds last status
 

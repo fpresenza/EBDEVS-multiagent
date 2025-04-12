@@ -83,15 +83,15 @@ class RadioModule(AtomicDEVS):
         current_time += self.elapsed
 
         if self.inPorts['radio'] in inputs:
-            transmitter, token, distance_meas = inputs[self.inPorts['radio']]
+            transmitter, token = inputs[self.inPorts['radio']]
+            distance_meas = self.parent.parent.getRobotDistances(transmitter, self.robot_id, current_time)
 
-            # gets last order from record dictionary
-            
             if token.creator != self.robot_id:
                 # update the number of traversed hops
                 token = copy.deepcopy(token)
                 token.hops_travelled += 1
 
+                # gets last order from record dictionary
                 try:
                     last_order = record[token.kind][token.creator]
                 except KeyError:
