@@ -188,6 +188,10 @@ class MultiRobotSystem(CoupledDEVS):
         if agent_1_id == agent_2_id:
             return False
 
+        # tweak to improve performance since target-target comm is no need so far
+        if agent_1_id.startswith('Target') and agent_2_id.startswith('Target'):
+            return False
+
         distance = self.distance(agent_1_id, agent_2_id, delta_time)
         trasmitter_range = self.agents_states[agent_1_id]['comm_range']
 
