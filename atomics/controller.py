@@ -203,7 +203,7 @@ class Controller(AtomicDEVS):
                 d = np.sqrt(np.square(r).sum())
                 tracking_radius = 20.0    # radius
                 forget_radius = 100.0     # radius
-                v_collect_max = 2.0
+                v_collect_max = 2.5
                 if d < tracking_radius:
                     v_collect = v_collect_max
                 elif d < forget_radius:
@@ -215,11 +215,13 @@ class Controller(AtomicDEVS):
             else:
                 target_action = np.zeros((2, 1), dtype=float)
 
+
             # obstacle avoidance
             if len(obstacles) > 0:
-                collision_action = 0.5 * self.collision.update(
+                collision_action = self.collision.update(
                     position, obstacles
                 ).reshape(-1, 1)
+                collision_action *= 0.5
             else:
                 collision_action = np.zeros((2, 1), dtype=float)
 
@@ -229,12 +231,13 @@ class Controller(AtomicDEVS):
 
             if len(subframework) > 1:
                 subframework_ids, subframework_positions = list(zip(*subframework.items()))
-                subframework_actions = 0.75 * self.rigidity.update(np.array(subframework_positions))
+                subframework_actions = self.rigidity.update(np.array(subframework_positions))
                 others_rigidity = {
                     node_id: action.reshape(-1, 1)
                     for node_id, action in zip(subframework_ids, subframework_actions)
                 }
                 rigidity_action += others_rigidity.pop(self.robot_id)
+                rigidity_action *= 0.75
 
             own_action = (target_action + collision_action + rigidity_action) * 0.5
             others_actions = others_rigidity
