@@ -75,19 +75,11 @@ class Router(AtomicDEVS):
 
         receivers = self.parent.getNeighbors(transmitter, current_time)
         if len(receivers) > 0:
-            # if transmitter.startswith('Robot'):
             self.outputs_queue += [
                 {self.outPorts[receiver_id]: (transmitter, token, distance_meas)} 
                 for receiver_id, distance_meas in receivers
             ]
             sigma = 0.0    # holds last status
-
-            # elif transmitter.startswith('Target'):
-            #     self.outputs_queue += [
-            #         {self.outPorts[receiver_id]: (transmitter, msg)} 
-            #         for receiver_id, _ in receivers
-            #     ]
-            #     sigma = 0.0    # holds last status
 
         if (self.debug):
             print(

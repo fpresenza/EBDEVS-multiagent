@@ -65,7 +65,7 @@ class Target(AtomicDEVS):
         self.state = TargetState(
             sigma=self.period,
             tvalue=0.0,
-            status='Active'
+            status='active'
         ) 
 
         # initialize y_up
@@ -75,7 +75,7 @@ class Target(AtomicDEVS):
                 'time': 0.0, 
                 'pose': [coord + [0.0] * 9 for coord in self.position], # 10-tuple
                 'comm_range': self.comm_range,
-                'status': 'Active',
+                'status': 'active',
             }
         ]
 
@@ -105,10 +105,10 @@ class Target(AtomicDEVS):
         self.y_up[1]['time'] = current_time
         transmitter, (_, distance_measurement) = inputs[self.inPorts['radio']]
         if transmitter.startswith('Robot'):
-            if (status == 'Active') and  (distance_measurement < self.collect_range * 0.9):
-                status = 'Passive'
+            if (status == 'active') and  (distance_measurement < self.collect_range * 0.9):
+                status = 'passive'
                 sigma = INFINITY
-                self.y_up[1]['status'] = 'Passive'
+                self.y_up[1]['status'] = 'passive'
 
         if (self.debug):
             print(

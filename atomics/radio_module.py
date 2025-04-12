@@ -28,6 +28,7 @@ class RadioModule(AtomicDEVS):
             self, 
             robot_id,
             name='RadioModule', 
+            forward=True,
             debug=False
             ):
         """Atomic model for the toking handling protocol"""
@@ -38,6 +39,7 @@ class RadioModule(AtomicDEVS):
         # Parameters
         self.robot_id = robot_id    # Robot identifier
         # self.status = []          # TODO
+        self.forward = forward
         self.debug = debug
 
         # Dictionaries as records of tokens received
@@ -47,7 +49,7 @@ class RadioModule(AtomicDEVS):
         self.state = RadioModuleState(
             sigma=INFINITY,
             tvalue=0.0,
-            record={'action': {}, 'state': {}},
+            record={'action': {}, 'state': {}, 'active': {}, 'passive': {}},
         ) 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -66,7 +68,6 @@ class RadioModule(AtomicDEVS):
         self.outPorts = {
             'radio': self.addOutPort(name="out_radio"),
             'token': self.addOutPort(name="out_token"),
-            'target_position': self.addOutPort(name="out_target_position"),
         }
 
         self.outputs_queue = []
@@ -86,10 +87,7 @@ class RadioModule(AtomicDEVS):
 
             # gets last order from record dictionary
             
-            if token.creator == self.robot_id:
-                # do nothing if this robot is the creator
-               pass
-            else:
+            if token.creator != self.robot_id:
                 # update the number of traversed hops
                 token = copy.deepcopy(token)
                 token.hops_travelled += 1
@@ -103,18 +101,13 @@ class RadioModule(AtomicDEVS):
                 # check if token is newer than last received
                 if token.order > last_order:
                     record[token.kind][token.creator] = token.order
+                    self.outputs_queue.append({self.outPorts['token']: (transmitter, token, distance_meas)})
 
                     # check if retransmission is needed
-                    if token.hops_travelled < token.hops_to_target:
+                    if self.forward and token.hops_travelled < token.hops_to_target:
                         self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, token)})
-                        sigma = 0.0
-
-                    if transmitter.startswith('Robot'):
-                        self.outputs_queue.append({self.outPorts['token']: (token, distance_meas)})
-                        sigma = 0.0
-                    elif transmitter.startswith('Target'):
-                        self.outputs_queue.append({self.outPorts['target_position']: (token, distance_meas)})
-                        sigma = 0.0
+                    
+                    sigma = 0.0
 
         elif self.inPorts['token'] in inputs:
             token = inputs[self.inPorts['token']]

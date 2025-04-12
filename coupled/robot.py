@@ -5,7 +5,6 @@ from pypdevs.DEVS import CoupledDEVS
 from atomics.controller import Controller
 from atomics.radio_module import RadioModule
 from atomics.token_handler import TokenHandler
-from atomics.target_handler import TargetHandler
 from atomics.kalman_filter import KalmanFilter
 from coupled.robot_dynamics import RobotDynamics
 from atomics.speedsensor import SpeedSensor
@@ -60,10 +59,6 @@ class Robot(CoupledDEVS):
             config=config['token_handler'],
             debug=self.debug,
         )
-        target_handler = TargetHandler(
-            config=config['target_handler'],
-            debug=self.debug,
-        )
         kalman_filter = KalmanFilter(
             robot_id=self.name,
             config=config['kalman_filter'],
@@ -79,7 +74,6 @@ class Robot(CoupledDEVS):
         self.controller = self.addSubModel(controller)
         self.radio_module = self.addSubModel(radio_module)
         self.token_handler = self.addSubModel(token_handler)
-        self.target_handler = self.addSubModel(target_handler)
         self.kalman_filter = self.addSubModel(kalman_filter)
         self.speed_sensor = self.addSubModel(speed_sensor)
 
@@ -93,18 +87,13 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.radio_module.outPorts['token'], self.token_handler.inPorts['token'])
         self.connectPorts(self.token_handler.outPorts['token'], self.radio_module.inPorts['token'])
         
-        self.connectPorts(self.radio_module.outPorts['target_position'], self.target_handler.inPorts['target_position'])
-
         self.connectPorts(self.token_handler.outPorts['neighbors_positions'], self.kalman_filter.inPorts['neighbors_positions'])
         self.connectPorts(self.kalman_filter.outPorts['position'], self.token_handler.inPorts['position'])
 
         self.connectPorts(self.token_handler.outPorts['other_position'], self.controller.inPorts['other_position'])
         self.connectPorts(self.token_handler.outPorts['external_action'], self.controller.inPorts['external_action'])
+        self.connectPorts(self.token_handler.outPorts['target_position'], self.controller.inPorts['target_position'])
         self.connectPorts(self.controller.outPorts['others_actions'], self.token_handler.inPorts['others_actions'])
-
-        self.connectPorts(self.target_handler.outPorts['target_position'], self.controller.inPorts['target_position'])
-
-        self.connectPorts(self.kalman_filter.outPorts['position'], self.target_handler.inPorts['position'])
 
         self.connectPorts(self.kalman_filter.outPorts['position'], self.controller.inPorts['position'])
         
@@ -129,7 +118,11 @@ class Robot(CoupledDEVS):
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
         # self.current_time += e_g
 
-        micro_id, data = x_b_micro
+        if len(x_b_micro) == 1:
+            micro_id, data = x_b_micro[0]
+        else:
+            micro_id, data = x_b_micro
+        
         self.y_up[1]['time'] = data['time']
         self.y_up[1]['pose'] = data['pose'].copy()
 

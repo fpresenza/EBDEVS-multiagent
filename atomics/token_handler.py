@@ -18,20 +18,21 @@ class TokenHandlerState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, record, position):
+    def __init__(self, sigma, tvalue, record, position, nearest_target):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, record, position)
+        self.set(sigma, tvalue, record, position, nearest_target)
 
-    def set(self, sigma, tvalue, record, position):
+    def set(self, sigma, tvalue, record, position, nearest_target):
         self._sigma = sigma
         self._tvalue = tvalue
         self._record = record
         self._state = position
+        self._nearest_target = nearest_target
 
     def get(self):
-        return self._sigma, self._tvalue, self._record, self._state
+        return self._sigma, self._tvalue, self._record, self._state, self._nearest_target
 
 
 class TokenHandler(AtomicDEVS):
@@ -63,6 +64,7 @@ class TokenHandler(AtomicDEVS):
             tvalue=0.0, 
             record={'action': 0, 'state': 0},
             position=None,
+            nearest_target={'id': None, 'sqdist': np.inf},
         ) 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -84,6 +86,7 @@ class TokenHandler(AtomicDEVS):
             'other_position': self.addOutPort(name="out_other_position"),
             'neighbors_positions': self.addOutPort(name="out_neighbors_positions"),
             'external_action': self.addOutPort(name="out_external_action"),
+            'target_position': self.addOutPort(name="out_target_position")
         }
 
         self.outputs_queue = []
@@ -95,15 +98,13 @@ class TokenHandler(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, record, position = self.state.get()
+        sigma, current_time, record, position, nearest_target = self.state.get()
         current_time += self.elapsed
 
         if self.inPorts['token'] in inputs:    # if token arrives through port self.inPorts['token']
-            token, distance_meas = inputs[self.inPorts['token']]
-            # if self.robot_id == 'Robot_0' and token.kind == 'state':
-            #     print(current_time, token.creator, token.order)
+            transmitter, token, distance_meas = inputs[self.inPorts['token']]
 
-            response = self.handle_received_token(token, distance_meas)
+            response, nearest_target = self.handle_received_token(token, distance_meas, position, nearest_target)
 
             if len(response) > 0:    # else pass, nothing to send
                 self.outputs_queue += response
@@ -157,13 +158,13 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, self.parent.name, token)
                 )
 
-        return TokenHandlerState(sigma, current_time, record, position) 
+        return TokenHandlerState(sigma, current_time, record, position, nearest_target) 
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, record, position = self.state.get()
+        _, current_time, record, position, nearest_target = self.state.get()
         
         if len(self.outputs_queue) == 0:
             sigma = INFINITY
@@ -176,13 +177,13 @@ class TokenHandler(AtomicDEVS):
                 .format(current_time, self.name, self.parent.name)
             )
 
-        return TokenHandlerState(sigma, current_time, record, position)
+        return TokenHandlerState(sigma, current_time, record, position, nearest_target)
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        _, current_time, _, _ = self.state.get()
+        _, current_time, _, _, _ = self.state.get()
 
         if (self.debug):
             print(
@@ -199,13 +200,13 @@ class TokenHandler(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _, _ = self.state.get()
+        sigma, _, _, _, _ = self.state.get()
         return max(sigma, 0.0)
     
     def __lt__(self, other):
         return self.name < other.name
 
-    def handle_received_token(self, token, distance):
+    def handle_received_token(self, token, distance, position, nearest_target):
         """Decide what to do with the received token"""
         response = []
 
@@ -230,6 +231,22 @@ class TokenHandler(AtomicDEVS):
                     # send data to positioning system
                     response.append({self.outPorts['neighbors_positions']: data + (distance, )})
 
-        return response
+        # check if it is nearest target
+        elif token.kind == 'active':
+            target_position = token.data
+            square_dist = np.sum(np.square(position - target_position))
+            if token.creator == nearest_target['id']:
+                nearest_target['sqdist'] = square_dist
+            elif square_dist < nearest_target['sqdist']:
+                nearest_target['id'] = token.creator
+                nearest_target['sqdist'] = square_dist
+                response.append({self.outPorts['target_position']: target_position})
+
+        elif token.kind == 'passive':
+            if token.creator == nearest_target['id']:
+                nearest_target['id'] = None
+                nearest_target['sqdist'] = np.inf
+
+        return response, nearest_target
 
 

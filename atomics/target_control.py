@@ -1,16 +1,28 @@
 import numpy as np
+
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
+
+from uvnpy.distances.control import RigidityMaintenance
+from uvnpy.control.core import CollisionAvoidanceVanishing
 
 from utils.files import append_csv_file
 
 
-class LoggerState:
+# do not reset random seed
+np.random.seed(0)
+
+
+class TargetControlState:
     """
     Encapsulates the system's state
     """
 
-    def __init__(self, sigma, tvalue):
+    def __init__(
+            self, 
+            sigma, 
+            tvalue, 
+            ):
         """
         Constructor (parameterizable).
         """
@@ -23,27 +35,41 @@ class LoggerState:
     def get(self):
         return self._sigma, self._tvalue
 
-
-class Logger(AtomicDEVS):
-    def __init__(self, period, name='Logger', logpath='./', debug=False):
-        """Atomic model for the Logger """
+class TargetControl(AtomicDEVS):
+    def __init__(
+            self,
+            robot_id,
+            config,
+            name='TargetControl',
+            debug=False
+        ):
+        """Atomic model for the rigidity maintenance controller"""
 
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
 
         # Parameters
-        # self.robots = range(number_of_robots)
-        self.period = period
-        self.logpath = logpath
+        self.robot_id = robot_id    # Robot identifier
+        self.period = config['period']
         self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = LoggerState(sigma=self.period, tvalue=self.period) 
+        self.state = TargetControlState(
+            sigma=self.period,   # waits till first token
+            tvalue=0.0
+        )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
         self.elapsed = 0.0
+
+        # PORTS:
+        #  Declare as many input and output ports as desired
+        #  (usually store returned references in local variables):
+        self.outPorts = {'beacon': self.addOutPort(name="out_beacon")}
+            
+        self.outputs_queue = []
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -53,36 +79,20 @@ class Logger(AtomicDEVS):
         Internal Transition Function.
         """
         sigma, current_time = self.state.get()
-
+        
         current_time += sigma
         sigma = self.period
 
         if (self.debug):
-            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time, self.name))
+            print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
-        return LoggerState(sigma, current_time) 
+        return TargetControlState(sigma, current_time) 
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        sigma, current_time = self.state.get()
-
-        ids, positions, comm_ranges, status = self.parent.getRobotPositions(current_time)
-        append_csv_file(self.logpath + 'logger_time.csv', [current_time])
-        append_csv_file(self.logpath + 'logger_ids.csv', ids)
-        append_csv_file(self.logpath + 'logger_positions.csv', positions)
-        append_csv_file(self.logpath + 'logger_comm_ranges.csv', comm_ranges)
-        append_csv_file(self.logpath + 'logger_status.csv', status)
-
-
-        if (self.debug):
-            print(
-                "t: {} s, Atomic name: {}, Output Function, data: {}"
-                .format(current_time, self.name, self.outputs_queue[0])
-            )
-
-        return {}
+        return {self.outPorts['beacon']: None}
 
     def timeAdvance(self):
         """
@@ -92,6 +102,6 @@ class Logger(AtomicDEVS):
         # based (typically) on current State.
         sigma, _ = self.state.get()
         return max(sigma, 0.0)
-    
+
     def __lt__(self, other):
         return self.name < other.name
