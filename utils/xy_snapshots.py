@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import argparse
 import progressbar
 
+from core import robot_id_to_index, target_id_to_index
 from files import find_latest_timestamp
 from uvnpy.network import plot, disk_graph
 from uvnpy.distances.core import distance_matrix
@@ -61,6 +62,8 @@ time_reader = csv.reader(open(experiment_directory + 'logger_time.csv', newline=
 ids_reader = csv.reader(open(experiment_directory + 'logger_ids.csv', newline=''))
 positions_reader = csv.reader(open(experiment_directory + 'logger_positions.csv', newline=''))
 comm_ranges_reader = csv.reader(open(experiment_directory + 'logger_comm_ranges.csv', newline=''))
+status_reader = csv.reader(open(experiment_directory + 'logger_status.csv', newline=''))
+
 
 # ------------------------------------------------------------------
 # Plot snapshots
@@ -68,9 +71,12 @@ comm_ranges_reader = csv.reader(open(experiment_directory + 'logger_comm_ranges.
 bar = progressbar.ProgressBar(maxval=N).start()
 
 for _ in range(k_i):
-    for r in readers:
-        next(r)
-
+    next(time_reader)
+    next(ids_reader)
+    next(positions_reader)
+    next(comm_ranges_reader)
+    next(status_reader)
+    
 k = 1
 while k < k_e:
     try:
@@ -79,9 +85,10 @@ while k < k_e:
         ids = list(next(ids_reader))
         positions = np.array(next(positions_reader), dtype=float).reshape(-1, 2)
         comm_ranges = np.array(next(comm_ranges_reader), dtype=float).reshape(-1, 1)
+        status = list(next(status_reader))
 
         lim = 100.0
-        fig, ax = plt.subplots(figsize=(5, 5))
+        fig, ax = plt.subplots(figsize=(3.0, 3.0))
         ax.tick_params(
             axis='both',       # changes apply to the x-axis
             which='both',      # both major and minor ticks are affected
@@ -96,29 +103,36 @@ while k < k_e:
         ax.set_ylim(0.0, lim)
 
         ax.text(
-                0.05, 0.01, r't = {:.3f}s'.format(time),
+                0.05, 0.01, r't = {:.3f}s'.format(time - 0.1),
                 verticalalignment='bottom', horizontalalignment='left',
-                transform=ax.transAxes, color='r', fontsize=8
+                transform=ax.transAxes, color='r', fontsize='x-small'
         )
     
         robots = [i for i, id in enumerate(ids) if id.startswith('Robot')]
-        targets = [i for i, id in enumerate(ids) if id.startswith('Target')]
-     
-        plot.nodes(
-            ax, positions[robots],
-            color='b',
-            marker='o',
-            s=20,
-            lw=0.2
-        )
+        targets = [i for i, id in enumerate(ids) if id.startswith('Target') and status[i] == 'active']
 
-        plot.nodes(
-            ax, positions[targets],
-            color='k',
-            marker='d',
-            s=20,
-            lw=0.2
-        )
+        for robot in robots:
+            plot.nodes(
+                ax, positions[robot],
+                color='b',
+                # marker='o',
+                marker=f'${robot_id_to_index(ids[robot])}$',
+                s=15,
+                lw=0.2
+            )
+
+        for target in targets:    
+            plot.nodes(
+                ax, positions[target],
+                color='k',
+                # marker='d',
+                marker=f'${target_id_to_index(ids[target])}$',
+                s=15,
+                lw=0.2
+            )
+        for target in targets:
+            circle = plt.Circle(positions[target], 5.0, fill=True, color='blue', alpha=0.2)
+            ax.add_patch(circle)
 
         edges = disk_graph.edges_from_positions(positions[robots], dmax=comm_ranges[robots])
         plot.edges(
@@ -127,18 +141,21 @@ while k < k_e:
             edges,
             color='0.0',
             alpha=0.5,
-            lw=0.5,
+            lw=0.3,
             zorder=0
         )
 
         fig.savefig(experiment_directory + 'snapshots/{}.png'.format(k), format='png', dpi=360)
         plt.close()
-        bar.update(k)
 
         # Skip rows in each file
         for _ in range(arg.jump - 1):
-            for r in readers:
-                next(r)
+            next(time_reader)
+            next(ids_reader)
+            next(positions_reader)
+            next(comm_ranges_reader)
+            next(status_reader)
+            
         bar.update(k)
         k += 1
     except StopIteration:
