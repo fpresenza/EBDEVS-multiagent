@@ -11,7 +11,7 @@ class Token(object):
     order: int                  # A counter to differentiate tokens
     data: object                # The data it carries
     hops_to_target: int         # The number of hops it must travel
-    hops_travelled: int = 0     # The number of hops it has travelled
+    hops_travelled: int = 1     # The number of hops it has travelled
 
 
 class TokenHandlerState:
@@ -123,7 +123,7 @@ class TokenHandler(AtomicDEVS):
                 order=record['action'],
                 data=inputs[self.inPorts['others_actions']],
                 hops_to_target=self.action_extent,
-                hops_travelled=0
+                hops_travelled=1
             )
             record['action'] += 1
             self.outputs_queue.append({self.outPorts['token']: action_token})
@@ -135,7 +135,7 @@ class TokenHandler(AtomicDEVS):
                     order=record['state'],
                     data=position,
                     hops_to_target=self.state_extent,
-                    hops_travelled=0
+                    hops_travelled=1
                 )
                 record['state'] += 1
                 position = None

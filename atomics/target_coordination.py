@@ -11,7 +11,7 @@ class Token(object):
     order: int                  # A counter to differentiate tokens
     data: object                # The data it carries
     hops_to_target: int         # The number of hops it must travel
-    hops_travelled: int = 0     # The number of hops it has travelled
+    hops_travelled: int = 1     # The number of hops it has travelled
 
 
 class TargetCoordinationState:
@@ -121,7 +121,7 @@ class TargetCoordination(AtomicDEVS):
                 order=record,
                 data=position,
                 hops_to_target=1,
-                hops_travelled=0
+                hops_travelled=1
             )
             record += 1
             self.output = token

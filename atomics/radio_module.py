@@ -87,10 +87,6 @@ class RadioModule(AtomicDEVS):
             distance_meas = self.parent.parent.getRobotDistances(transmitter, self.robot_id, current_time)
 
             if token.creator != self.robot_id:
-                # update the number of traversed hops
-                token = copy.deepcopy(token)
-                token.hops_travelled += 1
-
                 # gets last order from record dictionary
                 try:
                     last_order = record[token.kind][token.creator]
@@ -105,6 +101,9 @@ class RadioModule(AtomicDEVS):
 
                     # check if retransmission is needed
                     if self.forward and token.hops_travelled < token.hops_to_target:
+                        # update the number of traversed hops
+                        token = copy.deepcopy(token)
+                        token.hops_travelled += 1
                         self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, token)})
                     
                     sigma = 0.0
