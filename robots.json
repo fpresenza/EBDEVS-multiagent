@@ -21,7 +21,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -119,7 +119,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -217,7 +217,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -315,7 +315,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -413,7 +413,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -511,7 +511,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -609,7 +609,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -707,7 +707,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -805,7 +805,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
@@ -903,7 +903,7 @@
             }
         },
         "controller": {
-            "period": 0.5,
+            "period": 0.1,
             "dmax": [
                 12.75,
                 15.0
