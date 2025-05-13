@@ -14,6 +14,7 @@ Coupled and Atomics DEVS Models:
 5. [Token Handler](atomics/token_handler.py)
 6. [Router](atomics/router.py)
 7. [Splitter](atomics/misc.py)
+8. [EB-DEVS Library](LIBRARY.md)
 
 Settings:
 * [robots](robots.json)
