@@ -202,8 +202,8 @@ class SpeedSensor(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.output = self.addOutPort(name="output")
-        self.input = self.addInPort(name="input")
+        self.inPorts = {'position_polynomial': self.addInPort(name="in_position_polynomial")}
+        self.outPorts = {'velocity_measurement': self.addOutPort(name="out_velocity_measurement")}
         
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -215,7 +215,7 @@ class SpeedSensor(AtomicDEVS):
         sigma, current_time, _ = self.state.get()
         current_time += self.elapsed
 
-        position = inputs[self.input]
+        position = inputs[self.inPorts['position_polynomial']]
         sigma = sigma - self.elapsed # holds last status
 
         if (self.debug):
@@ -257,7 +257,7 @@ class SpeedSensor(AtomicDEVS):
         )
         output = np.array([vx, vy]) + noise_sample
 
-        return {self.output: output}
+        return {self.outPorts['velocity_measurement']: output}
 
     def timeAdvance(self):
         """

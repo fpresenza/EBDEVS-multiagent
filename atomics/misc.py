@@ -159,10 +159,10 @@ class Splitter(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.in_splitter_msgs = self.addInPort(name="IN")
-        self.out_splitter_msgs = []
+        self.inPort = self.addInPort(name="in")
+        self.outPorts = {}
         for i in range(self.num_outputs):
-            self.out_splitter_msgs.append(self.addOutPort(name="out_splitter_port_{}".format(i)))
+            self.outPorts[i] = self.addOutPort(name="out_{}".format(i))
 
         self.outputs_queue = []
 
@@ -181,7 +181,7 @@ class Splitter(AtomicDEVS):
         current_time += self.elapsed
 
         # Received a new event, so start processing it
-        data = np.ravel(inputs[self.in_splitter_msgs])    # serialize data
+        data = np.ravel(inputs[self.inPort])    # serialize data
 
         sigma = 0.0
         if (self.debug):
@@ -204,7 +204,7 @@ class Splitter(AtomicDEVS):
         if (self.debug):
             print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
-        return SplitterState(sigma,current_time,data)
+        return SplitterState(sigma, current_time, data)
 
     def outputFnc(self):
         """
@@ -213,7 +213,7 @@ class Splitter(AtomicDEVS):
         if len(self.outputs_queue) == 0:
             _, _, data = self.state.get()
             for i, splitted_data in enumerate(data):
-                self.outputs_queue.append({self.out_splitter_msgs[i]: [splitted_data]})
+                self.outputs_queue.append({self.outPorts[i]: [splitted_data]})
 
         return self.outputs_queue.pop()
     
@@ -277,11 +277,11 @@ class Merger(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.in_merger_msgs = []
+        self.inPorts = {}
         for i in range(self.num_inputs):
-            self.in_merger_msgs.append(self.addInPort(name="IN_merger_port_{}".format(i)))
+            self.inPorts[i] = self.addInPort(name="in_{}".format(i))
 
-        self.out_merger_msgs = self.addOutPort(name="OUT")
+        self.outPort = self.addOutPort(name="out")
 
         self.outputs_queue = []
 
@@ -301,8 +301,8 @@ class Merger(AtomicDEVS):
 
         # Received a new event, so start processing it
         for i in range(self.num_inputs):
-            if self.in_merger_msgs[i] in inputs:
-                data[i] = inputs[self.in_merger_msgs[i]]
+            if self.inPorts[i] in inputs:
+                data[i] = inputs[self.inPorts[i]]
             else:
                 if data[i] != None:
                     data[i] = advance_time(data[i], self.elapsed, order=-1)
@@ -333,7 +333,7 @@ class Merger(AtomicDEVS):
         """
         _, _, data = self.state.get()
 
-        return {self.out_merger_msgs: data}
+        return {self.outPort: data}
     
     def timeAdvance(self):
         """

@@ -63,7 +63,6 @@ class TargetHandler(AtomicDEVS):
             'position': self.addInPort(name="in_position")
         }
         self.outPorts = {
-            'collect': self.addOutPort(name="out_collect"),
             'target_position': self.addOutPort(name="out_target_position")
         }
 
@@ -82,7 +81,7 @@ class TargetHandler(AtomicDEVS):
         sigma -= self.elapsed    # holds last status
 
         if self.inPorts['target_position'] in inputs:
-            target_id, target_position = inputs[self.inPorts['target_position']]
+            token, _ = inputs[self.inPorts['target_position']]
             targets[target_id] = target_position
 
         elif self.inPorts['position'] in inputs:   # if data arrives through port in_position
@@ -126,7 +125,6 @@ class TargetHandler(AtomicDEVS):
             _, current_time, targets, position = self.state.get()
             target_position = self.allocation(targets, position)
             self.outputs_queue.append({self.outPorts['target_position']: target_position})
-            self.outputs_queue.append({self.outPorts['collect']: None})
         
         return self.outputs_queue.pop()
     
@@ -144,8 +142,11 @@ class TargetHandler(AtomicDEVS):
 
     def allocation(self, targets, position):
         if len(targets) > 0:
-            # distances = position - list(targets.values())
-            _, target_position = targets.popitem()
+            targets_positions = np.array(list(targets.values()))
+            r = position - targets_positions
+            dist = np.sum(np.square(r), axis=1)
+            target_position = targets_positions[np.argmin(dist)]
         else:
             target_position = None
+
         return target_position

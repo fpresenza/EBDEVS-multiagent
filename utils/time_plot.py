@@ -59,7 +59,8 @@ data = []
 with open(experiment_directory + 'global.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
-        data.append(row)
+        if row[0].startswith('Robot'):
+            data.append(row)
 
 time = {robot: [] for robot in robot_ids}
 position_x = {robot: [] for robot in robot_ids}
@@ -86,14 +87,14 @@ for i, robot in enumerate(robot_ids):
         time[robot], position_x[robot],
         color='C{}'.format(i),
         marker='.',
-        ds='steps-post',
+        # ds='steps-post',
         label='{}'.format(i)
     )
     ax[1].plot(
         time[robot], position_y[robot],
         color='C{}'.format(i),
         marker='.',
-        ds='steps-post',
+        # ds='steps-post',
         label='{}'.format(i)
     )
 

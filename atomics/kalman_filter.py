@@ -64,19 +64,20 @@ class KalmanFilter(AtomicDEVS):
 
         # kalman filter parameters (hardcoded)
         self.ekf = StatelessKalmanFilter(
-            input_covariance=np.array([[0.0225, 0.0], [0.0, 0.0225]]),
-            distance_measurement_covariance=np.array([[100.0]]),
-            position_measurement_covariance=np.array([[25.0, 0.0], [0.0, 25.0]])
+            input_covariance=np.array([[0.0, 0.0], [0.0, 0.0]]),
+            distance_measurement_covariance=np.array([[1.0]]),
+            position_measurement_covariance=np.array([[1.0, 0.0], [0.0, 1.0]])
         )
 
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         #
-        self.in_dynamics_velmeas = self.addInPort(name="in_dynamics_velmeas")
-        self.in_gps_posmeas = self.addInPort(name="in_gps_posmeas")
-        self.in_handler_extpos = self.addInPort(name="in_handler_extpos")
-
+        self.inPorts = {
+            'velocity_measurement': self.addInPort(name="in_velocity_measurement"),
+            'position_measurement': self.addInPort(name="in_position_measurement"),
+            'neighbors_positions': self.addInPort(name="in_neighbors_positions")
+        }
         self.outPorts = {'position': self.addOutPort(name="out_position")}
 
         if (self.debug):
@@ -92,8 +93,8 @@ class KalmanFilter(AtomicDEVS):
         sigma, current_time, previous_time, position, covariance = self.state.get()
         current_time += self.elapsed
 
-        if self.in_dynamics_velmeas in inputs: # if data arrives through port in_dynamics_velmeas
-            velocity_measurement = inputs[self.in_dynamics_velmeas].reshape(2, 1)
+        if self.inPorts['velocity_measurement'] in inputs: # if data arrives through port inPorts['velocity_measurement']
+            velocity_measurement = inputs[self.inPorts['velocity_measurement']].reshape(2, 1)
             position, covariance = self.ekf.first_order_dynamic_step(
                 position,
                 covariance,
@@ -102,16 +103,16 @@ class KalmanFilter(AtomicDEVS):
             )
             sigma = 0.0 # holds last status
             previous_time = current_time
-        elif self.in_gps_posmeas in inputs: # if data arrives through port in_gps_posmeas
-            position_measurement = inputs[self.in_gps_posmeas].reshape(2, 1)
+        elif self.inPorts['position_measurement'] in inputs: # if data arrives through port inPorts['position_measurement']
+            position_measurement = inputs[self.inPorts['position_measurement']].reshape(2, 1)
             position, covariance = self.ekf.position_measurement_step(
                 position,
                 covariance,
                 position_measurement
             )
             sigma = 0.0 # holds last status
-        elif self.in_handler_extpos in inputs: # if token arrives through port in_handler_extpos
-            robot_id, neighbor_position, distance_measurement = inputs[self.in_handler_extpos]
+        elif self.inPorts['neighbors_positions'] in inputs: # if token arrives through port inPorts['neighbors_positions']
+            robot_id, neighbor_position, distance_measurement = inputs[self.inPorts['neighbors_positions']]
             position, covariance = self.ekf.asynchronous_distance_measurement_step(
                 position, 
                 covariance, 

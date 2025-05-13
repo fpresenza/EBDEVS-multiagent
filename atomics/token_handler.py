@@ -1,6 +1,5 @@
 import numpy as np
 from dataclasses import dataclass
-import copy
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
@@ -12,27 +11,28 @@ class Token(object):
     order: int                  # A counter to differentiate tokens
     data: object                # The data it carries
     hops_to_target: int         # The number of hops it must travel
-    hops_travelled: int = 0     # The number of hops it has travelled
+    hops_travelled: int = 1     # The number of hops it has travelled
 
 
 class TokenHandlerState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, history, position):
+    def __init__(self, sigma, tvalue, record, position, nearest_target):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, history, position)
+        self.set(sigma, tvalue, record, position, nearest_target)
 
-    def set(self, sigma, tvalue, history, position):
+    def set(self, sigma, tvalue, record, position, nearest_target):
         self._sigma = sigma
         self._tvalue = tvalue
-        self._history = history
+        self._record = record
         self._state = position
+        self._nearest_target = nearest_target
 
     def get(self):
-        return self._sigma, self._tvalue, self._history, self._state
+        return self._sigma, self._tvalue, self._record, self._state, self._nearest_target
 
 
 class TokenHandler(AtomicDEVS):
@@ -62,11 +62,9 @@ class TokenHandler(AtomicDEVS):
         self.state = TokenHandlerState(
             sigma=INFINITY, 
             tvalue=0.0, 
-            history={
-                'out': {'action': 0, 'state': 0}, 
-                'in': {'action': {}, 'state': {}}
-            },
+            record={'action': 0, 'state': 0},
             position=None,
+            nearest_target={'id': None, 'sqdist': np.inf},
         ) 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -79,15 +77,16 @@ class TokenHandler(AtomicDEVS):
         #
         self.inPorts = {
             'token': self.addInPort(name="in_token"),
-            'subframework_actions': self.addInPort(name="in_subframework_actions"),
+            'others_actions': self.addInPort(name="in_others_actions"),
             'position': self.addInPort(name="in_position")
         }
 
         self.outPorts = {
             'token': self.addOutPort(name="out_token"),
-            'subframework_positions': self.addOutPort(name="out_subframework_positions"),
+            'other_position': self.addOutPort(name="out_other_position"),
             'neighbors_positions': self.addOutPort(name="out_neighbors_positions"),
             'external_action': self.addOutPort(name="out_external_action"),
+            'target_position': self.addOutPort(name="out_target_position")
         }
 
         self.outputs_queue = []
@@ -99,16 +98,13 @@ class TokenHandler(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, history, position = self.state.get()
+        sigma, current_time, record, position, nearest_target = self.state.get()
         current_time += self.elapsed
 
         if self.inPorts['token'] in inputs:    # if token arrives through port self.inPorts['token']
-            token, distance_measurement = inputs[self.inPorts['token']]
-            history, response = self.handle_received_token(
-                history,
-                token,
-                distance_measurement
-            )
+            transmitter, token, distance_meas = inputs[self.inPorts['token']]
+
+            response, nearest_target = self.handle_received_token(token, distance_meas, position, nearest_target)
 
             if len(response) > 0:    # else pass, nothing to send
                 self.outputs_queue += response
@@ -120,28 +116,28 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, token)
                 )
 
-        elif self.inPorts['subframework_actions'] in inputs: # if data arrives through port inPorts['subframework_actions']
+        elif self.inPorts['others_actions'] in inputs: # if data arrives through port inPorts['others_actions']
             action_token = Token(
                 creator=self.parent.name,
                 kind='action',
-                order=history['out']['action'],
-                data=inputs[self.inPorts['subframework_actions']],
+                order=record['action'],
+                data=inputs[self.inPorts['others_actions']],
                 hops_to_target=self.action_extent,
-                hops_travelled=0
+                hops_travelled=1
             )
-            history['out']['action'] += 1
+            record['action'] += 1
             self.outputs_queue.append({self.outPorts['token']: action_token})
 
             if position is not None:
                 state_token = Token(
                     creator=self.parent.name,
                     kind='state',
-                    order=history['out']['state'],
+                    order=record['state'],
                     data=position,
                     hops_to_target=self.state_extent,
-                    hops_travelled=0
+                    hops_travelled=1
                 )
-                history['out']['state'] += 1
+                record['state'] += 1
                 position = None
                 self.outputs_queue.append({self.outPorts['token']: state_token})
 
@@ -162,13 +158,13 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, self.parent.name, token)
                 )
 
-        return TokenHandlerState(sigma, current_time, history, position) 
+        return TokenHandlerState(sigma, current_time, record, position, nearest_target) 
     
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, history, position = self.state.get()
+        _, current_time, record, position, nearest_target = self.state.get()
         
         if len(self.outputs_queue) == 0:
             sigma = INFINITY
@@ -181,13 +177,13 @@ class TokenHandler(AtomicDEVS):
                 .format(current_time, self.name, self.parent.name)
             )
 
-        return TokenHandlerState(sigma, current_time, history, position)
+        return TokenHandlerState(sigma, current_time, record, position, nearest_target)
     
     def outputFnc(self):
         """
         Output Funtion.
         """
-        _, current_time, _, _ = self.state.get()
+        _, current_time, _, _, _ = self.state.get()
 
         if (self.debug):
             print(
@@ -204,58 +200,53 @@ class TokenHandler(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _, _ = self.state.get()
+        sigma, _, _, _, _ = self.state.get()
         return max(sigma, 0.0)
     
     def __lt__(self, other):
         return self.name < other.name
 
-    def handle_received_token(self, history, token, distance):
+    def handle_received_token(self, token, distance, position, nearest_target):
         """Decide what to do with the received token"""
         response = []
 
-        if token.creator == self.robot_id:
-            # do nothing if this robot is the creator
-            pass
-        else:
-            # update the number of traversed hops
-            token = copy.deepcopy(token)
-            token.hops_travelled += 1
-
-            # check if retransmission is needed
-            if token.hops_travelled < token.hops_to_target:
-                response.append({self.outPorts['token']: token})
-
+        # check if token is of kind action
+        if token.kind == 'action':
             try:
-                # gets order from received dictionary
-                last_order = history['in'][token.kind][token.creator]
+                # check if there is data for this robot
+                data = (token.creator, token.data[self.robot_id])
+                # send data to controller
+                response.append({self.outPorts['external_action']: data})
             except KeyError:
-                # first time received
-                last_order = -1
+                pass
 
-            # check if token is newer than last received
-            if token.order > last_order:
-                history['in'][token.kind][token.creator] = token.order
-                # check if token is of kind action
-                if token.kind == 'action':
-                    try:
-                        # check if there is data for this robot
-                        data = (token.creator, token.data[self.robot_id])
-                        # send data to controller
-                        response.append({self.outPorts['external_action']: data})
-                    except KeyError:
-                        pass
-                # check if token is of kind state
-                elif token.kind == 'state':
-                    # check if token creator is within action extent
-                    if token.hops_travelled <= self.action_extent:
-                        # send data to controller
-                        data = (token.creator, token.data)
-                        response.append({self.outPorts['subframework_positions']: data + (token.hops_travelled, )})
-                        if token.hops_travelled == 1:
-                            # send data to positioning system
-                            response.append({self.outPorts['neighbors_positions']: data + (distance, )})
+        # check if token is of kind state
+        elif token.kind == 'state':
+            # check if token creator is within action extent
+            if token.hops_travelled <= self.action_extent:
+                # send data to controller
+                data = (token.creator, token.data)
+                response.append({self.outPorts['other_position']: data + (token.hops_travelled, )})
+                if token.hops_travelled == 1:
+                    # send data to positioning system
+                    response.append({self.outPorts['neighbors_positions']: data + (distance, )})
 
-        return history, response
+        # check if it is nearest target
+        elif token.kind == 'active':
+            target_position = token.data
+            square_dist = np.sum(np.square(position - target_position))
+            if token.creator == nearest_target['id']:
+                nearest_target['sqdist'] = square_dist
+            elif square_dist < nearest_target['sqdist']:
+                nearest_target['id'] = token.creator
+                nearest_target['sqdist'] = square_dist
+                response.append({self.outPorts['target_position']: target_position})
+
+        elif token.kind == 'passive':
+            if token.creator == nearest_target['id']:
+                nearest_target['id'] = None
+                nearest_target['sqdist'] = np.inf
+
+        return response, nearest_target
 
 

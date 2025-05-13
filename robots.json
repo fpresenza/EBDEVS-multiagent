@@ -2,10 +2,10 @@
     "Robot_0": {
         "position": [
             [
-                162.343
+                9.085
             ],
             [
-                182.097
+                6.11
             ]
         ],
         "dynamics": {
@@ -22,26 +22,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    154.94579428280346
+                    9.085
                 ],
                 [
-                    183.4386842484365
+                    6.11
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
@@ -49,10 +52,7 @@
             "action": 1,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
             "enabled": false,
             "bias": [
@@ -65,12 +65,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -86,24 +86,24 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
         }
     },
     "Robot_1": {
         "position": [
             [
-                145.759
+                17.441
             ],
             [
-                104.87
+                11.093
             ]
         ],
         "dynamics": {
@@ -120,26 +120,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    143.55464192069599
+                    17.441
                 ],
                 [
-                    99.0308518504429
+                    11.093
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
@@ -147,10 +150,7 @@
             "action": 1,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
             "enabled": false,
             "bias": [
@@ -163,12 +163,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -184,24 +184,24 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
         }
     },
     "Robot_2": {
         "position": [
             [
-                82.645
+                30.955
             ],
             [
-                59.704
+                9.21
             ]
         ],
         "dynamics": {
@@ -218,37 +218,37 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    83.41385609474575
+                    30.955
                 ],
                 [
-                    60.48066175811621
+                    9.21
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
         "token_handler": {
-            "action": 1,
+            "action": 2,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
             "enabled": false,
             "bias": [
@@ -261,12 +261,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -282,24 +282,24 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
         }
     },
     "Robot_3": {
         "position": [
             [
-                78.051
+                18.693
             ],
             [
-                158.593
+                35.477
             ]
         ],
         "dynamics": {
@@ -316,37 +316,37 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    74.80842095184832
+                    18.693
                 ],
                 [
-                    147.6948272541591
+                    35.477
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
         "token_handler": {
-            "action": 2,
+            "action": 1,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
             "enabled": false,
             "bias": [
@@ -359,12 +359,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -380,24 +380,24 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
         }
     },
     "Robot_4": {
         "position": [
             [
-                14.097
+                24.375
             ],
             [
-                140.411
+                32.719
             ]
         ],
         "dynamics": {
@@ -414,37 +414,37 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    16.05741781283753
+                    24.375
                 ],
                 [
-                    145.59695080998827
+                    32.719
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
         "token_handler": {
-            "action": 2,
+            "action": 1,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
             "enabled": false,
             "bias": [
@@ -457,12 +457,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -478,24 +478,24 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
         }
     },
     "Robot_5": {
         "position": [
             [
-                169.784
+                37.217
             ],
             [
-                91.93
+                16.962
             ]
         ],
         "dynamics": {
@@ -512,124 +512,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    170.55964369925778
+                    37.217
                 ],
                 [
-                    91.01137700282379
+                    16.962
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
-                ]
-            ]
-        },
-        "token_handler": {
-            "action": 1,
-            "state": 2
-        },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    25.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    25.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0225,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0225
-                ]
-            ],
-            "period": 0.2
-        }
-    },
-    "Robot_6": {
-        "position": [
-            [
-                25.618
-            ],
-            [
-                77.308
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
-        "controller": {
-            "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
-        },
-        "kalman_filter": {
-            "position": [
-                [
-                    27.287429898674986
-                ],
-                [
-                    78.74292280100853
-                ]
-            ],
-            "covariance": [
-                [
-                    25.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
@@ -637,12 +542,9 @@
             "action": 2,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
-            "enabled": true,
+            "enabled": false,
             "bias": [
                 [
                     0.0
@@ -653,12 +555,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -674,24 +576,122 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
+        }
+    },
+    "Robot_6": {
+        "position": [
+            [
+                11.93
+            ],
+            [
+                14.068
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1,
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
+        },
+        "kalman_filter": {
+            "position": [
+                [
+                    11.93
+                ],
+                [
+                    14.068
+                ]
+            ],
+            "covariance": [
+                [
+                    1.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ]
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
+        "comm_range": 15.0,
+        "gps_sensor": {
+            "enabled": false,
+            "bias": [
+                [
+                    0.0
+                ],
+                [
+                    0.0
+                ]
+            ],
+            "covariance": [
+                [
+                    1.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ]
+            ],
+            "period": 1.0
+        },
+        "speed_sensor": {
+            "bias": [
+                [
+                    0.0
+                ],
+                [
+                    0.0
+                ]
+            ],
+            "covariance": [
+                [
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0
+                ]
+            ],
+            "period": 0.1
         }
     },
     "Robot_7": {
         "position": [
             [
-                102.778
+                27.872
             ],
             [
-                164.4
+                25.36
             ]
         ],
         "dynamics": {
@@ -708,37 +708,37 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    95.46146922016614
+                    27.872
                 ],
                 [
-                    162.83134181224642
+                    25.36
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
         "token_handler": {
-            "action": 1,
+            "action": 2,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
             "enabled": false,
             "bias": [
@@ -751,12 +751,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -772,24 +772,24 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
         }
     },
     "Robot_8": {
         "position": [
             [
-                176.862
+                23.436
             ],
             [
-                155.808
+                11.032
             ]
         ],
         "dynamics": {
@@ -806,26 +806,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
         },
         "kalman_filter": {
             "position": [
                 [
-                    173.66980597641398
+                    23.436
                 ],
                 [
-                    160.18761762080305
+                    11.032
                 ]
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ]
         },
@@ -833,108 +836,7 @@
             "action": 1,
             "state": 2
         },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
-        "gps_sensor": {
-            "enabled": true,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    25.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    25.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0225,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0225
-                ]
-            ],
-            "period": 0.2
-        }
-    },
-    "Robot_9": {
-        "position": [
-            [
-                89.537
-            ],
-            [
-                91.138
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
-        "controller": {
-            "period": 0.1,
-            "dmax": 85.5,
-            "steepness": 0.55
-        },
-        "kalman_filter": {
-            "position": [
-                [
-                    94.48309123837622
-                ],
-                [
-                    87.80716555675137
-                ]
-            ],
-            "covariance": [
-                [
-                    25.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    25.0
-                ]
-            ]
-        },
-        "token_handler": {
-            "action": 1,
-            "state": 2
-        },
-        "target_handler": {
-            "period": 1.0
-        },
-        "comm_range": 90.0,
+        "comm_range": 15.0,
         "gps_sensor": {
             "enabled": false,
             "bias": [
@@ -947,12 +849,12 @@
             ],
             "covariance": [
                 [
-                    25.0,
+                    1.0,
                     0.0
                 ],
                 [
                     0.0,
-                    25.0
+                    1.0
                 ]
             ],
             "period": 1.0
@@ -968,15 +870,113 @@
             ],
             "covariance": [
                 [
-                    0.0225,
+                    0.0,
                     0.0
                 ],
                 [
                     0.0,
-                    0.0225
+                    0.0
                 ]
             ],
-            "period": 0.2
+            "period": 0.1
+        }
+    },
+    "Robot_9": {
+        "position": [
+            [
+                22.484
+            ],
+            [
+                21.999
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "controller": {
+            "period": 0.1,
+            "dmax": [
+                12.75,
+                15.0
+            ],
+            "steepness": 2.0
+        },
+        "kalman_filter": {
+            "position": [
+                [
+                    22.484
+                ],
+                [
+                    21.999
+                ]
+            ],
+            "covariance": [
+                [
+                    1.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ]
+            ]
+        },
+        "token_handler": {
+            "action": 1,
+            "state": 2
+        },
+        "comm_range": 15.0,
+        "gps_sensor": {
+            "enabled": false,
+            "bias": [
+                [
+                    0.0
+                ],
+                [
+                    0.0
+                ]
+            ],
+            "covariance": [
+                [
+                    1.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ]
+            ],
+            "period": 1.0
+        },
+        "speed_sensor": {
+            "bias": [
+                [
+                    0.0
+                ],
+                [
+                    0.0
+                ]
+            ],
+            "covariance": [
+                [
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0
+                ]
+            ],
+            "period": 0.1
         }
     }
 }

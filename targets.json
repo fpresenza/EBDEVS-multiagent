@@ -2,27 +2,1111 @@
     "Target_0": {
         "position": [
             [
-                172.343
+                69.18771139504733
             ],
             [
-                192.097
+                31.551563100606295
             ]
         ],
-        "period": 1.0,
-        "comm_range": 300.0,
-        "collect_range": 30.0
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    69.18771139504733
+                ],
+                [
+                    31.551563100606295
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
     },
     "Target_1": {
         "position": [
             [
-                162.343
+                68.65009276815837
             ],
             [
-                480.0
+                83.46256718973729
             ]
         ],
-        "period": 1.0,
-        "comm_range": 300.0,
-        "collect_range": 30.0
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    68.65009276815837
+                ],
+                [
+                    83.46256718973729
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_2": {
+        "position": [
+            [
+                1.8288277344191806
+            ],
+            [
+                75.01443149449675
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    1.8288277344191806
+                ],
+                [
+                    75.01443149449675
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_3": {
+        "position": [
+            [
+                98.88610889064947
+            ],
+            [
+                74.81656543798394
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    98.88610889064947
+                ],
+                [
+                    74.81656543798394
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_4": {
+        "position": [
+            [
+                28.044399206440517
+            ],
+            [
+                78.92793284514885
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    28.044399206440517
+                ],
+                [
+                    78.92793284514885
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_5": {
+        "position": [
+            [
+                10.322600657764202
+            ],
+            [
+                44.78935261759052
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    10.322600657764202
+                ],
+                [
+                    44.78935261759052
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_6": {
+        "position": [
+            [
+                90.85955030930955
+            ],
+            [
+                29.36141483736795
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    90.85955030930955
+                ],
+                [
+                    29.36141483736795
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_7": {
+        "position": [
+            [
+                28.777533858634875
+            ],
+            [
+                13.002857211827767
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    28.777533858634875
+                ],
+                [
+                    13.002857211827767
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_8": {
+        "position": [
+            [
+                1.9366957870297075
+            ],
+            [
+                67.8835532939891
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    1.9366957870297075
+                ],
+                [
+                    67.8835532939891
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_9": {
+        "position": [
+            [
+                21.162811600005902
+            ],
+            [
+                26.554665937222623
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    21.162811600005902
+                ],
+                [
+                    26.554665937222623
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_10": {
+        "position": [
+            [
+                49.15731592803383
+            ],
+            [
+                5.336254511708038
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    49.15731592803383
+                ],
+                [
+                    5.336254511708038
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_11": {
+        "position": [
+            [
+                57.411760549201304
+            ],
+            [
+                14.672857490581015
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    57.411760549201304
+                ],
+                [
+                    14.672857490581015
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_12": {
+        "position": [
+            [
+                58.93055369032842
+            ],
+            [
+                69.97583600209312
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    58.93055369032842
+                ],
+                [
+                    69.97583600209312
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_13": {
+        "position": [
+            [
+                10.233442882782583
+            ],
+            [
+                41.40559878195683
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    10.233442882782583
+                ],
+                [
+                    41.40559878195683
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_14": {
+        "position": [
+            [
+                69.44001577277452
+            ],
+            [
+                41.417926952690266
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    69.44001577277452
+                ],
+                [
+                    41.417926952690266
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_15": {
+        "position": [
+            [
+                4.995345894608716
+            ],
+            [
+                53.58964059155116
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    4.995345894608716
+                ],
+                [
+                    53.58964059155116
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_16": {
+        "position": [
+            [
+                66.37946452197887
+            ],
+            [
+                51.48891120583086
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    66.37946452197887
+                ],
+                [
+                    51.48891120583086
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_17": {
+        "position": [
+            [
+                94.45947559908133
+            ],
+            [
+                58.65550405019929
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    94.45947559908133
+                ],
+                [
+                    58.65550405019929
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_18": {
+        "position": [
+            [
+                90.34019152878835
+            ],
+            [
+                13.747470414623752
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    90.34019152878835
+                ],
+                [
+                    13.747470414623752
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_19": {
+        "position": [
+            [
+                13.927634725075855
+            ],
+            [
+                80.73912887095238
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    13.927634725075855
+                ],
+                [
+                    80.73912887095238
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_20": {
+        "position": [
+            [
+                39.767683698553355
+            ],
+            [
+                16.53541971169328
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    39.767683698553355
+                ],
+                [
+                    16.53541971169328
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_21": {
+        "position": [
+            [
+                92.75085803960339
+            ],
+            [
+                34.776585974550656
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    92.75085803960339
+                ],
+                [
+                    34.776585974550656
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_22": {
+        "position": [
+            [
+                75.08121031361556
+            ],
+            [
+                72.59979853504515
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    75.08121031361556
+                ],
+                [
+                    72.59979853504515
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_23": {
+        "position": [
+            [
+                88.33060912058099
+            ],
+            [
+                62.36722070556089
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    88.33060912058099
+                ],
+                [
+                    62.36722070556089
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_24": {
+        "position": [
+            [
+                75.09424340273372
+            ],
+            [
+                34.88983419778425
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    75.09424340273372
+                ],
+                [
+                    34.88983419778425
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_25": {
+        "position": [
+            [
+                26.99278917650261
+            ],
+            [
+                89.58862181960669
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    26.99278917650261
+                ],
+                [
+                    89.58862181960669
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_26": {
+        "position": [
+            [
+                42.809118987129494
+            ],
+            [
+                96.48400471483856
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    42.809118987129494
+                ],
+                [
+                    96.48400471483856
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_27": {
+        "position": [
+            [
+                66.3441497818448
+            ],
+            [
+                62.16957202091218
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    66.3441497818448
+                ],
+                [
+                    62.16957202091218
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_28": {
+        "position": [
+            [
+                11.474597295337519
+            ],
+            [
+                94.94892587070713
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    11.474597295337519
+                ],
+                [
+                    94.94892587070713
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
+    },
+    "Target_29": {
+        "position": [
+            [
+                44.991213347994055
+            ],
+            [
+                57.83896143871318
+            ]
+        ],
+        "dynamics": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        },
+        "control": {
+            "period": 0.1
+        },
+        "coordination": {
+            "position": [
+                [
+                    44.991213347994055
+                ],
+                [
+                    57.83896143871318
+                ]
+            ],
+            "collect_range": 5.0
+        },
+        "comm_range": 1000000.0
     }
 }

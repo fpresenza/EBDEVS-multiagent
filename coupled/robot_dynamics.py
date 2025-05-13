@@ -58,19 +58,19 @@ class RobotDynamics(CoupledDEVS):
         self.integrator_y = self.addSubModel(integrator_y)
 
         # Declare the coupled model's output ports:
-        self.IN_control_input = self.addInPort( name="IN_control_input")
-        self.OUT_position = self.addOutPort(name="OUT_position")
+        self.inPorts = {'control_input': self.addInPort(name="in_control_input")}
+        self.outPorts = {'position_polynomial': self.addOutPort(name="out_position_polynomial")}
 
         # Connect coupled model's input with splitter's input
-        self.connectPorts(self.IN_control_input, self.splitter.in_splitter_msgs)
+        self.connectPorts(self.inPorts['control_input'], self.splitter.inPort)
         # Connect splitter's output with integrator's input
-        self.connectPorts(self.splitter.out_splitter_msgs[0], self.integrator_x.IN_dx)
-        self.connectPorts(self.splitter.out_splitter_msgs[1], self.integrator_y.IN_dx)
+        self.connectPorts(self.splitter.outPorts[0], self.integrator_x.IN_dx)
+        self.connectPorts(self.splitter.outPorts[1], self.integrator_y.IN_dx)
         # Connect integrators with merger's input
-        self.connectPorts(self.integrator_x.OUT_q, self.merger.in_merger_msgs[0])
-        self.connectPorts(self.integrator_y.OUT_q, self.merger.in_merger_msgs[1])
+        self.connectPorts(self.integrator_x.OUT_q, self.merger.inPorts[0])
+        self.connectPorts(self.integrator_y.OUT_q, self.merger.inPorts[1])
         # Connect merger's output with coupled model's output
-        self.connectPorts(self.merger.out_merger_msgs, self.OUT_position)
+        self.connectPorts(self.merger.outPort, self.outPorts['position_polynomial'])
         
 
         if (self.debug):
