@@ -13,6 +13,14 @@ def write_json_file(filename, data):
     with open(filename, 'w') as file:
         json.dump(data, file, indent=4)
 
+def read_csv_file(filename):
+    data = []
+    with open(filename, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            data.append(row)
+    return data
+
 
 def append_csv_file(filename, data):
     with open(filename, 'a', newline='') as csvfile:
