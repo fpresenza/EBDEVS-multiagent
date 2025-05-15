@@ -20,10 +20,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     69.18771139504733
@@ -57,10 +57,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     68.65009276815837
@@ -94,10 +94,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     1.8288277344191806
@@ -131,10 +131,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     98.88610889064947
@@ -168,10 +168,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     28.044399206440517
@@ -205,10 +205,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     10.322600657764202
@@ -242,10 +242,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     90.85955030930955
@@ -279,10 +279,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     28.777533858634875
@@ -316,10 +316,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     1.9366957870297075
@@ -353,10 +353,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     21.162811600005902
@@ -390,10 +390,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     49.15731592803383
@@ -427,10 +427,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     57.411760549201304
@@ -464,10 +464,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     58.93055369032842
@@ -501,10 +501,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     10.233442882782583
@@ -538,10 +538,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     69.44001577277452
@@ -575,10 +575,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     4.995345894608716
@@ -612,10 +612,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     66.37946452197887
@@ -649,10 +649,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     94.45947559908133
@@ -686,10 +686,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     90.34019152878835
@@ -723,10 +723,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     13.927634725075855
@@ -760,10 +760,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     39.767683698553355
@@ -797,10 +797,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     92.75085803960339
@@ -834,10 +834,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     75.08121031361556
@@ -871,10 +871,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     88.33060912058099
@@ -908,10 +908,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     75.09424340273372
@@ -945,10 +945,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     26.99278917650261
@@ -982,10 +982,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     42.809118987129494
@@ -1019,10 +1019,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     66.3441497818448
@@ -1056,10 +1056,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     11.474597295337519
@@ -1093,10 +1093,10 @@
                 "gain": 1.0
             }
         },
-        "control": {
+        "controller": {
             "period": 0.1
         },
-        "coordination": {
+        "coordinator": {
             "position": [
                 [
                     44.991213347994055

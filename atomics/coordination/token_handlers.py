@@ -14,7 +14,7 @@ class Token(object):
     hops_travelled: int = 1     # The number of hops it has travelled
 
 
-class TokenHandlerState:
+class RobotCoordinatorState:
     """
     Encapsulates the system's state
     """
@@ -35,12 +35,12 @@ class TokenHandlerState:
         return self._sigma, self._tvalue, self._record, self._state, self._nearest_target
 
 
-class TokenHandler(AtomicDEVS):
+class RobotCoordinator(AtomicDEVS):
     def __init__(
             self, 
             robot_id,
             config,
-            name='TokenHandler', 
+            name='RobotCoordinator', 
             debug=False
             ):
         """Atomic model for the toking handling protocol"""
@@ -59,7 +59,7 @@ class TokenHandler(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = TokenHandlerState(
+        self.state = RobotCoordinatorState(
             sigma=INFINITY, 
             tvalue=0.0, 
             record={'action': 0, 'state': 0},
@@ -158,7 +158,7 @@ class TokenHandler(AtomicDEVS):
                     .format(current_time, self.name, self.parent.name, token)
                 )
 
-        return TokenHandlerState(sigma, current_time, record, position, nearest_target) 
+        return RobotCoordinatorState(sigma, current_time, record, position, nearest_target) 
     
     def intTransition(self):
         """
@@ -177,7 +177,7 @@ class TokenHandler(AtomicDEVS):
                 .format(current_time, self.name, self.parent.name)
             )
 
-        return TokenHandlerState(sigma, current_time, record, position, nearest_target)
+        return RobotCoordinatorState(sigma, current_time, record, position, nearest_target)
     
     def outputFnc(self):
         """
@@ -249,4 +249,169 @@ class TokenHandler(AtomicDEVS):
 
         return response, nearest_target
 
+
+class TargetCoordinatorState:
+    """
+    Encapsulates the system's state
+    """
+    def __init__(self, sigma, tvalue, status, record, position):
+        """
+        Constructor (parameterizable).
+        """
+        self.set(sigma, tvalue, status, record, position)
+
+    def set(self, sigma, tvalue, status, record, position):
+        self._sigma = sigma
+        self._tvalue = tvalue
+        self._status = status
+        self._record = record
+        self._state = position
+
+    def get(self):
+        return self._sigma, self._tvalue, self._status, self._record, self._state
+
+
+class TargetCoordinator(AtomicDEVS):
+    def __init__(
+            self, 
+            robot_id,
+            config,
+            name='TargetCoordinator', 
+            debug=False
+        ):
+        """Atomic model for the toking handling protocol"""
+
+        # Always call parent class' constructor FIRST:
+        AtomicDEVS.__init__(self, name)
+
+        # Parameters
+        self.robot_id = robot_id    # Robot identifier
+        self.collect_range = config['collect_range']
+        self.debug = debug
+
+        # Dictionaries as records of tokens received
+
+        # STATE:
+        #  Define 'state' attribute (initial sate):
+        self.state = TargetCoordinatorState(
+            sigma=INFINITY, 
+            tvalue=0.0,
+            status='active',
+            record=0,
+            position=np.array(config['position']),
+        ) 
+        # ELAPSED TIME:
+        #  Initialize 'elapsed time' attribute if required
+        #  (by default, value is 0.0):
+        self.elapsed = 0.0
+
+        # PORTS:
+        #  Declare as many input and output ports as desired
+        #  (usually store returned references in local variables):
+        #
+        self.inPorts = {
+            'beacon': self.addInPort(name="in_beacon"), 
+            'token': self.addInPort(name="in_token")
+        }
+        self.outPorts = {'token': self.addOutPort(name="out_token")}
+
+        self.output = None
+
+        self.y_up = [
+            self.name, 
+            {
+                'time': 0.0, 
+                'status': 'active', 
+            }
+        ]
+
+        if (self.debug):
+            print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
+
+    def extTransition(self, inputs):
+        """
+        External Transition Function.
+        """
+        sigma, current_time, status, record, position = self.state.get()
+        current_time += self.elapsed
+
+        if self.inPorts['token'] in inputs:    # if token arrives through port self.inPorts['token']
+            transmitter, token, distance_meas = inputs[self.inPorts['token']]
+
+            if transmitter.startswith('Robot'):
+                if (status == 'active') and  (distance_meas < self.collect_range):
+                    status = 'passive'
+                    self.y_up[1]['time'] = current_time
+                    self.y_up[1]['status'] = 'passive'
+    
+            if (self.debug):
+                print(
+                    "t: {} s, Atomic name: {}, External Transition Function, token: {} from Router"
+                    .format(current_time, self.name, token)
+                )
+
+        elif self.inPorts['beacon'] in inputs: # if data arrives through port inPorts['beacon']
+            token = Token(
+                creator=self.robot_id,
+                kind=status,
+                order=record,
+                data=position,
+                hops_to_target=1,
+                hops_travelled=1
+            )
+            record += 1
+            self.output = token
+            sigma = 0.0
+
+            if (self.debug):
+                print(
+                    "t: {} s, Atomic name: {}@{}, External Transition Function, token: {} from Controller"
+                    .format(current_time, self.name, self.robot_id, token)
+                )
+
+        return TargetCoordinatorState(sigma, current_time, status, record, position) 
+    
+    def intTransition(self):
+        """
+        Internal Transition Function.
+        """
+        _, current_time, status, record, position = self.state.get()
+    
+        self.output = None        
+        sigma = INFINITY
+
+        if (self.debug):
+            print(
+                "t: {} s, Atomic name: {}@{}, Internal Transition Function"
+                .format(current_time, self.name, self.robot_id)
+            )
+
+        return TargetCoordinatorState(sigma, current_time, status, record, position)
+    
+    def outputFnc(self):
+        """
+        Output Funtion.
+        """
+        _, current_time, _, _, _ = self.state.get()
+
+        if (self.debug):
+            print(
+                "t: {} s, Atomic name: {}@{}, Output Function, data: {}"
+                .format(current_time, self.name, self.robot_id, self.output)
+            )
+        
+        return {self.outPorts['token']: self.output}
+    
+
+    def timeAdvance(self):
+        """
+        Time-Advance Function.
+        """
+        # Compute 'ta', the time to the next scheduled internal transition,
+        # based (typically) on current State.
+        sigma, _, _, _, _ = self.state.get()
+        return max(sigma, 0.0)
+    
+    def __lt__(self, other):
+        return self.name < other.name
 

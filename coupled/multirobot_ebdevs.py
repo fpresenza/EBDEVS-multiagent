@@ -20,9 +20,9 @@ from pypdevs.DEVS import CoupledDEVS
 from pypdevs.infinity import INFINITY
 
 # Import all models to couple
-from atomics.qsstools import evaluate_poly
-from atomics.router import Router
-from atomics.logger import Logger
+from atomics.integrators.qsstools import evaluate_poly
+from atomics.communication.router import Router
+from atomics.misc.logger import Logger
 
 # our coupled models
 from coupled.robot import Robot

@@ -2,10 +2,6 @@ import numpy as np
 
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
-
-from uvnpy.distances.control import RigidityMaintenance
-from uvnpy.control.core import CollisionAvoidanceVanishing
-
 from utils.files import append_csv_file
 
 
@@ -13,7 +9,7 @@ from utils.files import append_csv_file
 np.random.seed(0)
 
 
-class TargetControlState:
+class BeaconState:
     """
     Encapsulates the system's state
     """
@@ -35,12 +31,13 @@ class TargetControlState:
     def get(self):
         return self._sigma, self._tvalue
 
-class TargetControl(AtomicDEVS):
+
+class Beacon(AtomicDEVS):
     def __init__(
             self,
             robot_id,
             config,
-            name='TargetControl',
+            name='Beacon',
             debug=False
         ):
         """Atomic model for the rigidity maintenance controller"""
@@ -55,7 +52,7 @@ class TargetControl(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = TargetControlState(
+        self.state = BeaconState(
             sigma=self.period,   # waits till first token
             tvalue=0.0
         )
@@ -86,7 +83,7 @@ class TargetControl(AtomicDEVS):
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
-        return TargetControlState(sigma, current_time) 
+        return BeaconState(sigma, current_time) 
     
     def outputFnc(self):
         """

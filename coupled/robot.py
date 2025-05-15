@@ -2,13 +2,13 @@ import numpy as np
 
 from pypdevs.DEVS import CoupledDEVS
 
-from atomics.controller import Controller
-from atomics.radio_module import RadioModule
-from atomics.token_handler import TokenHandler
-from atomics.kalman_filter import KalmanFilter
+from atomics.controllers.distance_rigidity_maintenance import Controller
+from atomics.communication.radio_module import RadioModule
+from atomics.coordination.token_handlers import RobotCoordinator
+from atomics.estimation.distance_kalman_filter import StateEstimator
+from atomics.sensors.speedsensor import SpeedSensor
+from atomics.sensors.gpssensor import PositioningSystem
 from coupled.robot_dynamics import RobotDynamics
-from atomics.speedsensor import SpeedSensor
-from atomics.gpssensor import PositioningSystem
 
 
 class Robot(CoupledDEVS):
@@ -54,14 +54,14 @@ class Robot(CoupledDEVS):
             robot_id=self.name,
             debug=self.debug,
         )
-        token_handler = TokenHandler(
+        coordinator = RobotCoordinator(
             robot_id=self.name,
-            config=config['token_handler'],
+            config=config['coordinator'],
             debug=self.debug,
         )
-        kalman_filter = KalmanFilter(
+        state_estimator = StateEstimator(
             robot_id=self.name,
-            config=config['kalman_filter'],
+            config=config['state_estimator'],
             logpath=logpath,
             debug=self.debug
         )
@@ -73,8 +73,8 @@ class Robot(CoupledDEVS):
         self.dynamics = self.addSubModel(dynamics)
         self.controller = self.addSubModel(controller)
         self.radio_module = self.addSubModel(radio_module)
-        self.token_handler = self.addSubModel(token_handler)
-        self.kalman_filter = self.addSubModel(kalman_filter)
+        self.coordinator = self.addSubModel(coordinator)
+        self.state_estimator = self.addSubModel(state_estimator)
         self.speed_sensor = self.addSubModel(speed_sensor)
 
         # Declare the coupled model's output ports:
@@ -84,24 +84,24 @@ class Robot(CoupledDEVS):
         self.connectPorts(self.inPorts['radio'], self.radio_module.inPorts['radio'])
         self.connectPorts(self.radio_module.outPorts['radio'], self.outPorts['radio'])
 
-        self.connectPorts(self.radio_module.outPorts['token'], self.token_handler.inPorts['token'])
-        self.connectPorts(self.token_handler.outPorts['token'], self.radio_module.inPorts['token'])
+        self.connectPorts(self.radio_module.outPorts['token'], self.coordinator.inPorts['token'])
+        self.connectPorts(self.coordinator.outPorts['token'], self.radio_module.inPorts['token'])
         
-        self.connectPorts(self.token_handler.outPorts['neighbors_positions'], self.kalman_filter.inPorts['neighbors_positions'])
-        self.connectPorts(self.kalman_filter.outPorts['position'], self.token_handler.inPorts['position'])
+        self.connectPorts(self.coordinator.outPorts['neighbors_positions'], self.state_estimator.inPorts['neighbors_positions'])
+        self.connectPorts(self.state_estimator.outPorts['position'], self.coordinator.inPorts['position'])
 
-        self.connectPorts(self.token_handler.outPorts['other_position'], self.controller.inPorts['other_position'])
-        self.connectPorts(self.token_handler.outPorts['external_action'], self.controller.inPorts['external_action'])
-        self.connectPorts(self.token_handler.outPorts['target_position'], self.controller.inPorts['target_position'])
-        self.connectPorts(self.controller.outPorts['others_actions'], self.token_handler.inPorts['others_actions'])
+        self.connectPorts(self.coordinator.outPorts['other_position'], self.controller.inPorts['other_position'])
+        self.connectPorts(self.coordinator.outPorts['external_action'], self.controller.inPorts['external_action'])
+        self.connectPorts(self.coordinator.outPorts['target_position'], self.controller.inPorts['target_position'])
+        self.connectPorts(self.controller.outPorts['others_actions'], self.coordinator.inPorts['others_actions'])
 
-        self.connectPorts(self.kalman_filter.outPorts['position'], self.controller.inPorts['position'])
+        self.connectPorts(self.state_estimator.outPorts['position'], self.controller.inPorts['position'])
         
         self.connectPorts(self.controller.outPorts['own_action'], self.dynamics.inPorts['control_input'])
 
         self.connectPorts(self.dynamics.outPorts['position_polynomial'], self.speed_sensor.inPorts['position_polynomial'])
         
-        self.connectPorts(self.speed_sensor.outPorts['velocity_measurement'], self.kalman_filter.inPorts['velocity_measurement'])
+        self.connectPorts(self.speed_sensor.outPorts['velocity_measurement'], self.state_estimator.inPorts['velocity_measurement'])
 
         if config['gps_sensor']['enabled']:
             gps_sensor = PositioningSystem(
@@ -110,7 +110,7 @@ class Robot(CoupledDEVS):
             )
             self.gps_sensor = self.addSubModel(gps_sensor)
             self.connectPorts(self.dynamics.outPorts['position_polynomial'], self.gps_sensor.inPorts['position_polynomial'])
-            self.connectPorts(self.gps_sensor.outPorts['position_measurement'], self.kalman_filter.inPorts['position_measurement'])
+            self.connectPorts(self.gps_sensor.outPorts['position_measurement'], self.state_estimator.inPorts['position_measurement'])
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))

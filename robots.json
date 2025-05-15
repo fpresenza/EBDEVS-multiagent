@@ -28,7 +28,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     9.085
@@ -48,7 +48,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 1,
             "state": 2
         },
@@ -126,7 +126,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     17.441
@@ -146,7 +146,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 1,
             "state": 2
         },
@@ -224,7 +224,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     30.955
@@ -244,7 +244,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 2,
             "state": 2
         },
@@ -322,7 +322,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     18.693
@@ -342,7 +342,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 1,
             "state": 2
         },
@@ -420,7 +420,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     24.375
@@ -440,7 +440,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 1,
             "state": 2
         },
@@ -518,7 +518,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     37.217
@@ -538,7 +538,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 2,
             "state": 2
         },
@@ -616,7 +616,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     11.93
@@ -636,7 +636,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 1,
             "state": 2
         },
@@ -714,7 +714,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     27.872
@@ -734,7 +734,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 2,
             "state": 2
         },
@@ -812,7 +812,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     23.436
@@ -832,7 +832,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 1,
             "state": 2
         },
@@ -910,7 +910,7 @@
             ],
             "steepness": 2.0
         },
-        "kalman_filter": {
+        "state_estimator": {
             "position": [
                 [
                     22.484
@@ -930,7 +930,7 @@
                 ]
             ]
         },
-        "token_handler": {
+        "coordinator": {
             "action": 1,
             "state": 2
         },

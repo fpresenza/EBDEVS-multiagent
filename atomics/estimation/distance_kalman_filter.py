@@ -7,7 +7,7 @@ from uvnpy.distances.localization import StatelessKalmanFilter
 from utils.files import append_csv_file
 
 
-class KalmanFilterState:
+class StateEstimatorState:
     """
     Encapsulates the system's state
     """
@@ -28,12 +28,12 @@ class KalmanFilterState:
         return self._sigma, self._tvalue, self._tvalue_prev, self._position, self._covariance
 
 
-class KalmanFilter(AtomicDEVS):
+class StateEstimator(AtomicDEVS):
     def __init__(
             self, 
             robot_id, 
             config, 
-            name='KalmanFilter', 
+            name='StateEstimator', 
             logpath='./', 
             debug=False):
         """Atomic model for the kalman filter"""
@@ -50,7 +50,7 @@ class KalmanFilter(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = KalmanFilterState(
+        self.state = StateEstimatorState(
             sigma=INFINITY,
             tvalue=0.0,
             tvalue_prev=0.0,
@@ -128,7 +128,7 @@ class KalmanFilter(AtomicDEVS):
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
 
-        return KalmanFilterState(sigma, current_time, previous_time, position, covariance)
+        return StateEstimatorState(sigma, current_time, previous_time, position, covariance)
     
     def intTransition(self):
         """
@@ -141,7 +141,7 @@ class KalmanFilter(AtomicDEVS):
         if (self.debug):
             print("t: {:.2f} s, Atomic name: {}, Internal Transition Function".format(current_time, self.name))
             
-        return KalmanFilterState(sigma, current_time, previous_time, position, covariance) 
+        return StateEstimatorState(sigma, current_time, previous_time, position, covariance) 
     
     def outputFnc(self):
         """

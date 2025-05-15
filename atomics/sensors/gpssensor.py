@@ -1,7 +1,7 @@
 import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
-from atomics.qsstools import *
+from atomics.integrators.qsstools import *
 
 
 # do not reset random seed

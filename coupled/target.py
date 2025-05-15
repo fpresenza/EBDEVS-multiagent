@@ -2,10 +2,10 @@ import numpy as np
 
 from pypdevs.DEVS import CoupledDEVS
 
-from atomics.radio_module import RadioModule
+from atomics.communication.radio_module import RadioModule
+from atomics.controllers.beacon import Beacon
+from atomics.coordination.token_handlers import TargetCoordinator
 from coupled.robot_dynamics import RobotDynamics
-from atomics.target_control import TargetControl
-from atomics.target_coordination import TargetCoordination
 
 
 class Target(CoupledDEVS):
@@ -46,14 +46,14 @@ class Target(CoupledDEVS):
             forward=False,
             debug=self.debug,
         )
-        controller = TargetControl(
+        controller = Beacon(
             robot_id=self.name,
-            config=config['control'],
+            config=config['controller'],
             debug=self.debug
         )
-        coordinator = TargetCoordination(
+        coordinator = TargetCoordinator(
             robot_id=self.name,
-            config=config['coordination'],
+            config=config['coordinator'],
             debug=self.debug,
         )
 
@@ -88,7 +88,7 @@ class Target(CoupledDEVS):
         if micro_id == 'RobotDynamics':
             self.y_up[1]['time'] = data['time']
             self.y_up[1]['pose'] = data['pose'].copy()
-        elif micro_id == 'TargetCoordination':
+        elif micro_id == 'TargetCoordinator':
             self.y_up[1]['time'] = data['time']
             self.y_up[1]['status'] = data['status']
 

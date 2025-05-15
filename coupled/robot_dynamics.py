@@ -1,8 +1,8 @@
 import numpy as np
 
 from pypdevs.DEVS import CoupledDEVS
-from atomics.qssintegrators import QSSIntegrator_Yup
-from atomics.misc import Splitter, Merger
+from atomics.integrators.qssintegrators import QSSIntegrator_Yup
+from atomics.misc.misc import Splitter, Merger
 
 
 class RobotDynamics(CoupledDEVS):

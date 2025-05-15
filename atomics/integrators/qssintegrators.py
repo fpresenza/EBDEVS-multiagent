@@ -18,7 +18,7 @@ import sys
 # Import code for DEVS model representation:
 from pypdevs.DEVS import *
 from pypdevs.infinity import INFINITY
-from atomics.qsstools import *
+from atomics.integrators.qsstools import *
 
 class QSSState:
     """

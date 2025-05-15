@@ -20,7 +20,7 @@ import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
-from atomics.qsstools import advance_time
+from atomics.integrators.qsstools import advance_time
 
 #################### 
 # Gain atomic model 
