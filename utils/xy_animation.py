@@ -28,10 +28,10 @@ class DevsAnimate(Animate2):
         super(DevsAnimate, self).__init__(*args, **kwargs)
 
     def set_xlim(self, t):
-        return (0.0, max(500.0, 5.0 * t))
+        return (0.0, 100.0)
 
     def set_ylim(self, t):
-        return (0.0, max(500.0, 5.0 * t))
+        return (0.0, 100.0)
 
     def _update_extra_artists(self, frame):
         for i, target in enumerate(frame[4]):
@@ -133,7 +133,7 @@ ax.set_aspect('equal')
 # ax.grid(1, lw=0.4)
 ax.set_xlabel(r'$x$ [m]', fontsize='small', labelpad=0.6)
 ax.set_ylabel(r'$y$ [m]', fontsize='small', labelpad=0.6)
-lim = 1000.0
+lim = 100.0
 ax.set_xlim(0, lim)
 ax.set_ylim(0, lim)
 ax.grid(zorder=0)
