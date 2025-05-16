@@ -1,19 +1,21 @@
-import numpy as np
+import numpy as np  # noqa
 
 from pypdevs.DEVS import CoupledDEVS
 from atomics.integrators.qssintegrators import QSSIntegrator_Yup
-from atomics.misc.misc import Splitter, Merger
+from atomics.misc.misc import Splitter, Merger  # noqa
+from atomics.dynamics.dynamics_function import DynamicsFunction
 
 
 class RobotDynamics(CoupledDEVS):
     def __init__(
-        self, 
-        position,
-        config,
-        name='RobotDynamics', 
-        debug=False):
+            self,
+            position,
+            config,
+            name='RobotDynamics',
+            debug=False):
         """
-        Robot's dynamic model composed of two integrators for x and y and a splitter.
+          Robot's dynamic model composed of two integrators for x and y
+          and a splitter.
         """
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
@@ -22,16 +24,16 @@ class RobotDynamics(CoupledDEVS):
 
         # dictionary to save childrens' states
         self.y_up = [
-            self.name, 
+            self.name,
             {
-                'time': 0.0, 
-                'pose': [coord + [0.0] * 9 for coord in position], 
+                'time': 0.0,
+                'pose': [coord + [0.0] * 9 for coord in position],
             }
         ]
         self.current_time = 0
 
         # Declare childrens: splitterx2, QSS integ x 2
-        splitter = Splitter(
+        splitter = DynamicsFunction(
             num_outputs=2,
             debug=self.debug
         )
@@ -40,15 +42,15 @@ class RobotDynamics(CoupledDEVS):
             debug=self.debug
         )
         integrator_x = QSSIntegrator_Yup(
-            name="x", 
+            name="x",
             **config['x'],
-            x0=position[0][0], 
+            x0=position[0][0],
             debug=self.debug
         )
         integrator_y = QSSIntegrator_Yup(
             name="y",
             **config['y'],
-            x0=position[1][0], 
+            x0=position[1][0],
             debug=self.debug
         )
 
@@ -58,11 +60,19 @@ class RobotDynamics(CoupledDEVS):
         self.integrator_y = self.addSubModel(integrator_y)
 
         # Declare the coupled model's output ports:
-        self.inPorts = {'control_input': self.addInPort(name="in_control_input")}
-        self.outPorts = {'position_polynomial': self.addOutPort(name="out_position_polynomial")}
+        self.inPorts = {
+            'control_input': self.addInPort(name="in_control_input")
+            }
+        self.outPorts = {
+            'position_polynomial':
+            self.addOutPort(name="out_position_polynomial")
+            }
 
         # Connect coupled model's input with splitter's input
-        self.connectPorts(self.inPorts['control_input'], self.splitter.inPort)
+        self.connectPorts(
+            self.inPorts['control_input'],
+            self.splitter.inPorts['control_action']
+        )
         # Connect splitter's output with integrator's input
         self.connectPorts(self.splitter.outPorts[0], self.integrator_x.IN_dx)
         self.connectPorts(self.splitter.outPorts[1], self.integrator_y.IN_dx)
@@ -70,14 +80,18 @@ class RobotDynamics(CoupledDEVS):
         self.connectPorts(self.integrator_x.OUT_q, self.merger.inPorts[0])
         self.connectPorts(self.integrator_y.OUT_q, self.merger.inPorts[1])
         # Connect merger's output with coupled model's output
-        self.connectPorts(self.merger.outPort, self.outPorts['position_polynomial'])
-        
+        self.connectPorts(
+            self.merger.outPort, self.outPorts['position_polynomial']
+            )
 
         if (self.debug):
-            print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
+            print("t: 0 s, Coupled name: {}, Init Function"
+                  .format(self.name))
 
     def globalTransition(self, e_g, x_b_micro, *args, **kwargs):
-        # update each coordinate separatedly, since the events in the integrators for the same robot do not need to be simultaneous
+        # update each coordinate separatedly, since the events in the
+        # integrators for the same robot do not need to be
+        # simultaneous
         # self.current_time += e_g
 
         micro_id, children_time, data = x_b_micro[0]
@@ -89,8 +103,9 @@ class RobotDynamics(CoupledDEVS):
             self.y_up[1]['pose'][1] = data.copy()
 
         if (self.debug):
-            # print("t: {} ms, I'm {} and I received this micro state {}".format(self.current_time,self.name,x_b_micro))
-            print("t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}".format(children_time, self.name, x_b_micro))
+            print("t: {:.2f} s, Coupled name: {}, \
+                   Global Transition Function, x_b_micro: {}"
+                  .format(children_time, self.name, x_b_micro))
 
     def select(self, immChildren):
         """
