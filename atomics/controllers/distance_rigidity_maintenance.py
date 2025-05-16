@@ -9,10 +9,6 @@ from uvnpy.control.core import CollisionAvoidanceVanishing
 from utils.files import append_csv_file
 
 
-# do not reset random seed
-np.random.seed(0)
-
-
 class ControllerState:
     """
     Encapsulates the system's state
