@@ -13,6 +13,19 @@ def write_json_file(filename, data):
     with open(filename, 'w') as file:
         json.dump(data, file, indent=4)
 
+
+def read_jsonl_file(filename):
+    with open(filename) as f:
+        data = [json.loads(line) for line in f]
+    return data
+
+
+def append_jsonl_file(filename, data):
+    with open(filename, 'a') as f:
+        json.dump(data, f)
+        f.write('\n')
+
+
 def read_csv_file(filename):
     data = []
     with open(filename, newline='') as csvfile:
@@ -33,9 +46,11 @@ def find_latest_timestamp(parent_path):
     located in parent_path, and named with format:
         "%Y-%m-%d_%H-%M-%S"
     """
-    directories = [d for d in os.listdir(parent_path) if os.path.isdir(parent_path + d)]
+    directories = [
+        d for d in os.listdir(parent_path) if os.path.isdir(parent_path + d)
+    ]
     latest = directories[0]
-    
+
     for timestamp in directories[1:]:
         if timestamp > latest:
             latest = timestamp
