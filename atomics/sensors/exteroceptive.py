@@ -2,7 +2,7 @@ import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 
 
-class InteroceptiveSensorState:
+class ExteroceptiveSensorState:
     """
     Encapsulates the system's state
     """
@@ -11,25 +11,25 @@ class InteroceptiveSensorState:
             self,
             sigma,
             tvalue,
-            internal_state
+            external_state
             ):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, internal_state)
+        self.set(sigma, tvalue, external_state)
 
-    def set(self, sigma, tvalue, internal_state):
+    def set(self, sigma, tvalue, external_state):
         self._sigma = sigma
         self._tvalue = tvalue
-        self._internal_state = internal_state
+        self._external_state = external_state
 
     def get(self):
-        return self._sigma, self._tvalue, self._internal_state
+        return self._sigma, self._tvalue, self._external_state
 
 
-class InteroceptiveSensor(AtomicDEVS):
-    def __init__(self, config, name='InteroceptiveSensor', debug=False):
-        """Atomic model for an interoceptive sensor"""
+class ExteroceptiveSensor(AtomicDEVS):
+    def __init__(self, config, name='ExteroceptiveSensor', debug=False):
+        """Atomic model for an exteroceptive sensor"""
 
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
@@ -41,10 +41,10 @@ class InteroceptiveSensor(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = InteroceptiveSensorState(
+        self.state = ExteroceptiveSensorState(
             sigma=self.period,   # waits till first token
             tvalue=0.0,
-            internal_state=None
+            external_state=None
         )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -57,8 +57,8 @@ class InteroceptiveSensor(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.inPorts = {
-            'internal_state':
-            self.addInPort(name="in_internal_state")
+            'external_state':
+            self.addInPort(name="in_external_state")
         }
         self.outPorts = {
             'measurement':
@@ -73,9 +73,9 @@ class InteroceptiveSensor(AtomicDEVS):
         External Transition Function.
         """
         sigma, current_time, _ = self.state.get()
-        current_time += self.elapsed
+        current_time += self.elapsed    # NOTE: self.elapsed is always zero
 
-        internal_state = inputs[self.inPorts['internal_state']]
+        external_state = inputs[self.inPorts['external_state']]
         sigma = sigma - self.elapsed  # holds last status
 
         if (self.debug):
@@ -84,13 +84,13 @@ class InteroceptiveSensor(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return InteroceptiveSensorState(sigma, current_time, internal_state)
+        return ExteroceptiveSensorState(sigma, current_time, external_state)
 
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        sigma, current_time, internal_state = self.state.get()
+        sigma, current_time, external_state = self.state.get()
         current_time += sigma
 
         sigma = self.period
@@ -101,18 +101,18 @@ class InteroceptiveSensor(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return InteroceptiveSensorState(sigma, current_time, internal_state)
+        return ExteroceptiveSensorState(sigma, current_time, external_state)
 
     def outputFnc(self):
         """
         Output Funtion.
         """
-        sigma, current_time, internal_state = self.state.get()
+        sigma, current_time, external_state = self.state.get()
 
         measurement = None
-        if internal_state is not None:
+        if external_state is not None:
             measurement = self.compute_measurement(
-                current_time, internal_state
+                current_time, external_state
             )
 
         return {self.outPorts['measurement']: measurement}
@@ -124,12 +124,12 @@ class InteroceptiveSensor(AtomicDEVS):
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
         sigma, _, _ = self.state.get()
-        return max(sigma, 0.0)
+        return sigma
 
     def __lt__(self, other):
         return self.name < other.name
 
-    def compute_measurement(self, current_time, internal_state):
+    def compute_measurement(self, current_time, external_state):
         #
         #  compute measurement here
         #

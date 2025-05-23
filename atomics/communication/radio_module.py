@@ -1,4 +1,3 @@
-import numpy as np
 import copy
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
@@ -25,9 +24,9 @@ class RadioModuleState:
 
 class RadioModule(AtomicDEVS):
     def __init__(
-            self, 
+            self,
             robot_id,
-            name='RadioModule', 
+            name='RadioModule',
             forward=True,
             debug=False
             ):
@@ -50,7 +49,7 @@ class RadioModule(AtomicDEVS):
             sigma=INFINITY,
             tvalue=0.0,
             record={'action': {}, 'state': {}, 'active': {}, 'passive': {}},
-        ) 
+        )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -84,7 +83,6 @@ class RadioModule(AtomicDEVS):
 
         if self.inPorts['radio'] in inputs:
             transmitter, token = inputs[self.inPorts['radio']]
-            distance_meas = self.parent.parent.getRobotDistances(transmitter, self.robot_id, current_time)
 
             if token.creator != self.robot_id:
                 # gets last order from record dictionary
@@ -97,36 +95,53 @@ class RadioModule(AtomicDEVS):
                 # check if token is newer than last received
                 if token.order > last_order:
                     record[token.kind][token.creator] = token.order
-                    self.outputs_queue.append({self.outPorts['token']: (transmitter, token, distance_meas)})
+
+                    if token.hops_travelled == 1:
+                        distance_meas = self.parent.parent.getRobotDistances(
+                            transmitter, self.robot_id, current_time
+                        )
+                    else:
+                        distance_meas = None
+
+                    self.outputs_queue.append(
+                        {
+                            self.outPorts['token']:
+                            (transmitter, token, distance_meas)
+                        }
+                    )
 
                     # check if retransmission is needed
-                    if self.forward and token.hops_travelled < token.hops_to_target:
+                    if self.forward and token.hops_travelled < token.hops_to_target:  # noqa
                         # update the number of traversed hops
                         token = copy.deepcopy(token)
                         token.hops_travelled += 1
-                        self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, token)})
-                    
+                        self.outputs_queue.append(
+                            {self.outPorts['radio']: (self.robot_id, token)}
+                        )
+
                     sigma = 0.0
 
         elif self.inPorts['token'] in inputs:
             token = inputs[self.inPorts['token']]
-            self.outputs_queue.append({self.outPorts['radio']: (self.robot_id, token)})
+            self.outputs_queue.append(
+                {self.outPorts['radio']: (self.robot_id, token)}
+            )
             sigma = 0.0
 
         if (self.debug):
             print(
-                "t: {} s, Atomic name: {}, External Transition Function, token: {} from Router"
+                "t: {} s, Atomic name: {}, Ext. Transition Func., token: {}"
                 .format(current_time, self.name, token)
             )
 
-        return RadioModuleState(sigma, current_time, record) 
-    
+        return RadioModuleState(sigma, current_time, record)
+
     def intTransition(self):
         """
         Internal Transition Function.
         """
         _, current_time, record = self.state.get()
-        
+
         if len(self.outputs_queue) == 0:
             sigma = INFINITY
         else:
@@ -139,7 +154,7 @@ class RadioModule(AtomicDEVS):
             )
 
         return RadioModuleState(sigma, current_time, record)
-    
+
     def outputFnc(self):
         """
         Output Funtion.
@@ -149,11 +164,15 @@ class RadioModule(AtomicDEVS):
         if (self.debug):
             print(
                 "t: {} s, Atomic name: {}@{}, Output Function, data: {}"
-                .format(current_time, self.name, self.parent.name, self.outputs_queue[0])
+                .format(
+                    current_time,
+                    self.name,
+                    self.parent.name,
+                    self.outputs_queue[0]
+                )
             )
 
         return self.outputs_queue.pop(0)
-    
 
     def timeAdvance(self):
         """
@@ -161,10 +180,8 @@ class RadioModule(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _ , _ = self.state.get()
+        sigma, _, _ = self.state.get()
         return max(sigma, 0.0)
-    
+
     def __lt__(self, other):
         return self.name < other.name
-
-

@@ -1,39 +1,37 @@
-import numpy as np
-
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
 from utils.files import append_jsonl_file
 
 
-class StateEstimatorState:
+class LocalizationState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, estimation):
+    def __init__(self, sigma, tvalue, loc_filter):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, estimation)
+        self.set(sigma, tvalue, loc_filter)
 
-    def set(self, sigma, tvalue, tvalue_prev, estimation):
+    def set(self, sigma, tvalue, loc_filter):
         self._sigma = sigma
         self._tvalue = tvalue
-        self._estimation = estimation
+        self._loc_filter = loc_filter
 
     def get(self):
-        return self._sigma, self._tvalue, self._estimation
+        return self._sigma, self._tvalue, self._loc_filter
 
 
-class StateEstimator(AtomicDEVS):
+class Localization(AtomicDEVS):
     def __init__(
             self,
             robot_id,
             config,
-            name='StateEstimator',
+            name='Localization',
             logpath='./',
             debug=False):
-        """Atomic model for the state estimator"""
+        """Atomic model for the kalman filter"""
 
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
@@ -47,10 +45,10 @@ class StateEstimator(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = StateEstimatorState(
+        self.state = LocalizationState(
             sigma=INFINITY,
             tvalue=0.0,
-            estimation=np.array(config['estimation']),
+            loc_filter=self.set_loc_filter(config)
         )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -61,18 +59,8 @@ class StateEstimator(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         #
-        self.inPorts = {
-            #
-            #    add inports here
-            #
-        }
-        self.outPorts = {
-            #
-            #    add inports here
-            #
-        }
-
-        self.outputs_queue = []
+        self.inPorts = self.set_in_ports()
+        self.outPorts = {'estimation': self.addOutPort(name="out_estimation")}
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
@@ -84,12 +72,12 @@ class StateEstimator(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, estimation = self.state.get()
+        sigma, current_time, loc_filter = self.state.get()
         current_time += self.elapsed
 
-        #
-        #    implement external transition here
-        #
+        sigma, loc_filter = self.process_inputs(
+            sigma, current_time, loc_filter, inputs
+        )
 
         if (self.debug):
             print(
@@ -97,21 +85,15 @@ class StateEstimator(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return StateEstimatorState(sigma, current_time, estimation)
+        return LocalizationState(sigma, current_time, loc_filter)
 
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, estimation = self.state.get()
+        _, current_time, loc_filter = self.state.get()
 
-        if len(self.outputs_queue) == 0:
-            sigma = INFINITY
-            #
-            #    nothing else to output here
-            #
-        else:
-            sigma = 0.0
+        sigma = INFINITY
 
         if (self.debug):
             print(
@@ -119,24 +101,26 @@ class StateEstimator(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return StateEstimatorState(sigma, current_time, estimation)
+        return LocalizationState(sigma, current_time, loc_filter)
 
     def outputFnc(self):
         """
         Output Funtion.
         """
-        _, current_time, estimation = self.state.get()
+        _, current_time, loc_filter = self.state.get()
 
-        #
-        #    append control action to self.outputs_queue here
-        #
+        loc_estimation, loc_metadata = self.loc_filter_results(loc_filter)
 
         append_jsonl_file(
-            self.logpath + 'state_estimator_{}.jsonl'.format(self.robot_id),
-            {'t': current_time, 'estimation': estimation, 'metadata': None}
+            self.logpath + 'kalman_{}.jsonl'.format(self.robot_id),
+            {
+                't': current_time,
+                'estimation': loc_estimation.tolist(),
+                'metadata': loc_metadata
+            }
         )
 
-        return self.outputs_queue.pop()
+        return {self.outPorts['estimation']: loc_estimation}
 
     def timeAdvance(self):
         """
@@ -146,3 +130,27 @@ class StateEstimator(AtomicDEVS):
         # based (typically) on current State.
         sigma, _, _ = self.state.get()
         return sigma
+
+    def set_loc_filter(self, config):
+        #
+        #    define localization filter here
+        #
+        return None
+
+    def set_in_ports(self):
+        #
+        #    define input ports here
+        #
+        return {}
+
+    def process_inputs(self, sigma, current_time, loc_filter, inputs):
+        #
+        #    process inputs here
+        #
+        return sigma, loc_filter
+
+    def loc_filter_results(self, loc_filter):
+        #
+        #    get estimation here
+        #
+        return None, None

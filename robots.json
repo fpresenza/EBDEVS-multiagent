@@ -28,7 +28,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     9.085
@@ -126,7 +126,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     17.441
@@ -224,7 +224,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     30.955
@@ -322,7 +322,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     18.693
@@ -420,7 +420,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     24.375
@@ -518,7 +518,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     37.217
@@ -616,7 +616,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     11.93
@@ -714,7 +714,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     27.872
@@ -812,7 +812,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     23.436
@@ -910,7 +910,7 @@
             ],
             "steepness": 2.0
         },
-        "state_estimator": {
+        "localization": {
             "position": [
                 [
                     22.484

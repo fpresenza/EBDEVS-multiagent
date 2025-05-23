@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
-
 # Import code for DEVS model representation:
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
@@ -22,7 +20,7 @@ from pypdevs.infinity import INFINITY
 from atomics.integrators.qsstools import advance_time
 
 #################################
-# Dynamics Function atomic model
+#  Dynamics Function atomic model
 #################################
 
 
@@ -65,8 +63,10 @@ class DynamicsFunction(AtomicDEVS):
         # STATE:
         #  Define 'state' attribute (initial sate):
         self.state = DynamicsFunctionState(
-                        sigma=INFINITY, tvalue=0.0, data=[None, None]
-                    )
+            sigma=INFINITY,
+            tvalue=0.0,
+            data=[None, None]
+        )
 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -100,26 +100,24 @@ class DynamicsFunction(AtomicDEVS):
         _, current_time, data = self.state.get()
         current_time += self.elapsed
 
-        x = data[1]
-        u = data[0]
-
         # Received a new event, so start processing it
         if self.inPorts['control_action'] in inputs:
             # receives an np.array() as many rows as states
             # and as many columns as polinomial coeffs.
-            data[0] = inputs[self.inPorts['control_action']]
-            if x is not None:
-                for i in range(x.shape[0]):
-                    data[i] = advance_time(x[i], self.elapsed)
+            data[0] = [
+                ui.tolist() + 9 * [0.0]
+                for ui in inputs[self.inPorts['control_action']]
+            ]
+            if data[1] is not None:
+                data[1] = [advance_time(pol, self.elapsed) for pol in data[1]]
         if self.inPorts['state'] in inputs:
-            if u is not None:
-                for i in range(u.shape[0]):
-                    data[0] = advance_time(u[i], self.elapsed)
             # receives an np.array() as many rows as states
             # and as many columns as polinomial coeffs.
             data[1] = inputs[self.inPorts['state']]
+            if data[0] is not None:
+                data[0] = [advance_time(pol, self.elapsed) for pol in data[0]]
 
-        if u is None or x is None:
+        if any(d is None for d in data):
             sigma = INFINITY
         else:
             sigma = 0.0
@@ -160,17 +158,15 @@ class DynamicsFunction(AtomicDEVS):
             _, _, data = self.state.get()
             u = data[0]  # noqa
             x = data[1]  # noqa
-            #
-            # Compute Dynamics Function f(x,u)
-            # <<<< replace the line below with your code >>>>
-            xdot = np.zeros(x.shape)
+
+            xdot = self.vector_field(x, u)
 
             if len(self.outPorts) == 1:
                 xdot = [xdot]
 
             # outputs one polynomial per output port
             self.outputs_queue = [
-                {port: var} for var, port in zip(xdot, self.outPorts)
+                {port: var} for var, port in zip(xdot, self.outPorts.values())
                 ]
 
         return self.outputs_queue.pop()
@@ -183,3 +179,9 @@ class DynamicsFunction(AtomicDEVS):
         # based (typically) on current State.
         sigma, _, _ = self.state.get()
         return sigma
+
+    def vector_field(self, x, u):
+        #
+        #  compute f(x, u) here
+        #
+        return None

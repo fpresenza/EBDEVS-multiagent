@@ -2,8 +2,8 @@ import numpy as np  # noqa
 
 from pypdevs.DEVS import CoupledDEVS
 from atomics.integrators.qssintegrators import QSSIntegrator_Yup
-from atomics.misc.misc import Splitter, Merger  # noqa
-from atomics.dynamics.dynamics_function import DynamicsFunction
+from atomics.misc.misc import Merger  # noqa
+from atomics.dynamics.single_integrator import SingleIntegrator
 
 
 class RobotDynamics(CoupledDEVS):
@@ -15,7 +15,7 @@ class RobotDynamics(CoupledDEVS):
             debug=False):
         """
           Robot's dynamic model composed of two integrators for x and y
-          and a splitter.
+          and a dynamics function.
         """
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
@@ -32,8 +32,8 @@ class RobotDynamics(CoupledDEVS):
         ]
         self.current_time = 0
 
-        # Declare childrens: splitterx2, QSS integ x 2
-        splitter = DynamicsFunction(
+        # Declare childrens:
+        dynamics_function = SingleIntegrator(
             num_outputs=2,
             debug=self.debug
         )
@@ -54,7 +54,7 @@ class RobotDynamics(CoupledDEVS):
             debug=self.debug
         )
 
-        self.splitter = self.addSubModel(splitter)
+        self.dynamics_function = self.addSubModel(dynamics_function)
         self.merger = self.addSubModel(merger)
         self.integrator_x = self.addSubModel(integrator_x)
         self.integrator_y = self.addSubModel(integrator_y)
@@ -68,20 +68,28 @@ class RobotDynamics(CoupledDEVS):
             self.addOutPort(name="out_position_polynomial")
             }
 
-        # Connect coupled model's input with splitter's input
+        # Connect coupled model's input with dynamics_function's input
         self.connectPorts(
             self.inPorts['control_input'],
-            self.splitter.inPorts['control_action']
+            self.dynamics_function.inPorts['control_action']
         )
-        # Connect splitter's output with integrator's input
-        self.connectPorts(self.splitter.outPorts[0], self.integrator_x.IN_dx)
-        self.connectPorts(self.splitter.outPorts[1], self.integrator_y.IN_dx)
+        # Connect dynamics_function's output with integrator's input
+        self.connectPorts(
+            self.dynamics_function.outPorts[0], self.integrator_x.IN_dx
+        )
+        self.connectPorts(
+            self.dynamics_function.outPorts[1], self.integrator_y.IN_dx
+        )
         # Connect integrators with merger's input
         self.connectPorts(self.integrator_x.OUT_q, self.merger.inPorts[0])
         self.connectPorts(self.integrator_y.OUT_q, self.merger.inPorts[1])
         # Connect merger's output with coupled model's output
         self.connectPorts(
             self.merger.outPort, self.outPorts['position_polynomial']
+            )
+        # Connect merger's output with coupled model's output
+        self.connectPorts(
+            self.merger.outPort, self.dynamics_function.inPorts['state']
             )
 
         if (self.debug):
