@@ -1,5 +1,6 @@
 from pypdevs.DEVS import CoupledDEVS
 
+from atomics.integrators.qss1tools import pad_zeros
 from atomics.controllers.distance_rigidity_maintenance import \
     DistanceRigidityMaintenance
 from atomics.communication.radio_module import RadioModule
@@ -32,7 +33,7 @@ class Robot(CoupledDEVS):
             self.name,
             {
                 'time': 0.0,
-                'pose': [coord + [0.0] * 9 for coord in position],
+                'pose': [pad_zeros(coord) for coord in position],
                 'comm_range': comm_range
             }
         ]
