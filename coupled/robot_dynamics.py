@@ -1,7 +1,7 @@
 import numpy as np  # noqa
 
 from pypdevs.DEVS import CoupledDEVS
-from atomics.integrators.qssintegrators import QSSIntegrator_Yup
+from atomics.integrators.qssintegrators import mQSSIntegrator
 from atomics.misc.misc import Merger  # noqa
 from atomics.dynamics.single_integrator import SingleIntegrator
 
@@ -41,13 +41,13 @@ class RobotDynamics(CoupledDEVS):
             num_inputs=2,
             debug=self.debug
         )
-        integrator_x = QSSIntegrator_Yup(
+        integrator_x = mQSSIntegrator(
             name="x",
             **config['x'],
             x0=position[0][0],
             debug=self.debug
         )
-        integrator_y = QSSIntegrator_Yup(
+        integrator_y = mQSSIntegrator(
             name="y",
             **config['y'],
             x0=position[1][0],

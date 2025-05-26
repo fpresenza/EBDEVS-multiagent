@@ -1,6 +1,6 @@
-# Copyright 2014 Modelling, Simulation and Design Lab (MSDL) at 
+# Copyright 2014 Modelling, Simulation and Design Lab (MSDL) at
 # McGill University and the University of Antwerp (http://msdl.cs.mcgill.ca/)
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,11 +17,11 @@ import numpy as np
 
 # Import code for DEVS model representation:
 from pypdevs.DEVS import CoupledDEVS
-from pypdevs.infinity import INFINITY
+from pypdevs.infinity import INFINITY  # noqa
 
 # Import all models to couple
 from atomics.integrators.qsstools import evaluate_poly
-from atomics.communication.router import Router
+from atomics.communication.transmission_medium import TransmissionMedium
 from atomics.misc.logger import Logger
 
 # our coupled models
@@ -45,14 +45,15 @@ class MultiRobotSystem(CoupledDEVS):
         self.logpath = logpath
         self.debug = debug
 
-        self.current_time = 0.0 # TODO: time cannot be managed as in the other coupled/atomic models
+        # TODO: time cannot be managed as in the other coupled/atomic models
+        self.current_time = 0.0
 
-        robots_config  = read_json_file('robots.json')
+        robots_config = read_json_file('robots.json')
         targets_config = read_json_file('targets.json')
 
-        self.router = self.addSubModel(Router(
+        self.router = self.addSubModel(TransmissionMedium(
             robots_ids=list(robots_config.keys()),
-            targets_ids=list(targets_config.keys()), 
+            targets_ids=list(targets_config.keys()),
             name='Router',
             debug=self.debug
         ))
@@ -69,11 +70,15 @@ class MultiRobotSystem(CoupledDEVS):
             self.robots[robot_id] = self.addSubModel(Robot(
                 config,
                 name=robot_id,
-                logpath=self.logpath, 
+                logpath=self.logpath,
                 debug=self.debug
             ))
-            self.connectPorts(self.robots[robot_id].outPorts['radio'], self.router.inPorts[robot_id])
-            self.connectPorts(self.router.outPorts[robot_id], self.robots[robot_id].inPorts['radio'])
+            self.connectPorts(self.robots[robot_id].outPorts['radio'],
+                              self.router.inPorts[robot_id]
+                              )
+            self.connectPorts(self.router.outPorts[robot_id],
+                              self.robots[robot_id].inPorts['radio']
+                              )
 
         self.targets = {}
         for target_id, config in targets_config.items():
@@ -82,13 +87,18 @@ class MultiRobotSystem(CoupledDEVS):
                 name=target_id,
                 debug=self.debug
             ))
-            self.connectPorts(self.targets[target_id].outPorts['radio'], self.router.inPorts[target_id]) # target -> router
-            self.connectPorts(self.router.outPorts[target_id], self.targets[target_id].inPorts['radio']) # router -> target
+            self.connectPorts(self.targets[target_id].outPorts['radio'],
+                              self.router.inPorts[target_id]
+                              )  # target -> router
+            self.connectPorts(self.router.outPorts[target_id],
+                              self.targets[target_id].inPorts['radio']
+                              )  # router -> target
 
             # targets_states must be initialized at the very beginning
             self.agents_states[target_id] = {
-                'time': 0.0, 
-                'pose': [coord + [0.0] * 9 for coord in config["position"]], # 10-tuple
+                'time': 0.0,
+                'pose': [coord + [0.0] * 9 for coord in
+                         config["position"]],  # 10-tuple
                 'comm_range': config["comm_range"],
                 'status': 'active',
             }
@@ -107,14 +117,15 @@ class MultiRobotSystem(CoupledDEVS):
 
         # log new value of micro_states
         log = [micro_id, data['time']]
-        log += [data['pose'][0][0],data['pose'][1][0]]
+        log += [data['pose'][0][0], data['pose'][1][0]]
         log += [data['comm_range']]
 
         if micro_id.startswith('Robot'):
             log += [
                 neighbor_id
                 for neighbor_id in self.agents_states.keys()
-                if self.in_range(micro_id, neighbor_id, 0.0) # checks and registers current neighboring robots
+                # checks and registers current neighboring robots
+                if self.in_range(micro_id, neighbor_id, 0.0)
             ]
         elif micro_id.startswith('Target'):
             log += [data['status']]
@@ -123,8 +134,10 @@ class MultiRobotSystem(CoupledDEVS):
 
         if (self.debug):
             print(
-                 "t: {} s, Coupled name: {}, Global Transition Function, x_b_micro: {}, global state: {}"
-                 .format(data['time'], self.name, x_b_micro, self.agents_states)
+                 "t: {} s, Coupled name: {}, Global Transition Function,"
+                 "x_b_micro: {}, global state: {}"
+                 .format(data['time'], self.name, x_b_micro,
+                         self.agents_states)
                  )
 
     def getNeighbors(self, agent_1_id, current_time):
@@ -175,11 +188,12 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def in_range(self, agent_1_id, agent_2_id, current_time): # agent_1_id might be robot or target
+    def in_range(self, agent_1_id, agent_2_id, current_time):
+        # agent_1_id might be robot or target
         if agent_1_id == agent_2_id:
             return False
 
-        # tweak to improve performance since target-target comm is no need so far
+        # fix to improve performance since target-target comm is no need so far
         if agent_1_id.startswith('Target') and agent_2_id.startswith('Target'):
             return False
 
