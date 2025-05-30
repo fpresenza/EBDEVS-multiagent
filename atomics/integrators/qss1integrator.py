@@ -17,12 +17,12 @@
 from pypdevs.DEVS import AtomicDEVS, DEVSException
 from pypdevs.infinity import INFINITY
 from atomics.integrators.qsstools import QSSState
-from atomics.integrators.qsstools import advance_time, minposroot, pad_zeros
+from atomics.integrators.qss1tools import advance_time, minposroot, pad_zeros
 
 
-class QSSIntegrator(AtomicDEVS):
+class QSS1Integrator(AtomicDEVS):
     """
-    QSS integrator atomic model
+    QSS1 integrator atomic model
     """
 
     def __init__(
@@ -89,7 +89,7 @@ class QSSIntegrator(AtomicDEVS):
         # TODO: replace by x = advance_time(xprev,sigma,1)
         # p: x, dt: sigma, order: 1
         # x = [xprev[0] + sigma * xprev[1], xprev[1]]
-        x = advance_time(xprev, sigma, 1)  # p: x, dt: sigma, order: 1
+        x = advance_time(xprev, sigma)  # p: x, dt: sigma, order: 1
         q[0] = x[0]
 
         self.dQ = max(self.dQRel * abs(x[0]), self.dQMin)
@@ -139,13 +139,13 @@ class QSSIntegrator(AtomicDEVS):
                 # diffxq = q - x - dQ = {q[0] - x[0] - dQ, -x[1]}
                 diffxq[1] = -x[1]
                 diffxq[0] = q[0] - x[0] - self.dQ
-                sigma = minposroot(diffxq, 1)  # coeff: diffxq, order: 1
+                sigma = minposroot(diffxq)  # coeff: diffxq, order: 1
                 sigma_lo = sigma
 
                 # superior delta difference
                 # diffxq = q - x + dQ = {q[0] - x[0] + dQ, -x[1]}
                 diffxq[0] = q[0] - x[0] + self.dQ
-                sigma_up = minposroot(diffxq, 1)  # coeff: diffxq, order: 1
+                sigma_up = minposroot(diffxq)  # coeff: diffxq, order: 1
 
                 # keep the smallest one
                 if (sigma_up < sigma):
@@ -204,7 +204,7 @@ class QSSIntegrator(AtomicDEVS):
         # make time advance to get next q
         # this change in q will be performed right after
         #  in the internal transition function
-        y = advance_time(y, sigma, 1)  # p: y, dt: sigma, order: 1
+        y = advance_time(y, sigma)  # p: y, dt: sigma, order: 1
         # y = [xprev[0] + sigma * xprev[1], 0.0]
         # y[1] = 0.0
 
@@ -239,12 +239,12 @@ class QSSIntegrator(AtomicDEVS):
 # -----------------------------------
 # QSS_Integrator with Y_up: QSS integrator with micro-macro
 # state communication with its parent.
-# This class derives from QSSIntegrator => it's only necessary
+# This class derives from QSS1Integrator => it's only necessary
 # to reimplement the input and output transition functions.
 # -----------------------------------
-class QSSIntegrator_Yup(QSSIntegrator):
+class QSS1Integrator_Yup(QSS1Integrator):
     """
-    QSS integrator atomic model
+    QSS1 integrator atomic model
     """
     def __init__(
             self,
@@ -259,7 +259,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
         Constructor (parameterizable).
         """
         #  Always call parent class' constructor FIRST:
-        QSSIntegrator.__init__(
+        QSS1Integrator.__init__(
             self,
             name=name,
             dQMin=dQMin,
@@ -280,7 +280,7 @@ class QSSIntegrator_Yup(QSSIntegrator):
         q, xprev, sigma, current_time = self.state.get()
 
         current_time += sigma
-        x = advance_time(xprev, sigma, 1)  # p: x, dt: sigma, order: 1
+        x = advance_time(xprev, sigma)  # p: x, dt: sigma, order: 1
         #  x = [xprev[0] + sigma * xprev[1], xprev[1]]
         q[0] = x[0]
 
@@ -339,13 +339,13 @@ class QSSIntegrator_Yup(QSSIntegrator):
                 # diffxq = q - x - dQ = {q[0] - x[0] - dQ, -x[1]}
                 diffxq[1] = -x[1]
                 diffxq[0] = q[0] - x[0] - self.dQ
-                sigma = minposroot(diffxq, 1)  # coeff: diffxq, order: 1
+                sigma = minposroot(diffxq)  # coeff: diffxq, order: 1
                 sigma_lo = sigma
 
                 #  superior delta difference
                 #  diffxq = q - x + dQ = {q[0] - x[0] + dQ, -x[1]}
                 diffxq[0] = q[0] - x[0] + self.dQ
-                sigma_up = minposroot(diffxq, 1)  # coeff: diffxq, order: 1
+                sigma_up = minposroot(diffxq)  # coeff: diffxq, order: 1
 
                 # keep the smallest one
                 if (sigma_up < sigma):

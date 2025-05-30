@@ -17,7 +17,7 @@
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
-from atomics.integrators.qsstools import advance_time
+from atomics.integrators.qss1tools import advance_time, pad_zeros
 
 #################################
 #  Dynamics Function atomic model
@@ -105,7 +105,7 @@ class DynamicsFunction(AtomicDEVS):
             # receives an np.array() as many rows as states
             # and as many columns as polinomial coeffs.
             data[0] = [
-                ui.tolist() + 9 * [0.0]
+                pad_zeros(ui.tolist())
                 for ui in inputs[self.inPorts['control_action']]
             ]
             if data[1] is not None:

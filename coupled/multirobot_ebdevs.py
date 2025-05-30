@@ -17,10 +17,9 @@ import numpy as np
 
 # Import code for DEVS model representation:
 from pypdevs.DEVS import CoupledDEVS
-from pypdevs.infinity import INFINITY  # noqa
 
 # Import all models to couple
-from atomics.integrators.qsstools import evaluate_poly
+from atomics.integrators.qss1tools import evaluate_poly, pad_zeros
 from atomics.communication.transmission_medium import TransmissionMedium
 from atomics.misc.logger import Logger
 
@@ -73,12 +72,14 @@ class MultiRobotSystem(CoupledDEVS):
                 logpath=self.logpath,
                 debug=self.debug
             ))
-            self.connectPorts(self.robots[robot_id].outPorts['radio'],
-                              self.router.inPorts[robot_id]
-                              )
-            self.connectPorts(self.router.outPorts[robot_id],
-                              self.robots[robot_id].inPorts['radio']
-                              )
+            self.connectPorts(
+                self.robots[robot_id].outPorts['radio'],
+                self.router.inPorts[robot_id]
+            )
+            self.connectPorts(
+                self.router.outPorts[robot_id],
+                self.robots[robot_id].inPorts['radio']
+            )
 
         self.targets = {}
         for target_id, config in targets_config.items():
@@ -87,18 +88,19 @@ class MultiRobotSystem(CoupledDEVS):
                 name=target_id,
                 debug=self.debug
             ))
-            self.connectPorts(self.targets[target_id].outPorts['radio'],
-                              self.router.inPorts[target_id]
-                              )  # target -> router
-            self.connectPorts(self.router.outPorts[target_id],
-                              self.targets[target_id].inPorts['radio']
-                              )  # router -> target
+            self.connectPorts(
+                self.targets[target_id].outPorts['radio'],
+                self.router.inPorts[target_id]
+            )  # target -> router
+            self.connectPorts(
+                self.router.outPorts[target_id],
+                self.targets[target_id].inPorts['radio']
+            )  # router -> target
 
             # targets_states must be initialized at the very beginning
             self.agents_states[target_id] = {
                 'time': 0.0,
-                'pose': [coord + [0.0] * 9 for coord in
-                         config["position"]],  # 10-tuple
+                'pose': [pad_zeros(coord) for coord in config["position"]],
                 'comm_range': config["comm_range"],
                 'status': 'active',
             }
@@ -124,8 +126,8 @@ class MultiRobotSystem(CoupledDEVS):
             log += [
                 neighbor_id
                 for neighbor_id in self.agents_states.keys()
-                # checks and registers current neighboring robots
                 if self.in_range(micro_id, neighbor_id, 0.0)
+                # checks and registers current neighboring robots
             ]
         elif micro_id.startswith('Target'):
             log += [data['status']]
@@ -134,11 +136,10 @@ class MultiRobotSystem(CoupledDEVS):
 
         if (self.debug):
             print(
-                 "t: {} s, Coupled name: {}, Global Transition Function,"
-                 "x_b_micro: {}, global state: {}"
-                 .format(data['time'], self.name, x_b_micro,
-                         self.agents_states)
-                 )
+                "t: {} s, Coupled name: {}, Global Transition Function,\
+                x_b_micro: {}, global state: {}"
+                .format(data['time'], self.name, x_b_micro, self.agents_states)
+                )
 
     def getNeighbors(self, agent_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
@@ -193,11 +194,13 @@ class MultiRobotSystem(CoupledDEVS):
         if agent_1_id == agent_2_id:
             return False
 
-        # fix to improve performance since target-target comm is no need so far
+        # tweak to improve performance since target-target comm is not needed
         if agent_1_id.startswith('Target') and agent_2_id.startswith('Target'):
             return False
 
-        distance = self.getRobotDistances(agent_1_id, agent_2_id, current_time)
+        distance = self.getRobotDistances(
+            agent_1_id, agent_2_id, current_time
+        )
         trasmitter_range = self.agents_states[agent_1_id]['comm_range']
 
         return distance < trasmitter_range

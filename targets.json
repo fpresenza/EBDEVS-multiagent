@@ -34,7 +34,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_1": {
         "position": [
@@ -71,7 +71,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_2": {
         "position": [
@@ -108,7 +108,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_3": {
         "position": [
@@ -145,7 +145,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_4": {
         "position": [
@@ -182,7 +182,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_5": {
         "position": [
@@ -219,7 +219,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_6": {
         "position": [
@@ -256,7 +256,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_7": {
         "position": [
@@ -293,7 +293,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_8": {
         "position": [
@@ -330,7 +330,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_9": {
         "position": [
@@ -367,7 +367,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_10": {
         "position": [
@@ -404,7 +404,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_11": {
         "position": [
@@ -441,7 +441,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_12": {
         "position": [
@@ -478,7 +478,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_13": {
         "position": [
@@ -515,7 +515,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_14": {
         "position": [
@@ -552,7 +552,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_15": {
         "position": [
@@ -589,7 +589,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_16": {
         "position": [
@@ -626,7 +626,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_17": {
         "position": [
@@ -663,7 +663,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_18": {
         "position": [
@@ -700,7 +700,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_19": {
         "position": [
@@ -737,7 +737,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_20": {
         "position": [
@@ -774,7 +774,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_21": {
         "position": [
@@ -811,7 +811,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_22": {
         "position": [
@@ -848,7 +848,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_23": {
         "position": [
@@ -885,7 +885,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_24": {
         "position": [
@@ -922,7 +922,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_25": {
         "position": [
@@ -959,7 +959,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_26": {
         "position": [
@@ -996,7 +996,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_27": {
         "position": [
@@ -1033,7 +1033,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_28": {
         "position": [
@@ -1070,7 +1070,7 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     },
     "Target_29": {
         "position": [
@@ -1107,6 +1107,6 @@
             ],
             "collect_range": 5.0
         },
-        "comm_range": 1000000.0
+        "comm_range": 50.0
     }
 }

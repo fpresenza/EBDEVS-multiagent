@@ -1,6 +1,6 @@
-# Copyright 2014 Modelling, Simulation and Design Lab (MSDL) at 
+# Copyright 2014 Modelling, Simulation and Design Lab (MSDL) at
 # McGill University and the University of Antwerp (http://msdl.cs.mcgill.ca/)
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,33 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import numpy as np
 
 # Import code for DEVS model representation:
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
-from atomics.integrators.qsstools import advance_time
+from atomics.integrators.qss1tools import advance_time
 
-#################### 
-# Gain atomic model 
+
+####################
+# Gain atomic model
 ####################
 class Gain(AtomicDEVS):
     """
-    A gain block 
+    A gain block
     """
-  
+
     def __init__(self, name=None, gain=1):
         """
         Constructor (parameterizable).
         """
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
-    
+
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.gain  = gain
+        self.gain = gain
         self.u = [0.0, 0.0]
         self.sigma = INFINITY
 
@@ -47,16 +47,16 @@ class Gain(AtomicDEVS):
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
         self.elapsed = 0.0
-        # with elapsed time initially 1.5 and initially in 
+        # with elapsed time initially 1.5 and initially in
         # state "red", which has a time advance of 60,
-        # there are 60-1.5 = 58.5time-units  remaining until the first 
-        # internal transition 
-    
+        # there are 60-1.5 = 58.5time-units  remaining until the first
+        # internal transition
+
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.OUT = self.addOutPort(name="OUT")
-        self.IN  = self.addInPort(name="IN")
+        self.IN = self.addInPort(name="IN")
 
     def __lt__(self, other):
         return self.name < other.name
@@ -64,7 +64,7 @@ class Gain(AtomicDEVS):
     def intTransition(self):
         """
         Internal Transition Function.
-        The policeman works forever, so only one mode. 
+        The policeman works forever, so only one mode.
         """
         self.sigma = INFINITY
         return self.sigma
@@ -75,30 +75,30 @@ class Gain(AtomicDEVS):
         """
 
         # Received a new event, so start processing it
-        in0    = inputs[self.IN][0]
+        in0 = inputs[self.IN][0]
         self.u = [in0, 0.0]
-        self.sigma  = 0.0
-        return self.sigma 
+        self.sigma = 0.0
+        return self.sigma
 
     def outputFnc(self):
         """
         Output Function.
         """
-   
+
         # A colourblind observer sees "grey" instead of "red" or "green".
- 
+
         # BEWARE: ouput is based on the OLD state
         # and is produced BEFORE making the transition.
         # We'll encode an "observation" of the state the
         # system will transition to !
 
-        # Send messages (events) to a subset of the atomic-DEVS' 
+        # Send messages (events) to a subset of the atomic-DEVS'
         # output ports by means of the 'poke' method, i.e.:
         # The content of the messages is based (typically) on current State.
- 
+
         y = [self.u[0] * self.gain, 0.0]
         return {self.OUT: y}
-    
+
     def timeAdvance(self):
         """
         Time-Advance Function.
@@ -108,7 +108,7 @@ class Gain(AtomicDEVS):
         return self.sigma
 
 
-######################## 
+########################
 # Splitter atomic model
 ########################
 class SplitterState:
@@ -123,7 +123,7 @@ class SplitterState:
         self.set(sigma, tvalue, data)
 
     def set(self, sigma, tvalue, data):
-        self._sigma  = sigma
+        self._sigma = sigma
         self._tvalue = tvalue
         self._data = data
 
@@ -133,18 +133,18 @@ class SplitterState:
 
 class Splitter(AtomicDEVS):
     """
-    Split input message in as many outputs as elements the message has 
+    Split input message in as many outputs as elements the message has
     """
-  
+
     def __init__(self, num_outputs, name='Splitter', debug=False):
         """
         Constructor (parameterizable).
         """
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
-    
+
         # PARAMETERS
-        self.num_outputs = num_outputs # number of output ports
+        self.num_outputs = num_outputs  # number of output ports
         self.debug = debug
 
         # STATE:
@@ -155,7 +155,7 @@ class Splitter(AtomicDEVS):
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
         self.elapsed = 0.0
-    
+
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
@@ -168,7 +168,6 @@ class Splitter(AtomicDEVS):
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
-
 
     def __lt__(self, other):
         return self.name < other.name
@@ -185,9 +184,12 @@ class Splitter(AtomicDEVS):
 
         sigma = 0.0
         if (self.debug):
-            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
+            print(
+                "t: {} s, Atomic name: {}, External Transition Function"
+                .format(current_time, self.name)
+            )
 
-        return SplitterState(sigma, current_time, data) 
+        return SplitterState(sigma, current_time, data)
 
     def intTransition(self):
         """
@@ -200,9 +202,12 @@ class Splitter(AtomicDEVS):
             sigma = INFINITY
         else:
             sigma = 0.0
-        
+
         if (self.debug):
-            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
+            print(
+                "t: {} s, Atomic name: {}, Internal Transition Function"
+                .format(current_time, self.name)
+            )
 
         return SplitterState(sigma, current_time, data)
 
@@ -216,7 +221,7 @@ class Splitter(AtomicDEVS):
                 self.outputs_queue.append({self.outPorts[i]: [splitted_data]})
 
         return self.outputs_queue.pop()
-    
+
     def timeAdvance(self):
         """
         Time-Advance Function.
@@ -226,7 +231,8 @@ class Splitter(AtomicDEVS):
         sigma, _, _ = self.state.get()
         return sigma
 
-######################## 
+
+########################
 # Merger atomic model
 ########################
 class MergerState:
@@ -241,7 +247,7 @@ class MergerState:
         self.set(sigma, tvalue, data)
 
     def set(self, sigma, tvalue, data):
-        self._sigma  = sigma
+        self._sigma = sigma
         self._tvalue = tvalue
         self._data = data
 
@@ -251,29 +257,31 @@ class MergerState:
 
 class Merger(AtomicDEVS):
     """
-    Merger several input messages in one output 
+    Merger several input messages in one output
     """
-  
+
     def __init__(self, num_inputs, name='Merger', debug=False):
         """
         Constructor (parameterizable).
         """
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
-    
+
         # PARAMETERS
-        self.num_inputs = num_inputs # number of input ports
+        self.num_inputs = num_inputs  # number of input ports
         self.debug = debug
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = MergerState(sigma=INFINITY, tvalue=0.0, data=[None] * num_inputs)
+        self.state = MergerState(
+            sigma=INFINITY, tvalue=0.0, data=[None] * num_inputs
+        )
 
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
         self.elapsed = 0.0
-    
+
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
@@ -287,7 +295,6 @@ class Merger(AtomicDEVS):
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
-
 
     def __lt__(self, other):
         return self.name < other.name
@@ -304,15 +311,18 @@ class Merger(AtomicDEVS):
             if self.inPorts[i] in inputs:
                 data[i] = inputs[self.inPorts[i]]
             else:
-                if data[i] != None:
-                    data[i] = advance_time(data[i], self.elapsed, order=-1)
+                if data[i] is not None:
+                    data[i] = advance_time(data[i], self.elapsed)
 
         sigma = 0.0
 
         if (self.debug):
-            print("t: {} s, Atomic name: {}, External Transition Function".format(current_time, self.name))
+            print(
+                "t: {} s, Atomic name: {}, External Transition Function"
+                .format(current_time, self.name)
+            )
 
-        return MergerState(sigma, current_time, data) 
+        return MergerState(sigma, current_time, data)
 
     def intTransition(self):
         """
@@ -321,11 +331,14 @@ class Merger(AtomicDEVS):
         sigma, current_time, data = self.state.get()
         current_time += sigma
         sigma = INFINITY
-        
-        if (self.debug):
-            print("t: {} s, Atomic name: {}, Internal Transition Function".format(current_time,self.name))
 
-        return MergerState(sigma,current_time,data)
+        if (self.debug):
+            print(
+                "t: {} s, Atomic name: {}, Internal Transition Function"
+                .format(current_time, self.name)
+            )
+
+        return MergerState(sigma, current_time, data)
 
     def outputFnc(self):
         """
@@ -334,7 +347,7 @@ class Merger(AtomicDEVS):
         _, _, data = self.state.get()
 
         return {self.outPort: data}
-    
+
     def timeAdvance(self):
         """
         Time-Advance Function.

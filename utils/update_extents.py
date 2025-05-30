@@ -23,7 +23,11 @@ for i in range(n_robots):
     for j in range(n_robots):
         if i != j:
             dist = np.sqrt(np.sum(np.square(position[i] - position[j])))
-            adjacency_matrix[i, j] = (dist < comm_range[i]) and (dist < comm_range[j])
+            adjacency_matrix[i, j] = (
+                dist < comm_range[i]
+            ) and (
+                dist < comm_range[j]
+            )
 
 geodesic_matrix = geodesics(adjacency_matrix)
 action_extents = minimum_rigidity_extents(geodesic_matrix, position)
@@ -31,7 +35,7 @@ state_extents = superframework_extents(geodesic_matrix, action_extents)
 
 for robot_id, config in robots_config.items():
     i = robot_id_to_index(robot_id)
-    config['token_handler']['action'] = int(action_extents[i])
-    config['token_handler']['state'] = int(state_extents[i])
+    config['coordinator']['action'] = int(action_extents[i])
+    config['coordinator']['state'] = int(state_extents[i])
 
 write_json_file('robots.json', robots_config)
