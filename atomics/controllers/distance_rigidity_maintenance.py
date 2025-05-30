@@ -114,7 +114,7 @@ class DistanceRigidityMaintenance(Controller):
         #
         #    process inputs here
         #
-        port, data = list(inputs.items())[0]
+        port, data = inputs.popitem()
 
         if port == self.inPorts['position']:
             control.subframework[self.robot_id] = data.ravel()

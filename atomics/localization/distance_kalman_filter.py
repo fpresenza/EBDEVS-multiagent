@@ -34,7 +34,7 @@ class DistanceKalmanFilter(Localization):
         #
         #    process inputs here
         #
-        port, data = list(inputs.items())[0]
+        port, data = inputs.popitem()
 
         if port == self.inPorts['velocity_measurement']:
             # if data arrives through port inPorts['velocity_measurement']
