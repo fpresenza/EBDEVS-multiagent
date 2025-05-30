@@ -3,7 +3,7 @@ from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
 
-class RadioModuleState:
+class CommunicationModuleState:
     """
     Encapsulates the system's state
     """
@@ -22,11 +22,11 @@ class RadioModuleState:
         return self._sigma, self._tvalue, self._record
 
 
-class RadioModule(AtomicDEVS):
+class CommunicationModule(AtomicDEVS):
     def __init__(
             self,
             robot_id,
-            name='RadioModule',
+            name='CommunicationModule',
             forward=True,
             debug=False
             ):
@@ -45,7 +45,7 @@ class RadioModule(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = RadioModuleState(
+        self.state = CommunicationModuleState(
             sigma=INFINITY,
             tvalue=0.0,
             record={'action': {}, 'state': {}, 'active': {}, 'passive': {}},
@@ -134,7 +134,7 @@ class RadioModule(AtomicDEVS):
                 .format(current_time, self.name, token)
             )
 
-        return RadioModuleState(sigma, current_time, record)
+        return CommunicationModuleState(sigma, current_time, record)
 
     def intTransition(self):
         """
@@ -153,7 +153,7 @@ class RadioModule(AtomicDEVS):
                 .format(current_time, self.name, self.parent.name)
             )
 
-        return RadioModuleState(sigma, current_time, record)
+        return CommunicationModuleState(sigma, current_time, record)
 
     def outputFnc(self):
         """

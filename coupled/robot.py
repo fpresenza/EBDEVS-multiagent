@@ -2,7 +2,7 @@ from pypdevs.DEVS import CoupledDEVS
 
 from atomics.controllers.distance_rigidity_maintenance import \
     DistanceRigidityMaintenance
-from atomics.communication.radio_module import RadioModule
+from atomics.communication.communication_module import CommunicationModule
 from atomics.coordination.token_handlers import RobotCoordinator
 from atomics.localization.distance_kalman_filter import DistanceKalmanFilter
 from atomics.sensors.speedsensor import SpeedSensor
@@ -49,7 +49,7 @@ class Robot(CoupledDEVS):
             logpath=logpath,
             debug=self.debug
         )
-        radio_module = RadioModule(
+        communication_module = CommunicationModule(
             robot_id=self.name,
             debug=self.debug,
         )
@@ -71,7 +71,7 @@ class Robot(CoupledDEVS):
 
         self.dynamics = self.addSubModel(dynamics)
         self.controller = self.addSubModel(controller)
-        self.radio_module = self.addSubModel(radio_module)
+        self.communication_module = self.addSubModel(communication_module)
         self.coordinator = self.addSubModel(coordinator)
         self.localization = self.addSubModel(localization)
         self.speed_sensor = self.addSubModel(speed_sensor)
@@ -82,20 +82,20 @@ class Robot(CoupledDEVS):
 
         self.connectPorts(
             self.inPorts['radio'],
-            self.radio_module.inPorts['radio']
+            self.communication_module.inPorts['radio']
         )
         self.connectPorts(
-            self.radio_module.outPorts['radio'],
+            self.communication_module.outPorts['radio'],
             self.outPorts['radio']
         )
 
         self.connectPorts(
-            self.radio_module.outPorts['token'],
+            self.communication_module.outPorts['token'],
             self.coordinator.inPorts['token']
         )
         self.connectPorts(
             self.coordinator.outPorts['token'],
-            self.radio_module.inPorts['token']
+            self.communication_module.inPorts['token']
         )
 
         self.connectPorts(

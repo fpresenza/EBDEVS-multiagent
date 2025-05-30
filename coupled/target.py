@@ -1,8 +1,6 @@
-import numpy as np
-
 from pypdevs.DEVS import CoupledDEVS
 
-from atomics.communication.radio_module import RadioModule
+from atomics.communication.communication_module import CommunicationModule
 from atomics.controllers.beacon import Beacon
 from atomics.coordination.token_handlers import TargetCoordinator
 from coupled.robot_dynamics import RobotDynamics
@@ -10,7 +8,7 @@ from coupled.robot_dynamics import RobotDynamics
 
 class Target(CoupledDEVS):
     def __init__(
-            self, 
+            self,
             config,
             name='Target',
             debug=False):
@@ -26,10 +24,10 @@ class Target(CoupledDEVS):
         self.debug = debug
 
         self.y_up = [
-            self.name, 
+            self.name,
             {
-                'time': 0.0, 
-                'pose': [coord + [0.0] * 9 for coord in position], 
+                'time': 0.0,
+                'pose': [coord + [0.0] * 9 for coord in position],
                 'comm_range': comm_range,
                 'status': 'active',
             }
@@ -41,7 +39,7 @@ class Target(CoupledDEVS):
             config=config['dynamics'],
             debug=self.debug
         )
-        radio_module = RadioModule(
+        communication_module = CommunicationModule(
             robot_id=self.name,
             forward=False,
             debug=self.debug,
@@ -58,22 +56,37 @@ class Target(CoupledDEVS):
         )
 
         self.dynamics = self.addSubModel(dynamics)
-        self.radio_module = self.addSubModel(radio_module)
+        self.communication_module = self.addSubModel(communication_module)
         self.controller = self.addSubModel(controller)
         self.coordinator = self.addSubModel(coordinator)
 
         # Declare the coupled model's output ports:
         self.outPorts = {'radio': self.addOutPort(name="out_radio")}
-        self.inPorts  = {'radio': self.addInPort(name="in_radio")}
+        self.inPorts = {'radio': self.addInPort(name="in_radio")}
 
-        self.connectPorts(self.inPorts['radio'], self.radio_module.inPorts['radio'])
-        self.connectPorts(self.radio_module.outPorts['radio'], self.outPorts['radio'])
+        self.connectPorts(
+            self.inPorts['radio'],
+            self.communication_module.inPorts['radio']
+        )
+        self.connectPorts(
+            self.communication_module.outPorts['radio'],
+            self.outPorts['radio']
+        )
 
-        self.connectPorts(self.radio_module.outPorts['token'], self.coordinator.inPorts['token'])
-        self.connectPorts(self.coordinator.outPorts['token'], self.radio_module.inPorts['token'])
+        self.connectPorts(
+            self.communication_module.outPorts['token'],
+            self.coordinator.inPorts['token']
+        )
+        self.connectPorts(
+            self.coordinator.outPorts['token'],
+            self.communication_module.inPorts['token']
+        )
 
-        self.connectPorts(self.controller.outPorts['beacon'], self.coordinator.inPorts['beacon'])
-        
+        self.connectPorts(
+            self.controller.outPorts['beacon'],
+            self.coordinator.inPorts['beacon']
+        )
+
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function".format(self.name))
 
@@ -84,7 +97,7 @@ class Target(CoupledDEVS):
             micro_id, data = x_b_micro[0]
         else:
             micro_id, data = x_b_micro
-            
+
         if micro_id == 'RobotDynamics':
             self.y_up[1]['time'] = data['time']
             self.y_up[1]['pose'] = data['pose'].copy()
@@ -94,7 +107,8 @@ class Target(CoupledDEVS):
 
         if (self.debug):
             print(
-                "t: {:.2f} s, Coupled name: {}, Global Transition Function, x_b_micro: {}"
+                "t: {:.2f} s, Coupled name: {}, \
+                Global Transition Function, x_b_micro: {}"
                 .format(data['time'], self.name, x_b_micro)
             )
 
