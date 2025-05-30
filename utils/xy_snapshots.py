@@ -12,8 +12,8 @@ import progressbar
 
 from core import robot_id_to_index, target_id_to_index
 from files import find_latest_timestamp
-from uvnpy.network import plot, disk_graph
-from uvnpy.distances.core import distance_matrix
+from uvnpy.network import plot
+from uvnpy.network.graphs import DiskGraph
 
 
 np.set_printoptions(suppress=True, precision=4)
@@ -58,11 +58,21 @@ N = len(t) // arg.jump
 k_i = int(np.argmin(np.abs(t - arg.init)))
 k_e = int(np.argmin(np.abs(t - arg.end)))
 
-time_reader = csv.reader(open(experiment_directory + 'logger_time.csv', newline=''))
-ids_reader = csv.reader(open(experiment_directory + 'logger_ids.csv', newline=''))
-positions_reader = csv.reader(open(experiment_directory + 'logger_positions.csv', newline=''))
-comm_ranges_reader = csv.reader(open(experiment_directory + 'logger_comm_ranges.csv', newline=''))
-status_reader = csv.reader(open(experiment_directory + 'logger_status.csv', newline=''))
+time_reader = csv.reader(
+    open(experiment_directory + 'logger_time.csv', newline='')
+)
+ids_reader = csv.reader(
+    open(experiment_directory + 'logger_ids.csv', newline='')
+)
+positions_reader = csv.reader(
+    open(experiment_directory + 'logger_positions.csv', newline='')
+)
+comm_ranges_reader = csv.reader(
+    open(experiment_directory + 'logger_comm_ranges.csv', newline='')
+)
+status_reader = csv.reader(
+    open(experiment_directory + 'logger_status.csv', newline='')
+)
 
 
 # ------------------------------------------------------------------
@@ -76,15 +86,19 @@ for _ in range(k_i):
     next(positions_reader)
     next(comm_ranges_reader)
     next(status_reader)
-    
+
 k = 1
 while k < k_e:
     try:
         # Read one row from each file
         time = float(next(time_reader)[0])
         ids = list(next(ids_reader))
-        positions = np.array(next(positions_reader), dtype=float).reshape(-1, 2)
-        comm_ranges = np.array(next(comm_ranges_reader), dtype=float).reshape(-1, 1)
+        positions = np.array(
+            next(positions_reader), dtype=float
+        ).reshape(-1, 2)
+        comm_ranges = np.array(
+            next(comm_ranges_reader), dtype=float
+        ).reshape(-1, 1)
         status = list(next(status_reader))
 
         lim = 100.0
@@ -107,9 +121,12 @@ while k < k_e:
                 verticalalignment='bottom', horizontalalignment='left',
                 transform=ax.transAxes, color='r', fontsize='x-small'
         )
-    
+
         robots = [i for i, id in enumerate(ids) if id.startswith('Robot')]
-        targets = [i for i, id in enumerate(ids) if id.startswith('Target') and status[i] == 'active']
+        targets = [
+            i for i, id in enumerate(ids)
+            if id.startswith('Target') and status[i] == 'active'
+        ]
 
         for robot in robots:
             plot.nodes(
@@ -121,7 +138,7 @@ while k < k_e:
                 lw=0.2
             )
 
-        for target in targets:    
+        for target in targets:
             plot.nodes(
                 ax, positions[target],
                 color='k',
@@ -131,10 +148,14 @@ while k < k_e:
                 lw=0.2
             )
         for target in targets:
-            circle = plt.Circle(positions[target], 5.0, fill=True, color='blue', alpha=0.2)
+            circle = plt.Circle(
+                positions[target], 5.0, fill=True, color='blue', alpha=0.2
+            )
             ax.add_patch(circle)
 
-        edges = disk_graph.edges_from_positions(positions[robots], dmax=comm_ranges[robots])
+        edges = DiskGraph(
+            positions[robots], dmax=comm_ranges[robots[0]]
+        ).edge_set()
         plot.edges(
             ax,
             positions[robots],
@@ -145,7 +166,11 @@ while k < k_e:
             zorder=0
         )
 
-        fig.savefig(experiment_directory + 'snapshots/{}.png'.format(k), format='png', dpi=360)
+        fig.savefig(
+            experiment_directory + 'snapshots/{}.png'.format(k),
+            format='png',
+            dpi=360
+        )
         plt.close()
 
         # Skip rows in each file
@@ -155,14 +180,11 @@ while k < k_e:
             next(positions_reader)
             next(comm_ranges_reader)
             next(status_reader)
-            
+
         bar.update(k)
         k += 1
     except StopIteration:
         break  # Stop if any reader runs out of lines
-
-
-
 
 #     untracked = targets[k][:, 2].astype(bool)
 #     tracked = np.logical_not(untracked)
@@ -172,7 +194,6 @@ while k < k_e:
 #     ax.scatter(
 #         targets[k][tracked, 0], targets[k][tracked, 1],
 #         marker='s', s=4, color='green')
-
 
 
 bar.finish()
