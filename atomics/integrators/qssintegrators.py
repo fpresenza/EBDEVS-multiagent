@@ -242,7 +242,7 @@ class QSSIntegrator(AtomicDEVS):
 # This class derives from QSSIntegrator => it's only necessary
 # to reimplement the input and output transition functions.
 # -----------------------------------
-class QSSIntegrator_Yup(QSSIntegrator):
+class mQSSIntegrator(QSSIntegrator):
     """
     QSS integrator atomic model
     """
