@@ -77,12 +77,12 @@ class TransmissionMedium(AtomicDEVS):
         sigma, current_time = self.state.get()
         current_time += self.elapsed
 
-        _, (transmitter, token) = inputs.popitem()
+        _, (transmitter, token_batch) = inputs.popitem()
 
         receivers = self.parent.getNeighbors(transmitter, current_time)
         if len(receivers) > 0:
             self.outputs_queue += [
-                {self.outPorts[receiver_id]: (transmitter, token)}
+                {self.outPorts[receiver_id]: (transmitter, token_batch)}
                 for receiver_id in receivers
             ]
             sigma = 0.0    # holds last status

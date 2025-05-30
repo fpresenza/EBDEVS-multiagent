@@ -28,6 +28,7 @@ class CommunicationModule(AtomicDEVS):
             robot_id,
             name='CommunicationModule',
             forward=True,
+            batch=False,
             debug=False
             ):
         """Atomic model for the toking handling protocol"""
@@ -39,6 +40,7 @@ class CommunicationModule(AtomicDEVS):
         self.robot_id = robot_id    # Robot identifier
         # self.status = []          # TODO
         self.forward = forward
+        self.batch = batch
         self.debug = debug
 
         # Dictionaries as records of tokens received
@@ -69,6 +71,7 @@ class CommunicationModule(AtomicDEVS):
             'token': self.addOutPort(name="out_token"),
         }
 
+        self.token_batch = []
         self.outputs_queue = []
 
         if (self.debug):
@@ -82,50 +85,61 @@ class CommunicationModule(AtomicDEVS):
         current_time += self.elapsed
 
         if self.inPorts['radio'] in inputs:
-            transmitter, token = inputs[self.inPorts['radio']]
+            transmitter, token_batch = inputs[self.inPorts['radio']]
 
-            if token.creator != self.robot_id:
-                # gets last order from record dictionary
-                try:
-                    last_order = record[token.kind][token.creator]
-                except KeyError:
-                    # first time received
-                    last_order = -1
+            for token in token_batch:
+                if token.creator != self.robot_id:
+                    # gets last order from record dictionary
+                    try:
+                        last_order = record[token.kind][token.creator]
+                    except KeyError:
+                        # first time received
+                        last_order = -1
 
-                # check if token is newer than last received
-                if token.order > last_order:
-                    record[token.kind][token.creator] = token.order
+                    # check if token is newer than last received
+                    if token.order > last_order:
+                        record[token.kind][token.creator] = token.order
 
-                    if token.hops_travelled == 1:
-                        distance_meas = self.parent.parent.getRobotDistances(
-                            transmitter, self.robot_id, current_time
-                        )
-                    else:
-                        distance_meas = None
+                        if token.hops_travelled == 1:
+                            distance_meas = self.parent.parent.getRobotDistances(  # noqa
+                                transmitter, self.robot_id, current_time
+                            )
+                        else:
+                            distance_meas = None
 
-                    self.outputs_queue.append(
-                        {
-                            self.outPorts['token']:
-                            (transmitter, token, distance_meas)
-                        }
-                    )
-
-                    # check if retransmission is needed
-                    if self.forward and token.hops_travelled < token.hops_to_target:  # noqa
-                        # update the number of traversed hops
-                        token = copy.deepcopy(token)
-                        token.hops_travelled += 1
                         self.outputs_queue.append(
-                            {self.outPorts['radio']: (self.robot_id, token)}
+                            {
+                                self.outPorts['token']:
+                                (transmitter, token, distance_meas)
+                            }
                         )
 
-                    sigma = 0.0
+                        # check if retransmission is needed
+                        if self.forward and token.hops_travelled < token.hops_to_target:  # noqa
+                            # update the number of traversed hops
+                            token = copy.deepcopy(token)
+                            token.hops_travelled += 1
+                            if self.batch:
+                                self.token_batch.append(token)
+                            else:
+                                self.outputs_queue.append(
+                                    {
+                                        self.outPorts['radio']:
+                                        (self.robot_id, [token])
+                                    }
+                                )
+
+                        sigma = 0.0
 
         elif self.inPorts['token'] in inputs:
             token = inputs[self.inPorts['token']]
             self.outputs_queue.append(
-                {self.outPorts['radio']: (self.robot_id, token)}
+                {
+                    self.outPorts['radio']:
+                    (self.robot_id, self.token_batch + [token])
+                }
             )
+            self.token_batch.clear()
             sigma = 0.0
 
         if (self.debug):

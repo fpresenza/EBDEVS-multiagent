@@ -52,6 +52,7 @@ class Robot(CoupledDEVS):
         )
         communication_module = CommunicationModule(
             robot_id=self.name,
+            batch=True,
             debug=self.debug,
         )
         coordinator = RobotCoordinator(
