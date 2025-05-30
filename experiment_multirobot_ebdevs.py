@@ -1,6 +1,6 @@
-# Copyright 2014 Modelling, Simulation and Design Lab (MSDL) at 
+# Copyright 2014 Modelling, Simulation and Design Lab (MSDL) at
 # McGill University and the University of Antwerp (http://msdl.cs.mcgill.ca/)
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -40,6 +40,10 @@ parser.add_argument(
     '-l', '--length',
     default=1.0, type=float, help='simulation length in seconds'
 )
+parser.add_argument(
+    '-v', '--verbose',
+    default=False, type=bool, help='save all events in a .out file'
+)
 arg = parser.parse_args()
 
 
@@ -54,15 +58,15 @@ shutil.copy('targets.json', logpath + 'targets.json')
 
 #    ======================================================================
 
-# 1. Instantiate the (Coupled or Atomic) DEVS at the root of the 
-#  hierarchical model. This effectively instantiates the whole model 
+# 1. Instantiate the (Coupled or Atomic) DEVS at the root of the
+#  hierarchical model. This effectively instantiates the whole model
 #  thanks to the recursion in the DEVS model constructors (__init__).
 #
 m = MultiRobotSystem(name="MultiRobotSystem", logpath=logpath, debug=False)
 
 #    ======================================================================
 
-# 2. Link the model to a DEVS Simulator: 
+# 2. Link the model to a DEVS Simulator:
 #  i.e., create an instance of the 'Simulator' class,
 #  using the model as a parameter.
 sim = Simulator(m)
@@ -89,7 +93,8 @@ sim.setTerminationTime(arg.length)
 # B. Set the use of a tracer to show what happened during the simulation run
 #    Both writing to stdout or file is possible:
 #    pass None for stdout, or a filename for writing to that file
-sim.setVerbose(logpath + "simu_out.out")
+if arg.verbose:
+    sim.setVerbose(logpath + "simu_out.out")
 
 # C. Use Classic DEVS instead of Parallel DEVS
 #    If your model uses Classic DEVS, this configuration MUST be set as
@@ -122,4 +127,7 @@ print("Elapsed Time: {} sec".format(b - a))
 
 # 5. (optional) Extract data from the simulated model
 # TODO: Add this condition
-# print("Simulation terminated with traffic light in state %s" % (trafficSystem.trafficLight.state.get()))
+# print(
+#     "Simulation terminated with traffic light in state %s"
+#     % (trafficSystem.trafficLight.state.get())
+# )
