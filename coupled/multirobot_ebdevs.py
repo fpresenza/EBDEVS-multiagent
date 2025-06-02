@@ -47,12 +47,17 @@ class MultiRobotSystem(CoupledDEVS):
         # TODO: time cannot be managed as in the other coupled/atomic models
         self.current_time = 0.0
 
+        world_config = read_json_file('world.json')
+        simu_config = read_json_file('simu.json')
         robots_config = read_json_file('robots.json')
         targets_config = read_json_file('targets.json')
 
+        robots_ids = list(robots_config.keys())
+        targets_ids = list(targets_config.keys())
+
         self.router = self.addSubModel(TransmissionMedium(
-            robots_ids=list(robots_config.keys()),
-            targets_ids=list(targets_config.keys()),
+            robots_ids=robots_ids,
+            targets_ids=targets_ids,
             name='Router',
             debug=self.debug
         ))
@@ -65,9 +70,11 @@ class MultiRobotSystem(CoupledDEVS):
 
         self.agents_states = {}
         self.robots = {}
-        for robot_id, config in robots_config.items():
+        for robot_id in robots_ids:
             self.robots[robot_id] = self.addSubModel(Robot(
-                config,
+                world_config[robot_id],
+                simu_config[robot_id],
+                robots_config[robot_id],
                 name=robot_id,
                 logpath=self.logpath,
                 debug=self.debug

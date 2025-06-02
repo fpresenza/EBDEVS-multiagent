@@ -1,0 +1,142 @@
+{
+    "Robot_0": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_1": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_2": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_3": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_4": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_5": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_6": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_7": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_8": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    },
+    "Robot_9": {
+        "qss": {
+            "x": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            },
+            "y": {
+                "dQMin": 0.05,
+                "dQRel": 0.0,
+                "gain": 1.0
+            }
+        }
+    }
+}

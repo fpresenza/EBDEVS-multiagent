@@ -14,7 +14,9 @@ from coupled.robot_dynamics import RobotDynamics
 class Robot(CoupledDEVS):
     def __init__(
             self,
-            config,
+            world_config,
+            simu_config,
+            robot_config,
             name='Robot',
             logpath='./',
             debug=False):
@@ -25,8 +27,8 @@ class Robot(CoupledDEVS):
         CoupledDEVS.__init__(self, name)
 
         # Parameters
-        position = config['position']
-        comm_range = config['comm_range']
+        position = world_config['position']
+        comm_range = world_config['comm_range']
         self.debug = debug
 
         self.y_up = [
@@ -41,12 +43,12 @@ class Robot(CoupledDEVS):
 
         dynamics = RobotDynamics(
             position=position,
-            config=config['dynamics'],
+            config=simu_config['qss'],
             debug=self.debug
         )
         controller = DistanceRigidityMaintenance(
             robot_id=self.name,
-            config=config['controller'],
+            config=robot_config['controller'],
             logpath=logpath,
             debug=self.debug
         )
@@ -57,17 +59,17 @@ class Robot(CoupledDEVS):
         )
         coordinator = RobotCoordinator(
             robot_id=self.name,
-            config=config['coordinator'],
+            config=robot_config['coordinator'],
             debug=self.debug,
         )
         localization = DistanceKalmanFilter(
             robot_id=self.name,
-            config=config['localization'],
+            config=robot_config['localization'],
             logpath=logpath,
             debug=self.debug
         )
         speed_sensor = SpeedSensor(
-            config=config['speed_sensor'],
+            config=world_config['speed_sensor'],
             debug=self.debug
         )
 
@@ -146,9 +148,9 @@ class Robot(CoupledDEVS):
             self.localization.inPorts['velocity_measurement']
         )
 
-        if config['gps_sensor']['enabled']:
+        if robot_config['gps_sensor'] is True:
             gps_sensor = GPSSensor(
-                config=config['gps_sensor'],
+                config=world_config['gps_sensor'],
                 debug=self.debug
             )
             self.gps_sensor = self.addSubModel(gps_sensor)

@@ -1,25 +1,5 @@
 {
     "Robot_0": {
-        "position": [
-            [
-                9.085
-            ],
-            [
-                6.11
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -98,72 +78,9 @@
             "action": 1,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_1": {
-        "position": [
-            [
-                17.441
-            ],
-            [
-                11.093
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -242,72 +159,9 @@
             "action": 1,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_2": {
-        "position": [
-            [
-                30.955
-            ],
-            [
-                9.21
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -386,72 +240,9 @@
             "action": 2,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_3": {
-        "position": [
-            [
-                18.693
-            ],
-            [
-                35.477
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -530,72 +321,9 @@
             "action": 1,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_4": {
-        "position": [
-            [
-                24.375
-            ],
-            [
-                32.719
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -674,72 +402,9 @@
             "action": 1,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_5": {
-        "position": [
-            [
-                37.217
-            ],
-            [
-                16.962
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -818,72 +483,9 @@
             "action": 2,
             "state": 1
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_6": {
-        "position": [
-            [
-                11.93
-            ],
-            [
-                14.068
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -962,72 +564,9 @@
             "action": 1,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_7": {
-        "position": [
-            [
-                27.872
-            ],
-            [
-                25.36
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -1106,72 +645,9 @@
             "action": 2,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_8": {
-        "position": [
-            [
-                23.436
-            ],
-            [
-                11.032
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -1250,72 +726,9 @@
             "action": 1,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     },
     "Robot_9": {
-        "position": [
-            [
-                22.484
-            ],
-            [
-                21.999
-            ]
-        ],
-        "dynamics": {
-            "x": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            },
-            "y": {
-                "dQMin": 0.05,
-                "dQRel": 0.0,
-                "gain": 1.0
-            }
-        },
         "controller": {
             "period": 0.1,
             "dim": 2,
@@ -1394,49 +807,6 @@
             "action": 1,
             "state": 2
         },
-        "comm_range": 15.0,
-        "gps_sensor": {
-            "enabled": false,
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    1.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    1.0
-                ]
-            ],
-            "period": 1.0
-        },
-        "speed_sensor": {
-            "bias": [
-                [
-                    0.0
-                ],
-                [
-                    0.0
-                ]
-            ],
-            "covariance": [
-                [
-                    0.0,
-                    0.0
-                ],
-                [
-                    0.0,
-                    0.0
-                ]
-            ],
-            "period": 0.1
-        }
+        "gps_sensor":  false
     }
 }
