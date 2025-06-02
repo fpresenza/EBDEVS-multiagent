@@ -48,7 +48,7 @@ class Localization(AtomicDEVS):
         self.state = LocalizationState(
             sigma=INFINITY,
             tvalue=0.0,
-            loc_filter=self.set_loc_filter(config)
+            loc_filter=self.set_loc_filter(robot_id, config)
         )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -133,27 +133,3 @@ class Localization(AtomicDEVS):
         # based (typically) on current State.
         sigma, _, _ = self.state.get()
         return sigma
-
-    def set_loc_filter(self, config):
-        #
-        #    define localization filter here
-        #
-        return None
-
-    def set_in_port_names(self):
-        #
-        #    define the list of input ports name here
-        #
-        return []
-
-    def process_inputs(self, sigma, current_time, loc_filter, inputs):
-        #
-        #    process inputs here
-        #
-        return sigma, loc_filter
-
-    def loc_filter_results(self, loc_filter):
-        #
-        #    get estimation here
-        #
-        return None, None

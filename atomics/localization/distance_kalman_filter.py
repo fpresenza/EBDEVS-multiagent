@@ -1,21 +1,32 @@
 import numpy as np
 
 from atomics.localization.localization import Localization
-from uvnpy.distances.localization import FirstOrderKalmanFilter
+from uvnpy.distances.localization import DistanceBasedKalmanFilter
+
+
+class DKFilter(object):
+    def __init__(self, robot_id, config):
+        self.robot_id = robot_id
+        self.dim = config['dim']
+        ekf_config = {
+            key: np.array(val)
+            for key, val in config['ekf'].items()
+        }
+        self.ekf = DistanceBasedKalmanFilter(**ekf_config)
+
+    def get_estimation(self):
+        """
+            Get the latest estimation.
+        """
+        return self.ekf.position()
 
 
 class DistanceKalmanFilter(Localization):
-    def set_loc_filter(self, config):
+    def set_loc_filter(self, robot_id, config):
         #
         #    define localization filter here
         #
-        return FirstOrderKalmanFilter(
-            position=np.array(config['position']).ravel(),
-            position_cov=np.array(config['covariance']),
-            vel_meas_cov=np.array([[0.0, 0.0], [0.0, 0.0]]),
-            range_meas_cov=np.array([[1.0]]),
-            gps_meas_cov=np.array([[1.0, 0.0], [0.0, 1.0]])
-        )
+        return DKFilter(robot_id, config)
 
     def set_in_port_names(self):
         #
@@ -36,23 +47,23 @@ class DistanceKalmanFilter(Localization):
         if port == self.inPorts['velocity_measurement']:
             # if data arrives through port inPorts['velocity_measurement']
             vel_meas = data
-            loc_filter.dynamic_step(
+            loc_filter.ekf.dynamic_step(
                 current_time,
-                np.ravel(vel_meas)
+                np.reshape(vel_meas, (-1, 1))
             )
             sigma = 0.0  # holds last status
         elif port == self.inPorts['position_measurement']:
             # if data arrives through port inPorts['position_measurement']
-            pos_meas = np.reshape(data, (2, 1))
-            loc_filter.gps_step(pos_meas)
+            pos_meas = np.reshape(data, (-1, 1))
+            loc_filter.ekf.gps_step(pos_meas)
             sigma = 0.0  # holds last status
-        elif self.inPorts['neighbors_positions'] in inputs:
+        elif port == self.inPorts['neighbors_positions']:
             #  if token arrives through port inPorts['neighbors_positions']
             _, neighbor_pos, dist_meas = data
-            loc_filter.range_step(
+            loc_filter.ekf.range_step(
                 dist_meas,
-                np.ravel(neighbor_pos),
-                np.zeros((2, 2), dtype=float)
+                np.reshape(neighbor_pos, (-1, 1)),
+                np.zeros((loc_filter.dim, loc_filter.dim), dtype=float)
             )
             sigma = 0.0  # holds last status
 
@@ -62,4 +73,5 @@ class DistanceKalmanFilter(Localization):
         #
         #    get estimation here
         #
-        return loc_filter.position(), None
+        estimation = loc_filter.get_estimation()
+        return estimation, None
