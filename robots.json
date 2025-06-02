@@ -74,6 +74,10 @@
                 ]
             }
         },
+        "communication": {
+            "forward": true,
+            "batch": false
+        },
         "coordinator": {
             "action": 1,
             "state": 2
@@ -154,6 +158,10 @@
                     ]
                 ]
             }
+        },
+        "communication": {
+            "forward": true,
+            "batch": false
         },
         "coordinator": {
             "action": 1,
@@ -236,6 +244,10 @@
                 ]
             }
         },
+        "communication": {
+            "forward": true,
+            "batch": false
+        },
         "coordinator": {
             "action": 2,
             "state": 2
@@ -316,6 +328,10 @@
                     ]
                 ]
             }
+        },
+        "communication": {
+            "forward": true,
+            "batch": false
         },
         "coordinator": {
             "action": 1,
@@ -398,6 +414,10 @@
                 ]
             }
         },
+        "communication": {
+            "forward": true,
+            "batch": false
+        },
         "coordinator": {
             "action": 1,
             "state": 2
@@ -478,6 +498,10 @@
                     ]
                 ]
             }
+        },
+        "communication": {
+            "forward": true,
+            "batch": false
         },
         "coordinator": {
             "action": 2,
@@ -560,6 +584,10 @@
                 ]
             }
         },
+        "communication": {
+            "forward": true,
+            "batch": false
+        },
         "coordinator": {
             "action": 1,
             "state": 2
@@ -640,6 +668,10 @@
                     ]
                 ]
             }
+        },
+        "communication": {
+            "forward": true,
+            "batch": false
         },
         "coordinator": {
             "action": 2,
@@ -722,6 +754,10 @@
                 ]
             }
         },
+        "communication": {
+            "forward": true,
+            "batch": false
+        },
         "coordinator": {
             "action": 1,
             "state": 2
@@ -803,6 +839,10 @@
                 ]
             }
         },
+        "communication": {
+            "forward": true,
+            "batch": false
+        },
         "coordinator": {
             "action": 1,
             "state": 2
@@ -812,6 +852,10 @@
     "Target_0": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -829,6 +873,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -844,6 +892,10 @@
     "Target_2": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -861,6 +913,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -876,6 +932,10 @@
     "Target_4": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -893,6 +953,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -908,6 +972,10 @@
     "Target_6": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -925,6 +993,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -940,6 +1012,10 @@
     "Target_8": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -957,6 +1033,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -972,6 +1052,10 @@
     "Target_10": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -989,6 +1073,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1004,6 +1092,10 @@
     "Target_12": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1021,6 +1113,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1036,6 +1132,10 @@
     "Target_14": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1053,6 +1153,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1068,6 +1172,10 @@
     "Target_16": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1085,6 +1193,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1100,6 +1212,10 @@
     "Target_18": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1117,6 +1233,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1132,6 +1252,10 @@
     "Target_20": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1149,6 +1273,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1164,6 +1292,10 @@
     "Target_22": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1181,6 +1313,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1196,6 +1332,10 @@
     "Target_24": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1213,6 +1353,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1228,6 +1372,10 @@
     "Target_26": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [
@@ -1245,6 +1393,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1261,6 +1413,10 @@
         "controller": {
             "period": 0.1
         },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
         "coordinator": {
             "position": [
                 [
@@ -1276,6 +1432,10 @@
     "Target_29": {
         "controller": {
             "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
         },
         "coordinator": {
             "position": [

@@ -54,7 +54,7 @@ class Hunter(CoupledDEVS):
         )
         communication_module = CommunicationModule(
             robot_id=self.name,
-            batch=True,
+            config=hunter_config['communication'],
             debug=self.debug,
         )
         coordinator = HunterCoordinator(

@@ -26,9 +26,8 @@ class CommunicationModule(AtomicDEVS):
     def __init__(
             self,
             robot_id,
+            config,
             name='CommunicationModule',
-            forward=True,
-            batch=False,
             debug=False
             ):
         """Atomic model for the toking handling protocol"""
@@ -39,8 +38,8 @@ class CommunicationModule(AtomicDEVS):
         # Parameters
         self.robot_id = robot_id    # Robot identifier
         # self.status = []          # TODO
-        self.forward = forward
-        self.batch = batch
+        self.forward = config['forward']
+        self.batch = config['batch']
         self.debug = debug
 
         # Dictionaries as records of tokens received
