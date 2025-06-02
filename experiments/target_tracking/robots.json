@@ -1,0 +1,1452 @@
+{
+    "Hunter_0": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        9.085
+                    ],
+                    [
+                        6.11
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 1,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_1": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        17.441
+                    ],
+                    [
+                        11.093
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 1,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_2": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        30.955
+                    ],
+                    [
+                        9.21
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 2,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_3": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        18.693
+                    ],
+                    [
+                        35.477
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 1,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_4": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        24.375
+                    ],
+                    [
+                        32.719
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 1,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_5": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        37.217
+                    ],
+                    [
+                        16.962
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 2,
+            "state": 1
+        },
+        "gps_sensor": false
+    },
+    "Hunter_6": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        11.93
+                    ],
+                    [
+                        14.068
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 1,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_7": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        27.872
+                    ],
+                    [
+                        25.36
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 2,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_8": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        23.436
+                    ],
+                    [
+                        11.032
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 1,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Hunter_9": {
+        "controller": {
+            "period": 0.1,
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 0.0001,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
+        },
+        "localization": {
+            "dim": 2,
+            "ekf": {
+                "position": [
+                    [
+                        22.484
+                    ],
+                    [
+                        21.999
+                    ]
+                ],
+                "position_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ],
+                "vel_meas_cov": [
+                    [
+                        0.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        0.0
+                    ]
+                ],
+                "range_meas_cov": [
+                    [
+                        1.0
+                    ]
+                ],
+                "gps_meas_cov": [
+                    [
+                        1.0,
+                        0.0
+                    ],
+                    [
+                        0.0,
+                        1.0
+                    ]
+                ]
+            }
+        },
+        "communication": {
+            "forward": true,
+            "batch": true
+        },
+        "coordinator": {
+            "action": 1,
+            "state": 2
+        },
+        "gps_sensor": false
+    },
+    "Target_0": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    69.18771139504733
+                ],
+                [
+                    31.551563100606295
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_1": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    68.65009276815837
+                ],
+                [
+                    83.46256718973729
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_2": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    1.8288277344191806
+                ],
+                [
+                    75.01443149449675
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_3": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    98.88610889064947
+                ],
+                [
+                    74.81656543798394
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_4": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    28.044399206440517
+                ],
+                [
+                    78.92793284514885
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_5": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    10.322600657764202
+                ],
+                [
+                    44.78935261759052
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_6": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    90.85955030930955
+                ],
+                [
+                    29.36141483736795
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_7": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    28.777533858634875
+                ],
+                [
+                    13.002857211827767
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_8": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    1.9366957870297075
+                ],
+                [
+                    67.8835532939891
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_9": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    21.162811600005902
+                ],
+                [
+                    26.554665937222623
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_10": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    49.15731592803383
+                ],
+                [
+                    5.336254511708038
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_11": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    57.411760549201304
+                ],
+                [
+                    14.672857490581015
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_12": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    58.93055369032842
+                ],
+                [
+                    69.97583600209312
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_13": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    10.233442882782583
+                ],
+                [
+                    41.40559878195683
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_14": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    69.44001577277452
+                ],
+                [
+                    41.417926952690266
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_15": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    4.995345894608716
+                ],
+                [
+                    53.58964059155116
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_16": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    66.37946452197887
+                ],
+                [
+                    51.48891120583086
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_17": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    94.45947559908133
+                ],
+                [
+                    58.65550405019929
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_18": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    90.34019152878835
+                ],
+                [
+                    13.747470414623752
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_19": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    13.927634725075855
+                ],
+                [
+                    80.73912887095238
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_20": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    39.767683698553355
+                ],
+                [
+                    16.53541971169328
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_21": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    92.75085803960339
+                ],
+                [
+                    34.776585974550656
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_22": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    75.08121031361556
+                ],
+                [
+                    72.59979853504515
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_23": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    88.33060912058099
+                ],
+                [
+                    62.36722070556089
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_24": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    75.09424340273372
+                ],
+                [
+                    34.88983419778425
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_25": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    26.99278917650261
+                ],
+                [
+                    89.58862181960669
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_26": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    42.809118987129494
+                ],
+                [
+                    96.48400471483856
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_27": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    66.3441497818448
+                ],
+                [
+                    62.16957202091218
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_28": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    11.474597295337519
+                ],
+                [
+                    94.94892587070713
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    },
+    "Target_29": {
+        "controller": {
+            "period": 0.1
+        },
+        "communication": {
+            "forward": false,
+            "batch": false
+        },
+        "coordinator": {
+            "position": [
+                [
+                    44.991213347994055
+                ],
+                [
+                    57.83896143871318
+                ]
+            ],
+            "collect_range": 5.0
+        }
+    }
+}
