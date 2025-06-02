@@ -2,68 +2,52 @@ import numpy as np
 
 from uvnpy.distances.control import RigidityMaintenance
 from uvnpy.control.core import CollisionAvoidanceVanishing
+from uvnpy.control.targets import TargetTracking
 
 from atomics.controllers.controller import Controller
 
 
 class DRMControl(object):
-    def __init__(self, config):
-        self.subframework = {}
-        self.obstacles = []
+    def __init__(self, robot_id, config):
+        self.robot_id = robot_id
+        self.dim = config['dim']
+        self.weights = config['weights']
         self.target_position = None
-        self.external_action = np.zeros((2, 1), dtype=float)
-        self.rigidity = RigidityMaintenance(
-            dim=2,
-            dmax=config['dmax'][0],
-            steepness=config['steepness'],
-            threshold=1e-4,
-            eigenvalues='all',
-            functional='log'
-        )
-        self.collision = CollisionAvoidanceVanishing(
-            power=2.0,
-            dmin=1.0,
-            dmax=config['dmax'][1]
-        )
+        self.obstacles = []
+        self.subframework = {}
+        self.external_action = np.zeros((self.dim, 1), dtype=float)
+        self.tracking = TargetTracking(**config['tracking'])
+        self.collision = CollisionAvoidanceVanishing(**config['collision'])
+        self.rigidity = RigidityMaintenance(**config['rigidity'])
 
     def clear(self):
         self.subframework.clear()
         self.obstacles.clear()
         self.external_action[:] = 0.0
 
-    def compute_action(self, robot_id):
+    def compute_action(self):
         coordination_data = {}
 
-        if robot_id in self.subframework:
-            position = self.subframework[robot_id]
+        if self.robot_id in self.subframework:
+            position = self.subframework[self.robot_id]
 
             # target collection
             if self.target_position is not None:
-                r = position.reshape(-1, 1) - self.target_position
-                d = np.sqrt(np.square(r).sum())
-                tracking_radius = 20.0    # radius
-                forget_radius = 100.0     # radius
-                v_collect_max = 1.25
-                if d < tracking_radius:
-                    v_collect = v_collect_max
-                elif d < forget_radius:
-                    factor = (forget_radius - d)
-                    factor /= (forget_radius - tracking_radius)
-                    v_collect = v_collect_max * factor
-                else:
-                    v_collect = 0.0
-                target_action = - v_collect * r / d
+                target_action = self.tracking.update(
+                    position, self.target_position.ravel()
+                ).reshape(-1, 1)
+                target_action *= self.weights['tracking']
             else:
-                target_action = np.zeros((2, 1), dtype=float)
+                target_action = np.zeros((self.dim, 1), dtype=float)
 
             # obstacle avoidance
             if len(self.obstacles) > 0:
                 collision_action = self.collision.update(
                     position, self.obstacles
                 ).reshape(-1, 1)
-                collision_action *= 0.25
+                collision_action *= self.weights['collision']
             else:
-                collision_action = np.zeros((2, 1), dtype=float)
+                collision_action = np.zeros((self.dim, 1), dtype=float)
 
             # rigidity maintenance
             rigidity_action = self.external_action
@@ -80,24 +64,26 @@ class DRMControl(object):
                     for node_id, action
                     in zip(subframework_ids, subframework_actions)
                 }
-                rigidity_action += subframework_actions.pop(robot_id)
-                rigidity_action *= 0.375
+                rigidity_action += subframework_actions.pop(
+                    self.robot_id
+                )
+                rigidity_action *= self.weights['rigidity']
                 coordination_data = subframework_actions
 
             # compose control action
             control_action = target_action + collision_action + rigidity_action
         else:
-            control_action = np.zeros((2, 1), dtype=float)
+            control_action = np.zeros((self.dim, 1), dtype=float)
 
         return control_action, coordination_data
 
 
 class DistanceRigidityMaintenance(Controller):
-    def set_control(self, config):
+    def set_control(self, robot_id, config):
         #
         #    define controller here
         #
-        return DRMControl(config)
+        return DRMControl(robot_id, config)
 
     def set_in_ports(self):
         #
@@ -137,8 +123,6 @@ class DistanceRigidityMaintenance(Controller):
         #
         #    compute control action here
         #
-        control_action, coordination_data = control.compute_action(
-            self.robot_id
-        )
+        control_action, coordination_data = control.compute_action()
 
         return control_action, coordination_data, None

@@ -47,7 +47,7 @@ class Controller(AtomicDEVS):
         self.state = ControllerState(
             sigma=self.period,   # waits till first token
             tvalue=0.0,
-            control=self.set_control(config)
+            control=self.set_control(robot_id, config)
         )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -148,7 +148,7 @@ class Controller(AtomicDEVS):
     def __lt__(self, other):
         return self.name < other.name
 
-    def set_control(self, config):
+    def set_control(self, robot_id, config):
         #
         #    define controller here
         #

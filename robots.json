@@ -22,11 +22,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -120,11 +138,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -218,11 +254,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -316,11 +370,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -414,11 +486,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -512,11 +602,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -540,7 +648,7 @@
         },
         "coordinator": {
             "action": 2,
-            "state": 2
+            "state": 1
         },
         "comm_range": 15.0,
         "gps_sensor": {
@@ -610,11 +718,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -708,11 +834,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -806,11 +950,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
@@ -904,11 +1066,29 @@
         },
         "controller": {
             "period": 0.1,
-            "dmax": [
-                12.75,
-                15.0
-            ],
-            "steepness": 2.0
+            "dim": 2,
+            "weights": {
+                "tracking": 1.0,
+                "collision": 0.25,
+                "rigidity": 0.375
+            },
+            "tracking": {
+                "tracking_radius": 20.0,
+                "forget_radius": 100.0,
+                "v_max": 1.25
+            },
+            "collision": {
+                "power": 2.0,
+                "dmin": 1.0,
+                "dmax": 15.0
+            },
+            "rigidity": {
+                "dmax": 12.75,
+                "steepness": 2.0,
+                "threshold": 1e-4,
+                "eigenvalues": "all",
+                "functional": "log"
+            }
         },
         "localization": {
             "position": [
