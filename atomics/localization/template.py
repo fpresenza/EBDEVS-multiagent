@@ -26,15 +26,13 @@ class Template(Localization):
         #
         return ['port_A', 'port_B']
 
-    def process_inputs(self, sigma, current_time, loc_filter, inputs):
+    def process_inputs(self, sigma, current_time, loc_filter, port_name, data):
         #
         #    process inputs here
         #
-        port, data = inputs.popitem()
-
-        if port == self.inPorts['port_A']:
+        if port_name == 'port_A':
             pass
-        elif port == self.inPorts['port_B']:
+        elif port_name == 'port_B':
             pass
 
         return sigma, loc_filter

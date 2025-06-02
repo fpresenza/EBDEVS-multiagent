@@ -93,25 +93,23 @@ class DistanceRigidityMaintenance(Controller):
             'position', 'other_position', 'external_action', 'target_position'
         ]
 
-    def process_inputs(self, sigma, current_time, control, inputs):
+    def process_inputs(self, sigma, current_time, control, port_name, data):
         #
         #    process inputs here
         #
-        port, data = inputs.popitem()
-
-        if port == self.inPorts['position']:
+        if port_name == 'position':
             control.subframework[self.robot_id] = data.ravel()
 
-        elif port == self.inPorts['other_position']:
+        elif port_name == 'other_position':
             node_id, other_position, hops = data
             control.subframework[node_id] = other_position.ravel()
             if hops == 1:
                 control.obstacles.append(other_position.ravel())
 
-        elif port == self.inPorts['external_action']:
+        elif port_name == 'external_action':
             control.external_action += data[1]
 
-        elif port == self.inPorts['target_position']:
+        elif port_name == 'target_position':
             control.target_position = data
 
         return control

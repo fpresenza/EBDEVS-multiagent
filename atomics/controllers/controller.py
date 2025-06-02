@@ -79,8 +79,11 @@ class Controller(AtomicDEVS):
         current_time += self.elapsed    # NOTE: self.elapsed is always zero
         sigma -= self.elapsed    # holds last status
 
+        port_id, data = inputs.popitem()
+        port_name = next(k for k, v in self.inPorts.items() if v == port_id)
+
         control = self.process_inputs(
-            sigma, current_time, control, inputs
+            sigma, current_time, control, port_name, data
         )
 
         if (self.debug):

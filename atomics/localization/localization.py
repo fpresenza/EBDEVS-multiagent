@@ -78,8 +78,11 @@ class Localization(AtomicDEVS):
         sigma, current_time, loc_filter = self.state.get()
         current_time += self.elapsed
 
+        port_id, data = inputs.popitem()
+        port_name = next(k for k, v in self.inPorts.items() if v == port_id)
+
         sigma, loc_filter = self.process_inputs(
-            sigma, current_time, loc_filter, inputs
+            sigma, current_time, loc_filter, port_name, data
         )
 
         if (self.debug):

@@ -38,13 +38,11 @@ class DistanceKalmanFilter(Localization):
             'neighbors_positions'
         ]
 
-    def process_inputs(self, sigma, current_time, loc_filter, inputs):
+    def process_inputs(self, sigma, current_time, loc_filter, port_name, data):
         #
         #    process inputs here
         #
-        port, data = inputs.popitem()
-
-        if port == self.inPorts['velocity_measurement']:
+        if port_name == 'velocity_measurement':
             # if data arrives through port inPorts['velocity_measurement']
             vel_meas = data
             loc_filter.ekf.dynamic_step(
@@ -52,12 +50,12 @@ class DistanceKalmanFilter(Localization):
                 np.reshape(vel_meas, (-1, 1))
             )
             sigma = 0.0  # holds last status
-        elif port == self.inPorts['position_measurement']:
+        elif port_name == 'position_measurement':
             # if data arrives through port inPorts['position_measurement']
             pos_meas = np.reshape(data, (-1, 1))
             loc_filter.ekf.gps_step(pos_meas)
             sigma = 0.0  # holds last status
-        elif port == self.inPorts['neighbors_positions']:
+        elif port_name == 'neighbors_positions':
             #  if token arrives through port inPorts['neighbors_positions']
             _, neighbor_pos, dist_meas = data
             loc_filter.ekf.range_step(
