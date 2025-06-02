@@ -17,18 +17,15 @@ class DistanceKalmanFilter(Localization):
             gps_meas_cov=np.array([[1.0, 0.0], [0.0, 1.0]])
         )
 
-    def set_in_ports(self):
+    def set_in_port_names(self):
         #
-        #    define input ports here
+        #    define the list of input ports name here
         #
-        return {
-            'velocity_measurement':
-                self.addInPort(name="in_velocity_measurement"),
-            'position_measurement':
-                self.addInPort(name="in_position_measurement"),
-            'neighbors_positions':
-                self.addInPort(name="in_neighbors_positions")
-        }
+        return [
+            'velocity_measurement',
+            'position_measurement',
+            'neighbors_positions'
+        ]
 
     def process_inputs(self, sigma, current_time, loc_filter, inputs):
         #

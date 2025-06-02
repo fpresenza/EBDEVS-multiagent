@@ -59,7 +59,10 @@ class Localization(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         #
-        self.inPorts = self.set_in_ports()
+        self.inPorts = {
+            name: self.addInPort(name="in_" + name)
+            for name in self.set_in_port_names()
+        }
         self.outPorts = {'estimation': self.addOutPort(name="out_estimation")}
 
         if (self.debug):
@@ -137,11 +140,11 @@ class Localization(AtomicDEVS):
         #
         return None
 
-    def set_in_ports(self):
+    def set_in_port_names(self):
         #
-        #    define input ports here
+        #    define the list of input ports name here
         #
-        return {}
+        return []
 
     def process_inputs(self, sigma, current_time, loc_filter, inputs):
         #

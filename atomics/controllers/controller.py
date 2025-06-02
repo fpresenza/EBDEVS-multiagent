@@ -57,7 +57,10 @@ class Controller(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.inPorts = self.set_in_ports()
+        self.inPorts = {
+            name: self.addInPort(name="in_" + name)
+            for name in self.set_in_port_names()
+        }
         self.outPorts = {
             'action': self.addOutPort(name="out_action"),
             'coordination_data': self.addOutPort("out_coodination_data")
@@ -154,11 +157,11 @@ class Controller(AtomicDEVS):
         #
         return None
 
-    def set_in_ports(self):
+    def set_in_port_names(self):
         #
-        #    define input ports here
+        #    define the list of input ports name here
         #
-        return {}
+        return []
 
     def process_inputs(self, sigma, current_time, control, inputs):
         #

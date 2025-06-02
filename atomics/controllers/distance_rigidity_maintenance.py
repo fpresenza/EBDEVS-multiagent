@@ -85,16 +85,13 @@ class DistanceRigidityMaintenance(Controller):
         #
         return DRMControl(robot_id, config)
 
-    def set_in_ports(self):
+    def set_in_port_names(self):
         #
-        #    define input ports here
+        #    define the list of input ports name here
         #
-        return {
-            'position': self.addInPort(name="in_position"),
-            'other_position': self.addInPort(name="in_other_position"),
-            'external_action': self.addInPort(name="in_external_action"),
-            'target_position': self.addInPort(name="in_target_position")
-        }
+        return [
+            'position', 'other_position', 'external_action', 'target_position'
+        ]
 
     def process_inputs(self, sigma, current_time, control, inputs):
         #
