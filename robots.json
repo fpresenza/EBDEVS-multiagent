@@ -21,7 +21,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -82,7 +82,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_1": {
         "controller": {
@@ -106,7 +106,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -167,7 +167,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_2": {
         "controller": {
@@ -191,7 +191,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -252,7 +252,7 @@
             "action": 2,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_3": {
         "controller": {
@@ -276,7 +276,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -337,7 +337,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_4": {
         "controller": {
@@ -361,7 +361,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -422,7 +422,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_5": {
         "controller": {
@@ -446,7 +446,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -507,7 +507,7 @@
             "action": 2,
             "state": 1
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_6": {
         "controller": {
@@ -531,7 +531,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -592,7 +592,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_7": {
         "controller": {
@@ -616,7 +616,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -677,7 +677,7 @@
             "action": 2,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_8": {
         "controller": {
@@ -701,7 +701,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -762,7 +762,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Hunter_9": {
         "controller": {
@@ -786,7 +786,7 @@
             "rigidity": {
                 "dmax": 12.75,
                 "steepness": 2.0,
-                "threshold": 1e-4,
+                "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
             }
@@ -847,7 +847,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor":  false
+        "gps_sensor": false
     },
     "Target_0": {
         "controller": {
