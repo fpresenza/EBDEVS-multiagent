@@ -1,5 +1,5 @@
 {
-    "Robot_0": {
+    "Hunter_0": {
         "position": [
             [
                 9.085
@@ -52,7 +52,7 @@
             "period": 0.1
         }
     },
-    "Robot_1": {
+    "Hunter_1": {
         "position": [
             [
                 17.441
@@ -105,7 +105,7 @@
             "period": 0.1
         }
     },
-    "Robot_2": {
+    "Hunter_2": {
         "position": [
             [
                 30.955
@@ -158,7 +158,7 @@
             "period": 0.1
         }
     },
-    "Robot_3": {
+    "Hunter_3": {
         "position": [
             [
                 18.693
@@ -211,7 +211,7 @@
             "period": 0.1
         }
     },
-    "Robot_4": {
+    "Hunter_4": {
         "position": [
             [
                 24.375
@@ -264,7 +264,7 @@
             "period": 0.1
         }
     },
-    "Robot_5": {
+    "Hunter_5": {
         "position": [
             [
                 37.217
@@ -317,7 +317,7 @@
             "period": 0.1
         }
     },
-    "Robot_6": {
+    "Hunter_6": {
         "position": [
             [
                 11.93
@@ -370,7 +370,7 @@
             "period": 0.1
         }
     },
-    "Robot_7": {
+    "Hunter_7": {
         "position": [
             [
                 27.872
@@ -423,7 +423,7 @@
             "period": 0.1
         }
     },
-    "Robot_8": {
+    "Hunter_8": {
         "position": [
             [
                 23.436
@@ -476,7 +476,7 @@
             "period": 0.1
         }
     },
-    "Robot_9": {
+    "Hunter_9": {
         "position": [
             [
                 22.484

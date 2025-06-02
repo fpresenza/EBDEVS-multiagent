@@ -22,7 +22,7 @@ class TransmissionMediumState:
 
 
 class TransmissionMedium(AtomicDEVS):
-    def __init__(self, robots_ids, targets_ids, name=None, debug=False):
+    def __init__(self, robots_ids, name=None, debug=False):
         """Atomic model for the TransmissionMedium """
 
         # Always call parent class' constructor FIRST:
@@ -31,7 +31,6 @@ class TransmissionMedium(AtomicDEVS):
         # Parameters
         # self.robots = range(number_of_robots)
         self.robots = robots_ids
-        self.targets = targets_ids
         # self.status = []          # TODO
         self.debug = debug
 
@@ -51,19 +50,11 @@ class TransmissionMedium(AtomicDEVS):
 
         for robot_id in self.robots:
             self.inPorts[robot_id] = self.addInPort(
-                                                name="in_{}".format(robot_id)
-                                                )
+                name="in_{}".format(robot_id)
+            )
             self.outPorts[robot_id] = self.addOutPort(
-                                                name="out_{}".format(robot_id)
-                                                )
-
-        for target_id in self.targets:
-            self.inPorts[target_id] = self.addInPort(
-                                                name="in_{}".format(target_id)
-                                                )
-            self.outPorts[target_id] = self.addOutPort(
-                                                name="out_{}".format(target_id)
-                                                )
+                name="out_{}".format(robot_id)
+            )
 
         self.outputs_queue = []
 

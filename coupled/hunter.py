@@ -4,20 +4,20 @@ from atomics.integrators.qss1tools import pad_zeros
 from atomics.controllers.distance_rigidity_maintenance import \
     DistanceRigidityMaintenance
 from atomics.communication.communication_module import CommunicationModule
-from atomics.coordination.token_handlers import RobotCoordinator
+from atomics.coordination.token_handlers import HunterCoordinator
 from atomics.localization.distance_kalman_filter import DistanceKalmanFilter
 from atomics.sensors.speedsensor import SpeedSensor
 from atomics.sensors.gpssensor import GPSSensor
 from coupled.robot_dynamics import RobotDynamics
 
 
-class Robot(CoupledDEVS):
+class Hunter(CoupledDEVS):
     def __init__(
             self,
             world_config,
             simu_config,
-            robot_config,
-            name='Robot',
+            hunter_config,
+            name='Hunter',
             logpath='./',
             debug=False):
         """
@@ -48,7 +48,7 @@ class Robot(CoupledDEVS):
         )
         controller = DistanceRigidityMaintenance(
             robot_id=self.name,
-            config=robot_config['controller'],
+            config=hunter_config['controller'],
             logpath=logpath,
             debug=self.debug
         )
@@ -57,14 +57,14 @@ class Robot(CoupledDEVS):
             batch=True,
             debug=self.debug,
         )
-        coordinator = RobotCoordinator(
+        coordinator = HunterCoordinator(
             robot_id=self.name,
-            config=robot_config['coordinator'],
+            config=hunter_config['coordinator'],
             debug=self.debug,
         )
         localization = DistanceKalmanFilter(
             robot_id=self.name,
-            config=robot_config['localization'],
+            config=hunter_config['localization'],
             logpath=logpath,
             debug=self.debug
         )
@@ -148,7 +148,7 @@ class Robot(CoupledDEVS):
             self.localization.inPorts['velocity_measurement']
         )
 
-        if robot_config['gps_sensor'] is True:
+        if hunter_config['gps_sensor'] is True:
             gps_sensor = GPSSensor(
                 config=world_config['gps_sensor'],
                 debug=self.debug

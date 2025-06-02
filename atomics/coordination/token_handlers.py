@@ -14,7 +14,7 @@ class Token(object):
     hops_travelled: int = 1     # The number of hops it has travelled
 
 
-class RobotCoordinatorState:
+class HunterCoordinatorState:
     """
     Encapsulates the system's state
     """
@@ -41,12 +41,12 @@ class RobotCoordinatorState:
         )
 
 
-class RobotCoordinator(AtomicDEVS):
+class HunterCoordinator(AtomicDEVS):
     def __init__(
             self,
             robot_id,
             config,
-            name='RobotCoordinator',
+            name='HunterCoordinator',
             debug=False
             ):
         """Atomic model for the toking handling protocol"""
@@ -65,7 +65,7 @@ class RobotCoordinator(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = RobotCoordinatorState(
+        self.state = HunterCoordinatorState(
             sigma=INFINITY,
             tvalue=0.0,
             record={'action': 0, 'state': 0},
@@ -162,7 +162,7 @@ class RobotCoordinator(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return RobotCoordinatorState(
+        return HunterCoordinatorState(
             sigma,
             current_time,
             record,
@@ -187,7 +187,7 @@ class RobotCoordinator(AtomicDEVS):
                 .format(current_time, self.name, self.parent.name)
             )
 
-        return RobotCoordinatorState(
+        return HunterCoordinatorState(
             sigma,
             current_time,
             record,
@@ -383,7 +383,7 @@ class TargetCoordinator(AtomicDEVS):
             #  if token arrives through port self.inPorts['token']
             transmitter, token, distance_meas = inputs[self.inPorts['token']]
 
-            if transmitter.startswith('Robot') and token.hops_travelled == 1:
+            if transmitter.startswith('Hunter') and token.hops_travelled == 1:
                 if status == 'active' and distance_meas < self.collect_range:
                     status = 'passive'
                     self.y_up[1]['time'] = current_time

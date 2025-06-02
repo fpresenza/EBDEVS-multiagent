@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import argparse
 import progressbar
 
-from core import robot_id_to_index, target_id_to_index
+from core import robot_id_to_index
 from files import find_latest_timestamp
 from uvnpy.network import plot
 from uvnpy.network.graphs import DiskGraph
@@ -122,18 +122,18 @@ while k < k_e:
                 transform=ax.transAxes, color='r', fontsize='x-small'
         )
 
-        robots = [i for i, id in enumerate(ids) if id.startswith('Robot')]
+        hunters = [i for i, id in enumerate(ids) if id.startswith('Hunter')]
         targets = [
             i for i, id in enumerate(ids)
             if id.startswith('Target') and status[i] == 'active'
         ]
 
-        for robot in robots:
+        for hunter in hunters:
             plot.nodes(
-                ax, positions[robot],
+                ax, positions[hunter],
                 color='b',
                 # marker='o',
-                marker=f'${robot_id_to_index(ids[robot])}$',
+                marker=f'${robot_id_to_index(ids[hunter])}$',
                 s=15,
                 lw=0.2
             )
@@ -143,7 +143,7 @@ while k < k_e:
                 ax, positions[target],
                 color='k',
                 # marker='d',
-                marker=f'${target_id_to_index(ids[target])}$',
+                marker=f'${robot_id_to_index(ids[target])}$',
                 s=15,
                 lw=0.2
             )
@@ -154,11 +154,11 @@ while k < k_e:
             ax.add_patch(circle)
 
         edges = DiskGraph(
-            positions[robots], dmax=comm_ranges[robots[0]]
+            positions[hunters], dmax=comm_ranges[hunters[0]]
         ).edge_set()
         plot.edges(
             ax,
-            positions[robots],
+            positions[hunters],
             edges,
             color='0.0',
             alpha=0.5,

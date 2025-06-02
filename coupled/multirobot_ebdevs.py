@@ -24,7 +24,7 @@ from atomics.communication.transmission_medium import TransmissionMedium
 from atomics.misc.logger import Logger
 
 # our coupled models
-from coupled.robot import Robot
+from coupled.hunter import Hunter
 from coupled.target import Target
 
 from utils.files import (
@@ -51,17 +51,16 @@ class MultiRobotSystem(CoupledDEVS):
         simu_config = read_json_file('simu.json')
         robots_config = read_json_file('robots.json')
 
-        robots_ids = [
-            idx for idx in robots_config.keys() if idx.startswith('Robot')
+        hunters_ids = [
+            idx for idx in robots_config.keys() if idx.startswith('Hunter')
         ]
         targets_ids = [
             idx for idx in robots_config.keys() if idx.startswith('Target')
         ]
 
         self.router = self.addSubModel(TransmissionMedium(
-            robots_ids=robots_ids,
-            targets_ids=targets_ids,
-            name='Router',
+            robots_ids=hunters_ids + targets_ids,
+            name='TransmissionMedium',
             debug=self.debug
         ))
         self.logger = self.addSubModel(Logger(
@@ -71,24 +70,24 @@ class MultiRobotSystem(CoupledDEVS):
             debug=self.debug
         ))
 
-        self.agents_states = {}
-        self.robots = {}
-        for robot_id in robots_ids:
-            self.robots[robot_id] = self.addSubModel(Robot(
-                world_config[robot_id],
-                simu_config[robot_id],
-                robots_config[robot_id],
-                name=robot_id,
+        self.robots_states = {}
+        self.hunters = {}
+        for hunter_id in hunters_ids:
+            self.hunters[hunter_id] = self.addSubModel(Hunter(
+                world_config[hunter_id],
+                simu_config[hunter_id],
+                robots_config[hunter_id],
+                name=hunter_id,
                 logpath=self.logpath,
                 debug=self.debug
             ))
             self.connectPorts(
-                self.robots[robot_id].outPorts['radio'],
-                self.router.inPorts[robot_id]
+                self.hunters[hunter_id].outPorts['radio'],
+                self.router.inPorts[hunter_id]
             )
             self.connectPorts(
-                self.router.outPorts[robot_id],
-                self.robots[robot_id].inPorts['radio']
+                self.router.outPorts[hunter_id],
+                self.hunters[hunter_id].inPorts['radio']
             )
 
         self.targets = {}
@@ -110,7 +109,7 @@ class MultiRobotSystem(CoupledDEVS):
             )  # router -> target
 
             # targets_states must be initialized at the very beginning
-            self.agents_states[target_id] = {
+            self.robots_states[target_id] = {
                 'time': 0.0,
                 'pose': [
                     pad_zeros(coord) for coord
@@ -130,7 +129,7 @@ class MultiRobotSystem(CoupledDEVS):
         else:
             micro_id, data = x_b_micro
 
-        self.agents_states[micro_id] = data.copy()
+        self.robots_states[micro_id] = data.copy()
 
         # log new value of micro_states
         log = [micro_id, data['time']]
@@ -153,15 +152,15 @@ class MultiRobotSystem(CoupledDEVS):
             print(
                 "t: {} s, Coupled name: {}, Global Transition Function,\
                 x_b_micro: {}, global state: {}"
-                .format(data['time'], self.name, x_b_micro, self.agents_states)
+                .format(data['time'], self.name, x_b_micro, self.robots_states)
                 )
 
-    def getNeighbors(self, agent_1_id, current_time):
+    def getNeighbors(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
         return [
-            agent_2_id
-            for agent_2_id in self.agents_states.keys()
-            if self.in_range(agent_1_id, agent_2_id, current_time)
+            robot_2_id
+            for robot_2_id in self.robots_states.keys()
+            if self.in_range(robot_1_id, robot_2_id, current_time)
         ]
 
     def getRobotPositions(self, current_time):
@@ -169,7 +168,7 @@ class MultiRobotSystem(CoupledDEVS):
         positions = []
         comm_ranges = []
         status = []
-        for robot, state in self.agents_states.items():
+        for robot, state in self.robots_states.items():
             ids.append(robot)
             comm_ranges.append(state['comm_range'])
             try:
@@ -185,13 +184,13 @@ class MultiRobotSystem(CoupledDEVS):
         return ids, positions, comm_ranges, status
 
     def getRobotDistances(self, robot_1, robot_2, current_time):
-        pose = self.agents_states[robot_1]['pose']
-        delta_time = current_time - self.agents_states[robot_1]['time']
+        pose = self.robots_states[robot_1]['pose']
+        delta_time = current_time - self.robots_states[robot_1]['time']
         x1 = evaluate_poly(pose[0], delta_time)
         y1 = evaluate_poly(pose[1], delta_time)
 
-        pose = self.agents_states[robot_2]['pose']
-        delta_time = current_time - self.agents_states[robot_2]['time']
+        pose = self.robots_states[robot_2]['pose']
+        delta_time = current_time - self.robots_states[robot_2]['time']
         x2 = evaluate_poly(pose[0], delta_time)
         y2 = evaluate_poly(pose[1], delta_time)
 
@@ -204,18 +203,18 @@ class MultiRobotSystem(CoupledDEVS):
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
 
-    def in_range(self, agent_1_id, agent_2_id, current_time):
-        # agent_1_id might be robot or target
-        if agent_1_id == agent_2_id:
+    def in_range(self, robot_1_id, robot_2_id, current_time):
+        # robots might be hunter or target
+        if robot_1_id == robot_2_id:
             return False
 
         # tweak to improve performance since target-target comm is not needed
-        if agent_1_id.startswith('Target') and agent_2_id.startswith('Target'):
+        if robot_1_id.startswith('Target') and robot_2_id.startswith('Target'):
             return False
 
         distance = self.getRobotDistances(
-            agent_1_id, agent_2_id, current_time
+            robot_1_id, robot_2_id, current_time
         )
-        trasmitter_range = self.agents_states[agent_1_id]['comm_range']
+        trasmitter_range = self.robots_states[robot_1_id]['comm_range']
 
         return distance < trasmitter_range
