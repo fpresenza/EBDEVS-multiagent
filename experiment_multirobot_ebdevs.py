@@ -54,7 +54,6 @@ timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 logpath = 'output/' + timestamp + '/'
 os.makedirs(logpath)
 shutil.copy('robots.json', logpath + 'robots.json')
-shutil.copy('targets.json', logpath + 'targets.json')
 
 #    ======================================================================
 

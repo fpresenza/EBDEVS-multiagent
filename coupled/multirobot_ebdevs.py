@@ -50,10 +50,13 @@ class MultiRobotSystem(CoupledDEVS):
         world_config = read_json_file('world.json')
         simu_config = read_json_file('simu.json')
         robots_config = read_json_file('robots.json')
-        targets_config = read_json_file('targets.json')
 
-        robots_ids = list(robots_config.keys())
-        targets_ids = list(targets_config.keys())
+        robots_ids = [
+            idx for idx in robots_config.keys() if idx.startswith('Robot')
+        ]
+        targets_ids = [
+            idx for idx in robots_config.keys() if idx.startswith('Target')
+        ]
 
         self.router = self.addSubModel(TransmissionMedium(
             robots_ids=robots_ids,
@@ -89,9 +92,11 @@ class MultiRobotSystem(CoupledDEVS):
             )
 
         self.targets = {}
-        for target_id, config in targets_config.items():
+        for target_id in targets_ids:
             self.targets[target_id] = self.addSubModel(Target(
-                config,
+                world_config[target_id],
+                simu_config[target_id],
+                robots_config[target_id],
                 name=target_id,
                 debug=self.debug
             ))
@@ -107,8 +112,11 @@ class MultiRobotSystem(CoupledDEVS):
             # targets_states must be initialized at the very beginning
             self.agents_states[target_id] = {
                 'time': 0.0,
-                'pose': [pad_zeros(coord) for coord in config["position"]],
-                'comm_range': config["comm_range"],
+                'pose': [
+                    pad_zeros(coord) for coord
+                    in world_config[target_id]["position"]
+                ],
+                'comm_range': world_config[target_id]["comm_range"],
                 'status': 'active',
             }
 
