@@ -150,27 +150,3 @@ class Controller(AtomicDEVS):
 
     def __lt__(self, other):
         return self.name < other.name
-
-    def set_control(self, robot_id, config):
-        #
-        #    define controller here
-        #
-        return None
-
-    def set_in_port_names(self):
-        #
-        #    define the list of input ports name here
-        #
-        return []
-
-    def process_inputs(self, sigma, current_time, control, inputs):
-        #
-        #    process inputs here
-        #
-        return control
-
-    def compute_action(self, control):
-        #
-        #    compute control action here
-        #
-        return None, None, None
