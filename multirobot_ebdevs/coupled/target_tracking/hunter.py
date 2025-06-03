@@ -162,10 +162,6 @@ class Hunter(CoupledDEVS):
             )
             self.gps_sensor = self.addSubModel(gps_sensor)
             self.connectPorts(
-                self.dynamics.outPorts['position_polynomial'],
-                self.gps_sensor.inPorts['external_state']
-            )
-            self.connectPorts(
                 self.gps_sensor.outPorts['measurement'],
                 self.localization.inPorts['position_measurement']
             )

@@ -144,15 +144,7 @@ class MultiRobotSystem(CoupledDEVS):
                 .format(data['time'], self.name, x_b_micro, self.robots_states)
                 )
 
-    def getNeighbors(self, robot_1_id, current_time):
-        # need to know the current time to make the polynomial advance in time
-        return [
-            robot_2_id
-            for robot_2_id in self.robots_states.keys()
-            if self.in_range(robot_1_id, robot_2_id, current_time)
-        ]
-
-    def getRobotPositions(self, current_time):
+    def getGlobalState(self, current_time):
         ids = []
         positions = []
         comm_ranges = []
@@ -171,6 +163,23 @@ class MultiRobotSystem(CoupledDEVS):
             y = evaluate_poly(position_poly[1], delta_time)
             positions += [x, y]
         return ids, positions, comm_ranges, status
+
+    def getRobotPosition(self, robot_id, current_time):
+        state = self.robots_states[robot_id]
+        previous_time = state['time']
+        delta_time = current_time - previous_time
+        position_poly = state['pose']
+        x = evaluate_poly(position_poly[0], delta_time)
+        y = evaluate_poly(position_poly[1], delta_time)
+        return [x, y]
+
+    def getNeighbors(self, robot_1_id, current_time):
+        # need to know the current time to make the polynomial advance in time
+        return [
+            robot_2_id
+            for robot_2_id in self.robots_states.keys()
+            if self.in_range(robot_1_id, robot_2_id, current_time)
+        ]
 
     def getRobotDistances(self, robot_1, robot_2, current_time):
         pose = self.robots_states[robot_1]['pose']

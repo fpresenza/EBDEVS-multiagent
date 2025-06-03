@@ -60,10 +60,6 @@ class ExteroceptiveSensor(AtomicDEVS):
         # PORTS:
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
-        self.inPorts = {
-            'external_state':
-            self.addInPort(name="in_external_state")
-        }
         self.outPorts = {
             'measurement':
             self.addOutPort(name="out_measurement")
@@ -72,23 +68,23 @@ class ExteroceptiveSensor(AtomicDEVS):
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
 
-    def extTransition(self, inputs):
-        """
-        External Transition Function.
-        """
-        sigma, current_time, _ = self.state.get()
-        current_time += self.elapsed    # NOTE: self.elapsed is always zero
+    # def extTransition(self, inputs):
+    #     """
+    #     External Transition Function.
+    #     """
+    #     sigma, current_time, _ = self.state.get()
+    #     current_time += self.elapsed    # NOTE: self.elapsed is always zero
 
-        external_state = inputs[self.inPorts['external_state']]
-        sigma = sigma - self.elapsed  # holds last status
+    #     external_state = inputs[self.inPorts['external_state']]
+    #     sigma = sigma - self.elapsed  # holds last status
 
-        if (self.debug):
-            print(
-                "t: {:.2f} s, Atomic name: {}, External Transition Function"
-                .format(current_time, self.name)
-            )
+    #     if (self.debug):
+    #         print(
+    #             "t: {:.2f} s, Atomic name: {}, External Transition Function"
+    #             .format(current_time, self.name)
+    #         )
 
-        return ExteroceptiveSensorState(sigma, current_time, external_state)
+    #     return ExteroceptiveSensorState(sigma, current_time, external_state)
 
     def intTransition(self):
         """
@@ -96,7 +92,6 @@ class ExteroceptiveSensor(AtomicDEVS):
         """
         sigma, current_time, external_state = self.state.get()
         current_time += sigma
-
         sigma = self.period
 
         if (self.debug):
@@ -113,11 +108,7 @@ class ExteroceptiveSensor(AtomicDEVS):
         """
         sigma, current_time, external_state = self.state.get()
 
-        measurement = None
-        if external_state is not None:
-            measurement = self.compute_measurement(
-                current_time, external_state
-            )
+        measurement = self.compute_measurement(current_time)
 
         return {self.outPorts['measurement']: measurement}
 
@@ -132,9 +123,3 @@ class ExteroceptiveSensor(AtomicDEVS):
 
     def __lt__(self, other):
         return self.name < other.name
-
-    def compute_measurement(self, current_time, external_state):
-        #
-        #  compute measurement here
-        #
-        return None

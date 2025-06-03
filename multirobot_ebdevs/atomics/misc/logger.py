@@ -72,7 +72,7 @@ class Logger(AtomicDEVS):
         """
         sigma, current_time = self.state.get()
 
-        ids, positions, comm_ranges, status = self.parent.getRobotPositions(
+        ids, positions, comm_ranges, status = self.parent.getGlobalState(
             current_time
         )
         append_csv_file(self.logpath + 'logger_time.csv', [current_time])
