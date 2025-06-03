@@ -88,6 +88,7 @@ $ pip3 install ./dist/multirobot_ebdevs-0.0.1.tar.gz
 ```
 
 Then, once changes are done, it is updated with:
+
 ```bash
 $ cd $HOME/repo/multirobot_ebdevs
 $ pip3 install .
