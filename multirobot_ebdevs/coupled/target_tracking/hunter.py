@@ -3,7 +3,7 @@
 
 from pypdevs.DEVS import CoupledDEVS
 
-from multirobot_ebdevs.atomics.integrators.qss1tools import pad_zeros
+from multirobot_ebdevs.atomics.integrators.qss1tools import pad_zeros_q
 from multirobot_ebdevs.atomics.controllers.target_tracking\
     .distance_rigidity_maintenance import DistanceRigidityMaintenance
 from multirobot_ebdevs.atomics.communication\
@@ -42,7 +42,7 @@ class Hunter(CoupledDEVS):
             self.name,
             {
                 'time': 0.0,
-                'pose': [pad_zeros(coord) for coord in position],
+                'pose': [pad_zeros_q(coord) for coord in position],
                 'comm_range': comm_range
             }
         ]

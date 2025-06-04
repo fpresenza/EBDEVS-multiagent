@@ -4,8 +4,9 @@
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
-from multirobot_ebdevs.atomics.integrators\
-    .qss1tools import advance_time, pad_zeros
+from multirobot_ebdevs.atomics.integrators.qss1tools import (
+    advance_time_q, pad_zeros_q
+)
 
 #################################
 #  Dynamics Function atomic model
@@ -93,17 +94,21 @@ class DynamicsFunction(AtomicDEVS):
             # receives an np.array() as many rows as states
             # and as many columns as polinomial coeffs.
             data[0] = [
-                pad_zeros(ui.tolist())
+                pad_zeros_q(ui.tolist())
                 for ui in inputs[self.inPorts['control_action']]
             ]
             if data[1] is not None:
-                data[1] = [advance_time(pol, self.elapsed) for pol in data[1]]
+                data[1] = [
+                    advance_time_q(poly, self.elapsed) for poly in data[1]
+                ]
         if self.inPorts['state'] in inputs:
             # receives an np.array() as many rows as states
             # and as many columns as polinomial coeffs.
             data[1] = inputs[self.inPorts['state']]
             if data[0] is not None:
-                data[0] = [advance_time(pol, self.elapsed) for pol in data[0]]
+                data[0] = [
+                    advance_time_q(poly, self.elapsed) for poly in data[0]
+                ]
 
         if any(d is None for d in data):
             sigma = INFINITY

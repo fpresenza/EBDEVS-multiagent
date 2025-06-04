@@ -4,8 +4,9 @@
 from pypdevs.DEVS import AtomicDEVS, DEVSException
 from pypdevs.infinity import INFINITY
 from multirobot_ebdevs.atomics.integrators.qsstools import QSSState
-from multirobot_ebdevs.atomics.integrators\
-    .qss1tools import advance_time, minposroot, pad_zeros
+from multirobot_ebdevs.atomics.integrators.qss1tools import (
+    advance_time, minposroot, pad_zeros, pad_zeros_q
+)
 
 
 class QSS1Integrator(AtomicDEVS):
@@ -37,7 +38,7 @@ class QSS1Integrator(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        _q0 = pad_zeros([])
+        _q0 = pad_zeros_q([])
         _x0 = pad_zeros([])
         _q0[0] = x0
         _x0[0] = x0

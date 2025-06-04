@@ -13,6 +13,14 @@ def evaluate_poly(p, dt):
     return p[0] + dt * p[1]
 
 
+def advance_time_q(p, dt):
+    return p
+
+
+def evaluate_poly_q(p, dt):
+    return p[0]
+
+
 def minposroot(p):
     if (p[1] == 0.0):
         # constant polynomial
@@ -29,3 +37,7 @@ def minposroot(p):
 
 def pad_zeros(x):
     return x + [0.0] * (2 - len(x))
+
+
+def pad_zeros_q(q):
+    return q + [0.0] * (1 - len(q))

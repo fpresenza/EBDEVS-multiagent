@@ -285,3 +285,7 @@ def evaluate_poly(coeff, dt, order=1, debug=False):
 
 def pad_zeros(x):
     return x + [0.0] * (10 - len(x))
+
+
+def pad_zeros_q(q):
+    return q + [0.0] * (9 - len(q))

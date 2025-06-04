@@ -7,7 +7,7 @@ import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
-from multirobot_ebdevs.atomics.integrators.qss1tools import advance_time
+from multirobot_ebdevs.atomics.integrators.qss1tools import advance_time_q
 
 
 class Gain(AtomicDEVS):
@@ -297,7 +297,7 @@ class Merger(AtomicDEVS):
                 data[i] = inputs[self.inPorts[i]]
             else:
                 if data[i] is not None:
-                    data[i] = advance_time(data[i], self.elapsed)
+                    data[i] = advance_time_q(data[i], self.elapsed)
 
         sigma = 0.0
 

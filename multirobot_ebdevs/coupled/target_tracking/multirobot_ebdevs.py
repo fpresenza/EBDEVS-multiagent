@@ -7,10 +7,12 @@ import numpy as np
 from pypdevs.DEVS import CoupledDEVS
 
 # Import all models to couple
-from multirobot_ebdevs.atomics.integrators\
-    .qss1tools import evaluate_poly, pad_zeros
-from multirobot_ebdevs.atomics.communication\
-    .transmission_medium import TransmissionMedium
+from multirobot_ebdevs.atomics.integrators.qss1tools import (
+    evaluate_poly_q, pad_zeros_q
+)
+from multirobot_ebdevs.atomics.communication.transmission_medium import (
+    TransmissionMedium
+)
 from multirobot_ebdevs.atomics.misc.logger import Logger
 
 # our coupled models
@@ -101,7 +103,7 @@ class MultiRobotSystem(CoupledDEVS):
             self.robots_states[target_id] = {
                 'time': 0.0,
                 'pose': [
-                    pad_zeros(coord) for coord
+                    pad_zeros_q(coord) for coord
                     in world_config[target_id]["position"]
                 ],
                 'comm_range': world_config[target_id]["comm_range"],
@@ -159,8 +161,8 @@ class MultiRobotSystem(CoupledDEVS):
             previous_time = state['time']
             delta_time = current_time - previous_time
             position_poly = state['pose']
-            x = evaluate_poly(position_poly[0], delta_time)
-            y = evaluate_poly(position_poly[1], delta_time)
+            x = evaluate_poly_q(position_poly[0], delta_time)
+            y = evaluate_poly_q(position_poly[1], delta_time)
             positions += [x, y]
         return ids, positions, comm_ranges, status
 
@@ -169,8 +171,8 @@ class MultiRobotSystem(CoupledDEVS):
         previous_time = state['time']
         delta_time = current_time - previous_time
         position_poly = state['pose']
-        x = evaluate_poly(position_poly[0], delta_time)
-        y = evaluate_poly(position_poly[1], delta_time)
+        x = evaluate_poly_q(position_poly[0], delta_time)
+        y = evaluate_poly_q(position_poly[1], delta_time)
         return [x, y]
 
     def getNeighbors(self, robot_1_id, current_time):
@@ -184,13 +186,13 @@ class MultiRobotSystem(CoupledDEVS):
     def getRobotDistances(self, robot_1, robot_2, current_time):
         pose = self.robots_states[robot_1]['pose']
         delta_time = current_time - self.robots_states[robot_1]['time']
-        x1 = evaluate_poly(pose[0], delta_time)
-        y1 = evaluate_poly(pose[1], delta_time)
+        x1 = evaluate_poly_q(pose[0], delta_time)
+        y1 = evaluate_poly_q(pose[1], delta_time)
 
         pose = self.robots_states[robot_2]['pose']
         delta_time = current_time - self.robots_states[robot_2]['time']
-        x2 = evaluate_poly(pose[0], delta_time)
-        y2 = evaluate_poly(pose[1], delta_time)
+        x2 = evaluate_poly_q(pose[0], delta_time)
+        y2 = evaluate_poly_q(pose[1], delta_time)
 
         return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
