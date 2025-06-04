@@ -186,14 +186,10 @@ class QSSIntegrator(AtomicDEVS):
 
         current_time += sigma
 
-        y = pad_zeros([])
-        y[0] = xprev[0]
-        y[1] = xprev[1]
-
         # make time advance to get next q
         # this change in q will be performed right after
         #  in the internal transition function
-        y = advance_time(y, sigma, 1)  # p: y, dt: sigma, order: 1
+        y = advance_time(xprev, sigma, 1)  # p: y, dt: sigma, order: 1
         # y = [xprev[0] + sigma * xprev[1], 0.0]
         # y[1] = 0.0
 
@@ -206,7 +202,7 @@ class QSSIntegrator(AtomicDEVS):
         # Send messages (events) to a subset of the atomic-DEVS'
         # output ports by means of the 'poke' method, i.e.:
         # The content of the messages is based (typically) on current State.
-        return {self.OUT_q: y}  # [y[0],y[1]]}
+        return {self.OUT_q: y[:-1]}  # [y[0],y[1]]}
 
     def timeAdvance(self):
         """
