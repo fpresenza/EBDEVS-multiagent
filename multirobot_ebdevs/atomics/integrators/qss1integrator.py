@@ -247,8 +247,7 @@ class mQSS1Integrator(QSS1Integrator):
         Constructor (parameterizable).
         """
         #  Always call parent class' constructor FIRST:
-        QSS1Integrator.__init__(
-            self,
+        super().__init__(
             name=name,
             dQMin=dQMin,
             dQRel=dQRel,
@@ -265,32 +264,7 @@ class mQSS1Integrator(QSS1Integrator):
         """
         Internal Transition Function.
         """
-        q, xprev, sigma, current_time = self.state.get()
-
-        current_time += sigma
-        x = advance_time(xprev, sigma)  # p: x, dt: sigma, order: 1
-        #  x = [xprev[0] + sigma * xprev[1], xprev[1]]
-        q[0] = x[0]
-
-        self.dQ = max(self.dQRel * abs(x[0]), self.dQMin)
-
-        if (x[1] == 0):
-            sigma = INFINITY
-        else:
-            sigma = abs(self.dQ/x[1])
-
-        if (sigma < 0):
-            raise DEVSException(
-                "invalid state sigma <%f> in internal transition function"
-                % sigma
-            )
-
-        if (self.debug):
-            print(
-                "t: {:.2f} s, Atomic name: {}, Internal Transition Function,\
-                xprev: {}, x: {}, q: {}, sigma: {}"
-                .format(current_time, self.name, xprev, x, q, sigma)
-            )
+        q, x, sigma, current_time = super().intTransition().get()
 
         # shares information to the parent to compute
         # the Global Transition function
@@ -307,59 +281,7 @@ class mQSS1Integrator(QSS1Integrator):
         """
         External Transition Function.
         """
-        # Received a new event, so start processing it
-        derx = inputs[self.IN_dx][0]
-        derx_val = derx * self.gain
-
-        # if (x.port==0) {
-        q, x, sigma, current_time = self.state.get()
-        current_time += self.elapsed
-
-        if self.IN_dx in inputs:
-            # update polynomial x
-            x[0] = x[0] + x[1] * self.elapsed
-            x[1] = derx_val  # dx[0]
-
-            diffxq = pad_zeros([])
-
-            if (sigma > 0):
-                # inferior delta crossing
-                # diffxq = q - x - dQ = {q[0] - x[0] - dQ, -x[1]}
-                diffxq[1] = -x[1]
-                diffxq[0] = q[0] - x[0] - self.dQ
-                sigma = minposroot(diffxq)  # coeff: diffxq, order: 1
-                sigma_lo = sigma
-
-                #  superior delta difference
-                #  diffxq = q - x + dQ = {q[0] - x[0] + dQ, -x[1]}
-                diffxq[0] = q[0] - x[0] + self.dQ
-                sigma_up = minposroot(diffxq)  # coeff: diffxq, order: 1
-
-                # keep the smallest one
-                if (sigma_up < sigma):
-                    sigma = sigma_up
-
-                if (abs(x[0] - q[0]) > self.dQ):
-                    sigma = 0
-
-                if (self.debug):
-                    print(
-                        "t: {:.2f} s, Atomic name: {}, External Transition Function,\
-                        dx: {}, x: {}, sigma: {}, sigma_lo: {}, sigma_up: {}"
-                        .format(
-                            current_time,
-                            self.name,
-                            derx_val,
-                            x,
-                            sigma,
-                            sigma_lo,
-                            sigma_up
-                        )
-                    )
-
-        else:
-            x[0] = derx_val
-            sigma = 0
+        q, x, sigma, current_time = super().extTransition(inputs).get()
 
         #  shares information to the parent to compute the
         #  Global Transition function
