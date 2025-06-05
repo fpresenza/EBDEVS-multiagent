@@ -11,20 +11,20 @@ class QSSState:
     Encapsulates the system's state
     """
 
-    def __init__(self, qval=None, xval=None, sigmaval=0.0, tval=0.0):
+    def __init__(self, q=None, x=None, sigma=0.0, t=0.0):
         """
         Constructor (parameterizable).
         """
-        self.set(qval, xval, sigmaval, tval)
+        self.set(q, x, sigma, t)
 
-    def set(self, qvalue, xvalue, sigmavalue, tvalue):
-        self._qvalue = qvalue
-        self._xvalue = xvalue
-        self._svalue = sigmavalue
-        self._tvalue = tvalue
+    def set(self, q, x, sigma, t):
+        self.q = q
+        self.x = x
+        self.sigma = sigma
+        self.t = t
 
     def get(self):
-        return [self._qvalue, self._xvalue, self._svalue, self._tvalue]
+        return self.q, self.x, self.sigma, self.t
 
 
 #######################################

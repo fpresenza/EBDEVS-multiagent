@@ -38,19 +38,18 @@ class QSS1Integrator(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        _q0 = pad_zeros_q([])
-        _x0 = pad_zeros([])
-        _q0[0] = x0
-        _x0[0] = x0
-        _sigma0 = 0.0
-        _t0 = 0.0
-        self.state = QSSState(_q0, _x0, _sigma0, _t0)  # q, x, sigma, t
+        self.state = QSSState(
+            q=pad_zeros_q([x0]),
+            x=pad_zeros([x0]),
+            sigma=0.0,
+            t=0.0
+        )
 
         if self.debug:
-            _q0, _x0, _sigma0, _t0 = self.state.get()
+            q, x, sigma, t = self.state.get()
             print(
                 "Init Function @ {} - t0: {}, q0: {}, x0: {}, sigma0: {}"
-                .format(self.name, _t0, _q0, _x0, _sigma0)
+                .format(self.name, t, q, x, sigma)
             )
 
         # ELAPSED TIME:
