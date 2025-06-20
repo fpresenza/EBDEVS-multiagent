@@ -3,7 +3,9 @@
 
 from pypdevs.DEVS import CoupledDEVS
 
-from multirobot_ebdevs.atomics.integrators.qss1tools import pad_zeros_q
+from multirobot_ebdevs.atomics.integrators.qss1tools import (
+    evaluate_poly_q, pad_zeros_q
+)
 from multirobot_ebdevs.atomics.controllers.target_tracking\
     .distance_rigidity_maintenance import DistanceRigidityMaintenance
 from multirobot_ebdevs.atomics.communication\
@@ -186,6 +188,15 @@ class Hunter(CoupledDEVS):
                 Global Transition Function, x_b_micro: {}"
                 .format(data['time'], self.name, x_b_micro)
             )
+
+    def getRobotPosition(self, current_time):
+        state = self.y_up[1]
+        previous_time = state['time']
+        delta_time = current_time - previous_time
+        position_poly = state['pose']
+        x = evaluate_poly_q(position_poly[0], delta_time)
+        y = evaluate_poly_q(position_poly[1], delta_time)
+        return [x, y]
 
     def select(self, immChildren):
         """

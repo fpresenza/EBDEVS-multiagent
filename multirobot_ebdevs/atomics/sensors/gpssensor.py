@@ -11,7 +11,7 @@ class GPSSensor(ExteroceptiveSensor):
         #
         #  compute measurement here
         #
-        p = self.parent.parent.getRobotPosition(self.parent.name, current_time)
+        p = self.parent.getRobotPosition(current_time)
         px = p[0]
         py = p[1]
         noise_sample = np.random.multivariate_normal(
