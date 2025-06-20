@@ -11,8 +11,9 @@ import time
 from pypdevs.simulator import Simulator
 
 # Import the model to be simulated
-from multirobot_ebdevs.coupled.target_tracking\
-    .multirobot_ebdevs import MultiRobotSystem
+from multirobot_ebdevs.coupled.target_tracking.multirobot_ebdevs import (
+    MultiRobotSystem
+)
 
 # Configuration (parameter sweeping)
 #

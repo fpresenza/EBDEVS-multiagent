@@ -8,16 +8,19 @@ from multirobot_ebdevs.atomics.integrators.qss1tools import (
 )
 from multirobot_ebdevs.atomics.controllers.target_tracking\
     .distance_rigidity_maintenance import DistanceRigidityMaintenance
-from multirobot_ebdevs.atomics.communication\
-    .communication_module import CommunicationModule
+from multirobot_ebdevs.atomics.communication. communication_module import (
+    CommunicationModule
+)
 from multirobot_ebdevs.atomics.coordination\
     .target_tracking.hunter_coordinator import HunterCoordinator
-from multirobot_ebdevs.atomics.localization\
-    .distance_kalman_filter import DistanceKalmanFilter
+from multirobot_ebdevs.atomics.localization.distance_kalman_filter import (
+    DistanceKalmanFilter
+)
 from multirobot_ebdevs.atomics.sensors.speedsensor import SpeedSensor
 from multirobot_ebdevs.atomics.sensors.gpssensor import GPSSensor
-from multirobot_ebdevs.coupled.robot_dynamics\
-    .r2_qss1_single_integrator import RobotDynamics
+from multirobot_ebdevs.coupled.robot_dynamics.kinematic_particle import (
+    RobotDynamics
+)
 
 
 class Hunter(CoupledDEVS):
