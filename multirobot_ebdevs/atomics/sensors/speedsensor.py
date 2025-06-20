@@ -11,8 +11,8 @@ class SpeedSensor(InteroceptiveSensor):
         #
         #  compute measurement here
         #
-        vx = internal_state[0][1]
-        vy = internal_state[1][1]
+        vx = internal_state[0][0]
+        vy = internal_state[1][0]
         noise_sample = np.random.multivariate_normal(
             mean=self.noise_mean.ravel(),
             cov=self.noise_covariance
