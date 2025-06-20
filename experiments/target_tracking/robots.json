@@ -592,7 +592,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor": false
+        "gps_sensor": true
     },
     "Hunter_7": {
         "controller": {
@@ -762,7 +762,7 @@
             "action": 1,
             "state": 2
         },
-        "gps_sensor": false
+        "gps_sensor": true
     },
     "Hunter_9": {
         "controller": {
