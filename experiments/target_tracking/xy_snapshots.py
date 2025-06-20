@@ -116,9 +116,9 @@ while k < k_e:
         ax.set_ylim(0.0, lim)
 
         ax.text(
-                0.05, 0.01, r't = {:.3f}s'.format(time - 0.1),
-                verticalalignment='bottom', horizontalalignment='left',
-                transform=ax.transAxes, color='r', fontsize='x-small'
+            0.05, 0.01, r't = {:.3f}s'.format(time - 0.1),
+            verticalalignment='bottom', horizontalalignment='left',
+            transform=ax.transAxes, color='r', fontsize='x-small'
         )
 
         hunters = [i for i, id in enumerate(ids) if id.startswith('Hunter')]
