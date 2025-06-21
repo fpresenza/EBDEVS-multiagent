@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import copy
+import numpy as np
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
@@ -30,6 +31,7 @@ class CommunicationModule(AtomicDEVS):
             self,
             robot_id,
             config,
+            params,
             name='CommunicationModule',
             debug=False
             ):
@@ -43,6 +45,8 @@ class CommunicationModule(AtomicDEVS):
         # self.status = []          # TODO
         self.forward = config['forward']
         self.batch = config['batch']
+        self.noise_mean = np.array(params['bias'])
+        self.noise_stdev = np.sqrt(params['covariance'])
         self.debug = debug
 
         # Dictionaries as records of tokens received
@@ -103,9 +107,19 @@ class CommunicationModule(AtomicDEVS):
                         record[token.kind][token.creator] = token.order
 
                         if token.hops_travelled == 1:
-                            distance_meas = self.parent.parent.getRobotDistances(  # noqa
-                                transmitter, self.robot_id, current_time
+                            transmitter_pos = self.parent.parent.getRobotPosition(  # noqa
+                                transmitter, current_time
                             )
+                            robot_pos = self.parent.getRobotPosition(
+                                current_time
+                            )
+                            distance = np.sqrt(np.sum(np.square(np.subtract(
+                                transmitter_pos, robot_pos
+                            ))))
+                            noise = np.random.normal(
+                                self.noise_mean, self.noise_stdev
+                            )
+                            distance_meas = distance + noise
                         else:
                             distance_meas = None
 

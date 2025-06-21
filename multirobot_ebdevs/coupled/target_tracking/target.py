@@ -3,13 +3,16 @@
 
 from pypdevs.DEVS import CoupledDEVS
 
-from multirobot_ebdevs.atomics.communication\
-    .communication_module import CommunicationModule
+from multirobot_ebdevs.atomics.integrators.qss1tools import evaluate_poly_q
+from multirobot_ebdevs.atomics.communication.communication_module import (
+    CommunicationModule
+)
 from multirobot_ebdevs.atomics.misc.beacon import Beacon
 from multirobot_ebdevs.atomics.coordination\
     .target_tracking.target_coordinator import TargetCoordinator
-from multirobot_ebdevs.coupled.robot_dynamics\
-    .r2_qss1_single_integrator import RobotDynamics
+from multirobot_ebdevs.coupled.robot_dynamics.kinematic_particle import (
+    RobotDynamics
+)
 
 
 class Target(CoupledDEVS):
@@ -119,6 +122,11 @@ class Target(CoupledDEVS):
                 Global Transition Function, x_b_micro: {}"
                 .format(data['time'], self.name, x_b_micro)
             )
+
+    def getRobotPosition(self, current_time):
+        state = self.y_up[1]
+        delta_time = current_time - state['time']
+        return [evaluate_poly_q(poly, delta_time) for poly in state['pose']]
 
     def select(self, immChildren):
         """

@@ -32,16 +32,16 @@ class ExteroceptiveSensorState:
 
 
 class ExteroceptiveSensor(AtomicDEVS):
-    def __init__(self, config, name='ExteroceptiveSensor', debug=False):
+    def __init__(self, params, name='ExteroceptiveSensor', debug=False):
         """Atomic model for an exteroceptive sensor"""
 
         # Always call parent class' constructor FIRST:
         AtomicDEVS.__init__(self, name)
 
         # Parameters
-        self.noise_mean = np.array(config['bias'])
-        self.noise_covariance = np.array(config['covariance'])
-        self.period = config['period']
+        self.noise_mean = np.array(params['bias'])
+        self.noise_covariance = np.array(params['covariance'])
+        self.period = params['period']
 
         # STATE:
         #  Define 'state' attribute (initial sate):
