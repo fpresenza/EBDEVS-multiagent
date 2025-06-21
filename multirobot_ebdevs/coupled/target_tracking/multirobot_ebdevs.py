@@ -168,33 +168,32 @@ class MultiRobotSystem(CoupledDEVS):
 
     def getRobotPosition(self, robot_id, current_time):
         state = self.robots_states[robot_id]
-        previous_time = state['time']
-        delta_time = current_time - previous_time
-        position_poly = state['pose']
-        x = evaluate_poly_q(position_poly[0], delta_time)
-        y = evaluate_poly_q(position_poly[1], delta_time)
-        return [x, y]
+        delta_time = current_time - state['time']
+        return [evaluate_poly_q(poly, delta_time) for poly in state['pose']]
 
     def getNeighbors(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
+        robot_1_pos = self.getRobotPosition(robot_1_id, current_time)
+
         return [
             robot_2_id
             for robot_2_id in self.robots_states.keys()
-            if self.in_range(robot_1_id, robot_2_id, current_time)
+            if self.in_range(robot_1_id, robot_1_pos, robot_2_id, current_time)
         ]
 
-    def getRobotDistances(self, robot_1, robot_2, current_time):
-        pose = self.robots_states[robot_1]['pose']
-        delta_time = current_time - self.robots_states[robot_1]['time']
-        x1 = evaluate_poly_q(pose[0], delta_time)
-        y1 = evaluate_poly_q(pose[1], delta_time)
+    def in_range(self, robot_1_id, robot_1_pos, robot_2_id, current_time):
+        # robots might be hunter or target
+        # tweak to improve performance since target-target comm is not needed
+        if robot_1_id.startswith('Target') and robot_2_id.startswith('Target'):
+            return False
 
-        pose = self.robots_states[robot_2]['pose']
-        delta_time = current_time - self.robots_states[robot_2]['time']
-        x2 = evaluate_poly_q(pose[0], delta_time)
-        y2 = evaluate_poly_q(pose[1], delta_time)
+        robot_2_pos = self.getRobotPosition(robot_2_id, current_time)
+        distance = np.sqrt(np.sum(np.square(np.subtract(
+            robot_1_pos, robot_2_pos
+        ))))
+        trasmitter_range = self.robots_states[robot_1_id]['comm_range']
 
-        return np.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+        return distance < trasmitter_range
 
     def select(self, immChildren):
         """
@@ -202,19 +201,3 @@ class MultiRobotSystem(CoupledDEVS):
         """
         # Doesn't really matter, as they don't influence each other
         return immChildren[0]
-
-    def in_range(self, robot_1_id, robot_2_id, current_time):
-        # robots might be hunter or target
-        if robot_1_id == robot_2_id:
-            return False
-
-        # tweak to improve performance since target-target comm is not needed
-        if robot_1_id.startswith('Target') and robot_2_id.startswith('Target'):
-            return False
-
-        distance = self.getRobotDistances(
-            robot_1_id, robot_2_id, current_time
-        )
-        trasmitter_range = self.robots_states[robot_1_id]['comm_range']
-
-        return distance < trasmitter_range
