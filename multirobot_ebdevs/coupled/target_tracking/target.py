@@ -53,6 +53,7 @@ class Target(CoupledDEVS):
         communication_module = CommunicationModule(
             robot_id=self.name,
             config=target_config['communication'],
+            params=world_config['range_sensor'],
             debug=self.debug,
         )
         controller = Beacon(

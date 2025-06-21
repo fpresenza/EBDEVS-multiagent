@@ -67,6 +67,7 @@ class Hunter(CoupledDEVS):
         communication_module = CommunicationModule(
             robot_id=self.name,
             config=hunter_config['communication'],
+            params=world_config['range_sensor'],
             debug=self.debug,
         )
         coordinator = HunterCoordinator(
@@ -162,7 +163,7 @@ class Hunter(CoupledDEVS):
 
         if hunter_config['gps_sensor'] is True:
             gps_sensor = GPSSensor(
-                config=world_config['gps_sensor'],
+                params=world_config['gps_sensor'],
                 debug=self.debug
             )
             self.gps_sensor = self.addSubModel(gps_sensor)
