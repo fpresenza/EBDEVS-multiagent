@@ -46,7 +46,7 @@ class Localization(AtomicDEVS):
         # STATE:
         #  Define 'state' attribute (initial sate):
         self.state = LocalizationState(
-            sigma=INFINITY,
+            sigma=0.0,
             tvalue=0.0,
             loc_filter=self.set_loc_filter(robot_id, config)
         )
