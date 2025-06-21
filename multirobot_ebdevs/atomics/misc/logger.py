@@ -40,11 +40,7 @@ class Logger(AtomicDEVS):
 
         # STATE:
         #  Define 'state' attribute (initial sate):
-        self.state = LoggerState(sigma=self.period, tvalue=self.period)
-        # ELAPSED TIME:
-        #  Initialize 'elapsed time' attribute if required
-        #  (by default, value is 0.0):
-        self.elapsed = 0.0
+        self.state = LoggerState(sigma=self.period, tvalue=0.0)
 
         if (self.debug):
             print("t: 0 s, Atomic name: {}, Init Function".format(self.name))
