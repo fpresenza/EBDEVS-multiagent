@@ -117,14 +117,15 @@ class Localization(AtomicDEVS):
 
         loc_estimation, loc_metadata = self.loc_filter_results(loc_filter)
 
-        append_jsonl_file(
-            self.log_path + 'kalman_{}.jsonl'.format(self.robot_id),
-            {
-                't': current_time,
-                'estimation': loc_estimation.tolist(),
-                'metadata': loc_metadata
-            }
-        )
+        if self.debug:
+            append_jsonl_file(
+                self.log_path + 'kalman_{}.jsonl'.format(self.robot_id),
+                {
+                    't': current_time,
+                    'estimation': loc_estimation.tolist(),
+                    'metadata': loc_metadata
+                }
+            )
 
         return {self.outPorts['estimation']: loc_estimation}
 

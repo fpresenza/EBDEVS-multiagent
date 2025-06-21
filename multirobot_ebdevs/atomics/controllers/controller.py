@@ -134,14 +134,15 @@ class Controller(AtomicDEVS):
                 {self.outPorts['coordination_data']: coordination_data}
             )
 
-            append_jsonl_file(
-                self.log_path + 'control_{}.jsonl'.format(self.robot_id),
-                {
-                    't': current_time,
-                    'action': control_action.tolist(),
-                    'metadata': control_metadata
-                }
-            )
+            if self.debug:
+                append_jsonl_file(
+                    self.log_path + 'control_{}.jsonl'.format(self.robot_id),
+                    {
+                        't': current_time + sigma,
+                        'action': control_action.tolist(),
+                        'metadata': control_metadata
+                    }
+                )
 
         return self.outputs_queue.pop()
 
