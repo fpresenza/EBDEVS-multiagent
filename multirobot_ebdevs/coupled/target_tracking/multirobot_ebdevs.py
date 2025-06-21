@@ -25,14 +25,20 @@ from multirobot_ebdevs.utils.files import (
 
 
 class MultiRobotSystem(CoupledDEVS):
-    def __init__(self, name='MultiRobotSystem', logpath='./', debug=False):
+    def __init__(
+            self,
+            name='MultiRobotSystem',
+            log_period=None,
+            log_path='./',
+            debug=False
+            ):
         """
         Multi robot system composed of N robots.
         """
         # Always call parent class' constructor FIRST:
         CoupledDEVS.__init__(self, name)
 
-        self.logpath = logpath
+        self.log_path = log_path
         self.debug = debug
 
         # TODO: time cannot be managed as in the other coupled/atomic models
@@ -55,9 +61,9 @@ class MultiRobotSystem(CoupledDEVS):
             debug=self.debug
         ))
         self.logger = self.addSubModel(Logger(
-            period=0.1,
+            period=log_period,
             name='Logger',
-            logpath=self.logpath,
+            log_path=self.log_path,
             debug=self.debug
         ))
 
@@ -69,7 +75,7 @@ class MultiRobotSystem(CoupledDEVS):
                 simu_config[hunter_id],
                 robots_config[hunter_id],
                 name=hunter_id,
-                logpath=self.logpath,
+                log_path=self.log_path,
                 debug=self.debug
             ))
             self.connectPorts(

@@ -29,7 +29,7 @@ class Localization(AtomicDEVS):
             robot_id,
             config,
             name='Localization',
-            logpath='./',
+            log_path='./',
             debug=False):
         """Atomic model for the kalman filter"""
 
@@ -38,7 +38,7 @@ class Localization(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
-        self.logpath = logpath
+        self.log_path = log_path
         self.debug = debug
 
         # self.status = []          # TODO
@@ -118,7 +118,7 @@ class Localization(AtomicDEVS):
         loc_estimation, loc_metadata = self.loc_filter_results(loc_filter)
 
         append_jsonl_file(
-            self.logpath + 'kalman_{}.jsonl'.format(self.robot_id),
+            self.log_path + 'kalman_{}.jsonl'.format(self.robot_id),
             {
                 't': current_time,
                 'estimation': loc_estimation.tolist(),

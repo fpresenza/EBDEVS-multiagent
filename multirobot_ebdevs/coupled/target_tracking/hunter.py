@@ -29,7 +29,7 @@ class Hunter(CoupledDEVS):
             simu_config,
             hunter_config,
             name='Hunter',
-            logpath='./',
+            log_path='./',
             debug=False):
         """
         A robot model composed of the robot's pysics.
@@ -60,7 +60,7 @@ class Hunter(CoupledDEVS):
         controller = DistanceRigidityMaintenance(
             robot_id=self.name,
             config=hunter_config['controller'],
-            logpath=logpath,
+            log_path=log_path,
             debug=self.debug
         )
         communication_module = CommunicationModule(
@@ -77,7 +77,7 @@ class Hunter(CoupledDEVS):
         localization = DistanceKalmanFilter(
             robot_id=self.name,
             config=hunter_config['localization'],
-            logpath=logpath,
+            log_path=log_path,
             debug=self.debug
         )
 

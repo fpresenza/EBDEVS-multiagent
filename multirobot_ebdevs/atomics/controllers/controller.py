@@ -31,7 +31,7 @@ class Controller(AtomicDEVS):
             robot_id,
             config,
             name='Controller',
-            logpath='./',
+            log_path='./',
             debug=False
             ):
         """Atomic model for the controller"""
@@ -41,7 +41,7 @@ class Controller(AtomicDEVS):
 
         # Parameters
         self.robot_id = robot_id    # Robot identifier
-        self.logpath = logpath
+        self.log_path = log_path
         self.period = config['period']
         self.debug = debug
 
@@ -135,7 +135,7 @@ class Controller(AtomicDEVS):
             )
 
             append_jsonl_file(
-                self.logpath + 'control_{}.jsonl'.format(self.robot_id),
+                self.log_path + 'control_{}.jsonl'.format(self.robot_id),
                 {
                     't': current_time,
                     'action': control_action.tolist(),

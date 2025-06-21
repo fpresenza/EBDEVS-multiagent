@@ -27,8 +27,12 @@ from multirobot_ebdevs.coupled.target_tracking.multirobot_ebdevs import (
 # ------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='')
 parser.add_argument(
-    '-l', '--length',
-    default=1.0, type=float, help='simulation length in seconds'
+    '-t', '--time',
+    default=1.0, type=float, help='simulation time length in seconds'
+)
+parser.add_argument(
+    '-l', '--logger',
+    default=1.0, type=float, help='logger period in seconds'
 )
 parser.add_argument(
     '-v', '--verbose',
@@ -41,9 +45,9 @@ arg = parser.parse_args()
 # Create folder with timestamp
 # ------------------------------------------------------------------
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-logpath = 'output/' + timestamp + '/'
-os.makedirs(logpath)
-shutil.copy('robots.json', logpath + 'robots.json')
+log_path = 'output/' + timestamp + '/'
+os.makedirs(log_path)
+shutil.copy('robots.json', log_path + 'robots.json')
 
 #    ======================================================================
 
@@ -51,7 +55,12 @@ shutil.copy('robots.json', logpath + 'robots.json')
 #  hierarchical model. This effectively instantiates the whole model
 #  thanks to the recursion in the DEVS model constructors (__init__).
 #
-m = MultiRobotSystem(name="MultiRobotSystem", logpath=logpath, debug=False)
+m = MultiRobotSystem(
+    name="MultiRobotSystem",
+    log_period=arg.logger,
+    log_path=log_path,
+    debug=False
+)
 
 #    ======================================================================
 
@@ -77,13 +86,13 @@ sim = Simulator(m)
 #    A termination time is prefered over a termination condition,
 #    as it is much simpler to use.
 #    e.g. to simulate until simulation time 400.0 is reached
-sim.setTerminationTime(arg.length)
+sim.setTerminationTime(arg.time)
 
 # B. Set the use of a tracer to show what happened during the simulation run
 #    Both writing to stdout or file is possible:
 #    pass None for stdout, or a filename for writing to that file
 if arg.verbose:
-    sim.setVerbose(logpath + "simu_out.out")
+    sim.setVerbose(log_path + "simu_out.out")
 
 # C. Use Classic DEVS instead of Parallel DEVS
 #    If your model uses Classic DEVS, this configuration MUST be set as
