@@ -16,7 +16,6 @@ from multirobot_ebdevs.atomics.coordination\
 from multirobot_ebdevs.atomics.localization.distance_kalman_filter import (
     DistanceKalmanFilter
 )
-from multirobot_ebdevs.atomics.sensors.speedsensor import SpeedSensor
 from multirobot_ebdevs.atomics.sensors.gpssensor import GPSSensor
 from multirobot_ebdevs.coupled.robot_dynamics.kinematic_particle import (
     RobotDynamics
@@ -81,17 +80,12 @@ class Hunter(CoupledDEVS):
             logpath=logpath,
             debug=self.debug
         )
-        speed_sensor = SpeedSensor(
-            config=world_config['speed_sensor'],
-            debug=self.debug
-        )
 
         self.dynamics = self.addSubModel(dynamics)
         self.controller = self.addSubModel(controller)
         self.communication_module = self.addSubModel(communication_module)
         self.coordinator = self.addSubModel(coordinator)
         self.localization = self.addSubModel(localization)
-        self.speed_sensor = self.addSubModel(speed_sensor)
 
         # Declare the coupled model's output ports:
         self.outPorts = {'radio': self.addOutPort(name="out_radio")}
@@ -152,12 +146,7 @@ class Hunter(CoupledDEVS):
         )
 
         self.connectPorts(
-            self.dynamics.outPorts['position_polynomial'],
-            self.speed_sensor.inPorts['internal_state']
-        )
-
-        self.connectPorts(
-            self.speed_sensor.outPorts['measurement'],
+            self.controller.outPorts['action'],
             self.localization.inPorts['velocity_measurement']
         )
 
@@ -195,12 +184,8 @@ class Hunter(CoupledDEVS):
 
     def getRobotPosition(self, current_time):
         state = self.y_up[1]
-        previous_time = state['time']
-        delta_time = current_time - previous_time
-        position_poly = state['pose']
-        x = evaluate_poly_q(position_poly[0], delta_time)
-        y = evaluate_poly_q(position_poly[1], delta_time)
-        return [x, y]
+        delta_time = current_time - state['time']
+        return [evaluate_poly_q(poly, delta_time) for poly in state['pose']]
 
     def select(self, immChildren):
         """
