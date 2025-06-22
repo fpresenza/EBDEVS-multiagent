@@ -3,7 +3,6 @@
 
 import os
 import datetime
-import shutil
 import argparse
 import time
 
@@ -14,6 +13,7 @@ from pypdevs.simulator import Simulator
 from multirobot_ebdevs.coupled.target_tracking.multirobot_ebdevs import (
     MultiRobotSystem
 )
+from multirobot_ebdevs.utils.files import read_json_file, write_json_file
 
 # Configuration (parameter sweeping)
 #
@@ -47,7 +47,12 @@ arg = parser.parse_args()
 timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 log_path = 'output/' + timestamp + '/'
 os.makedirs(log_path)
-shutil.copy('robots.json', log_path + 'robots.json')
+world_config = read_json_file('world.json')
+simu_config = read_json_file('simu.json')
+robots_config = read_json_file('robots.json')
+write_json_file(log_path + 'world.json', world_config)
+write_json_file(log_path + 'simu.json', simu_config)
+write_json_file(log_path + 'robots.json', robots_config)
 
 #    ======================================================================
 
@@ -56,6 +61,9 @@ shutil.copy('robots.json', log_path + 'robots.json')
 #  thanks to the recursion in the DEVS model constructors (__init__).
 #
 m = MultiRobotSystem(
+    world_config,
+    simu_config,
+    robots_config,
     name="MultiRobotSystem",
     log_period=arg.logger,
     log_path=log_path,

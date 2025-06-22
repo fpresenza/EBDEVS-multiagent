@@ -18,15 +18,15 @@ from multirobot_ebdevs.atomics.misc.logger import Logger
 # our coupled models
 from multirobot_ebdevs.coupled.target_tracking.hunter import Hunter
 from multirobot_ebdevs.coupled.target_tracking.target import Target
-from multirobot_ebdevs.utils.files import (
-    read_json_file,
-    append_csv_file
-)
+from multirobot_ebdevs.utils.files import append_csv_file
 
 
 class MultiRobotSystem(CoupledDEVS):
     def __init__(
             self,
+            world_config,
+            simu_config,
+            robots_config,
             name='MultiRobotSystem',
             log_period=None,
             log_path='./',
@@ -43,10 +43,6 @@ class MultiRobotSystem(CoupledDEVS):
 
         # TODO: time cannot be managed as in the other coupled/atomic models
         self.current_time = 0.0
-
-        world_config = read_json_file('world.json')
-        simu_config = read_json_file('simu.json')
-        robots_config = read_json_file('robots.json')
 
         hunters_ids = [
             idx for idx in robots_config.keys() if idx.startswith('Hunter')
