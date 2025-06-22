@@ -125,21 +125,20 @@ class MultiRobotSystem(CoupledDEVS):
         self.robots_states[micro_id] = data.copy()
 
         # log new value of micro_states
-        log = [micro_id, data['time']]
-        log += [data['pose'][0][0], data['pose'][1][0]]
-        log += [data['comm_range']]
+        micro_pos = [data['pose'][0][0], data['pose'][1][0]]
+        log = [micro_id, data['time'], micro_pos, data['comm_range']]
 
         if micro_id.startswith('Hunter'):
             log += [
                 neighbor_id
                 for neighbor_id in self.robots_states.keys()
-                if self.in_range(micro_id, neighbor_id, 0.0)
+                if self.in_range(micro_id, micro_pos, neighbor_id, 0.0)
                 # checks and registers current neighboring hunters
             ]
         elif micro_id.startswith('Target'):
             log += [data['status']]
 
-        append_csv_file(self.logpath + 'global.csv', log)
+        append_csv_file(self.log_path + 'global.csv', log)
 
         if (self.debug):
             print(
