@@ -154,8 +154,6 @@ class MultiRobotSystem(CoupledDEVS):
             position = self.getRobotPosition(robot, current_time)
             if robot.startswith('Hunter'):
                 robot_data += position
-                # print(current_time, robot, self.robots_states[robot])
-                # 1/0
             if robot.startswith('Target'):
                 target_data += position
                 target_data += [1.0 if state['status'] == 'active' else 0.0]
@@ -174,7 +172,8 @@ class MultiRobotSystem(CoupledDEVS):
         return [
             robot_2_id
             for robot_2_id in self.robots_states.keys()
-            if self.in_range(robot_1_id, robot_1_pos, robot_2_id, current_time)
+            if robot_1_id != robot_2_id and
+            self.in_range(robot_1_id, robot_1_pos, robot_2_id, current_time)
         ]
 
     def in_range(self, robot_1_id, robot_1_pos, robot_2_id, current_time):
