@@ -26,7 +26,7 @@ class LoggerState:
 
 
 class Logger(AtomicDEVS):
-    def __init__(self, period, name='Logger', logpath='./', debug=False):
+    def __init__(self, period, name='Logger', log_path='./', debug=False):
         """Atomic model for the Logger """
 
         # Always call parent class' constructor FIRST:
@@ -35,7 +35,7 @@ class Logger(AtomicDEVS):
         # Parameters
         # self.robots = range(number_of_robots)
         self.period = period
-        self.logpath = logpath
+        self.log_path = log_path
         self.debug = debug
 
         # STATE:
@@ -68,14 +68,18 @@ class Logger(AtomicDEVS):
         """
         sigma, current_time = self.state.get()
 
-        ids, positions, comm_ranges, status = self.parent.getGlobalState(
+        robot_data, target_data = self.parent.getGlobalState(
             current_time
         )
-        append_csv_file(self.logpath + 'logger_time.csv', [current_time])
-        append_csv_file(self.logpath + 'logger_ids.csv', ids)
-        append_csv_file(self.logpath + 'logger_positions.csv', positions)
-        append_csv_file(self.logpath + 'logger_comm_ranges.csv', comm_ranges)
-        append_csv_file(self.logpath + 'logger_status.csv', status)
+        append_csv_file(
+            self.log_path + 'logger_time.csv', [current_time + sigma]
+        )
+        append_csv_file(
+            self.log_path + 'logger_robot_data.csv', robot_data
+        )
+        append_csv_file(
+            self.log_path + 'logger_target_data.csv', target_data
+        )
 
         if (self.debug):
             print(

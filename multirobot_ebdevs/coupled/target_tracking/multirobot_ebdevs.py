@@ -153,24 +153,19 @@ class MultiRobotSystem(CoupledDEVS):
                 )
 
     def getGlobalState(self, current_time):
-        ids = []
-        positions = []
-        comm_ranges = []
-        status = []
+        robot_data = []
+        target_data = []
         for robot, state in self.robots_states.items():
-            ids.append(robot)
-            comm_ranges.append(state['comm_range'])
-            try:
-                status.append(state['status'])
-            except KeyError:
-                status.append('')
-            previous_time = state['time']
-            delta_time = current_time - previous_time
-            position_poly = state['pose']
-            x = evaluate_poly_q(position_poly[0], delta_time)
-            y = evaluate_poly_q(position_poly[1], delta_time)
-            positions += [x, y]
-        return ids, positions, comm_ranges, status
+            position = self.getRobotPosition(robot, current_time)
+            if robot.startswith('Hunter'):
+                robot_data += position
+                # print(current_time, robot, self.robots_states[robot])
+                # 1/0
+            if robot.startswith('Target'):
+                target_data += position
+                target_data += [1.0 if state['status'] == 'active' else 0.0]
+
+        return robot_data, target_data
 
     def getRobotPosition(self, robot_id, current_time):
         state = self.robots_states[robot_id]
