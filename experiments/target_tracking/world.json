@@ -578,7 +578,7 @@
                 31.551563100606295
             ]
         ],
-        "comm_range": 50.0,
+        "collect_range": 5.0,
         "range_sensor": {
             "bias": 0.0,
             "covariance": 0.0
@@ -593,11 +593,7 @@
                 83.46256718973729
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_2": {
         "position": [
@@ -608,11 +604,7 @@
                 75.01443149449675
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_3": {
         "position": [
@@ -623,11 +615,7 @@
                 74.81656543798394
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_4": {
         "position": [
@@ -638,11 +626,7 @@
                 78.92793284514885
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_5": {
         "position": [
@@ -653,11 +637,7 @@
                 44.78935261759052
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_6": {
         "position": [
@@ -668,11 +648,7 @@
                 29.36141483736795
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_7": {
         "position": [
@@ -683,11 +659,7 @@
                 13.002857211827767
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_8": {
         "position": [
@@ -698,11 +670,7 @@
                 67.8835532939891
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_9": {
         "position": [
@@ -713,11 +681,7 @@
                 26.554665937222623
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_10": {
         "position": [
@@ -728,11 +692,7 @@
                 5.336254511708038
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_11": {
         "position": [
@@ -743,11 +703,7 @@
                 14.672857490581015
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_12": {
         "position": [
@@ -758,11 +714,7 @@
                 69.97583600209312
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_13": {
         "position": [
@@ -773,11 +725,7 @@
                 41.40559878195683
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_14": {
         "position": [
@@ -788,11 +736,7 @@
                 41.417926952690266
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_15": {
         "position": [
@@ -803,11 +747,7 @@
                 53.58964059155116
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_16": {
         "position": [
@@ -818,11 +758,7 @@
                 51.48891120583086
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_17": {
         "position": [
@@ -833,11 +769,7 @@
                 58.65550405019929
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_18": {
         "position": [
@@ -848,11 +780,7 @@
                 13.747470414623752
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_19": {
         "position": [
@@ -863,11 +791,7 @@
                 80.73912887095238
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_20": {
         "position": [
@@ -878,11 +802,7 @@
                 16.53541971169328
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_21": {
         "position": [
@@ -893,11 +813,7 @@
                 34.776585974550656
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_22": {
         "position": [
@@ -908,11 +824,7 @@
                 72.59979853504515
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_23": {
         "position": [
@@ -923,11 +835,7 @@
                 62.36722070556089
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_24": {
         "position": [
@@ -938,11 +846,7 @@
                 34.88983419778425
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_25": {
         "position": [
@@ -953,11 +857,7 @@
                 89.58862181960669
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_26": {
         "position": [
@@ -968,11 +868,7 @@
                 96.48400471483856
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_27": {
         "position": [
@@ -983,11 +879,7 @@
                 62.16957202091218
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_28": {
         "position": [
@@ -998,11 +890,7 @@
                 94.94892587070713
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     },
     "Target_29": {
         "position": [
@@ -1013,10 +901,6 @@
                 57.83896143871318
             ]
         ],
-        "comm_range": 50.0,
-        "range_sensor": {
-            "bias": 0.0,
-            "covariance": 0.0
-        }
+        "collect_range": 5.0
     }
 }

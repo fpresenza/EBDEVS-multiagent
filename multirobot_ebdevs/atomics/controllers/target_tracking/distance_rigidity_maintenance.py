@@ -15,7 +15,6 @@ class DRMControl(object):
         self.robot_id = robot_id
         self.dim = config['dim']
         self.weights = config['weights']
-        self.target_position = None
         self.obstacles = []
         self.subframework = {}
         self.external_action = np.zeros((self.dim, 1), dtype=float)
@@ -28,16 +27,16 @@ class DRMControl(object):
         self.obstacles.clear()
         self.external_action[:] = 0.0
 
-    def compute_action(self):
+    def compute_action(self, target_position):
         coordination_data = {}
 
         if self.robot_id in self.subframework:
             position = self.subframework[self.robot_id]
 
             # target collection
-            if self.target_position is not None:
+            if target_position is not None:
                 target_action = self.tracking.update(
-                    position, self.target_position.ravel()
+                    position, np.ravel(target_position)
                 ).reshape(-1, 1)
                 target_action *= self.weights['tracking']
             else:
@@ -93,7 +92,7 @@ class DistanceRigidityMaintenance(Controller):
         #    define the list of input ports name here
         #
         return [
-            'position', 'other_position', 'external_action', 'target_position'
+            'position', 'other_position', 'external_action'
         ]
 
     def process_inputs(self, sigma, current_time, control, port_name, data):
@@ -112,17 +111,19 @@ class DistanceRigidityMaintenance(Controller):
         elif port_name == 'external_action':
             control.external_action += data[1]
 
-        elif port_name == 'target_position':
-            control.target_position = data
-
         return control
 
     def compute_action(self):
         #
-        #    compute control action here
+        #    compute control action here`
         #
-        _, _, control = self.state.get()
+        sigma, current_time, control = self.state.get()
 
-        control_action, coordination_data = control.compute_action()
+        target_position = self.parent.parent.getNearestTarget(
+            self.robot_id, current_time + sigma
+        )
+        control_action, coordination_data = control.compute_action(
+            target_position
+        )
 
         return control_action, coordination_data, None

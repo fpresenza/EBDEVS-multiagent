@@ -127,10 +127,6 @@ class Hunter(CoupledDEVS):
             self.controller.inPorts['external_action']
         )
         self.connectPorts(
-            self.coordinator.outPorts['target_position'],
-            self.controller.inPorts['target_position']
-        )
-        self.connectPorts(
             self.controller.outPorts['coordination_data'],
             self.coordinator.inPorts['others_actions']
         )

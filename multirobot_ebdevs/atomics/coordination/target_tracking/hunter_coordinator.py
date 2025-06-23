@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-
 from pypdevs.DEVS import AtomicDEVS
 from pypdevs.infinity import INFINITY
 
@@ -13,18 +11,17 @@ class HunterCoordinatorState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, record, position, nearest_target):
+    def __init__(self, sigma, tvalue, record, position):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, record, position, nearest_target)
+        self.set(sigma, tvalue, record, position)
 
-    def set(self, sigma, tvalue, record, position, nearest_target):
+    def set(self, sigma, tvalue, record, position):
         self._sigma = sigma
         self._tvalue = tvalue
         self._record = record
         self._state = position
-        self._nearest_target = nearest_target
 
     def get(self):
         return (
@@ -32,7 +29,6 @@ class HunterCoordinatorState:
             self._tvalue,
             self._record,
             self._state,
-            self._nearest_target
         )
 
 
@@ -65,7 +61,6 @@ class HunterCoordinator(AtomicDEVS):
             tvalue=0.0,
             record={'action': 0, 'state': 0},
             position=None,
-            nearest_target={'id': None, 'sqdist': np.inf},
         )
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
@@ -89,7 +84,6 @@ class HunterCoordinator(AtomicDEVS):
                 name="out_neighbors_positions"
             ),
             'external_action': self.addOutPort(name="out_external_action"),
-            'target_position': self.addOutPort(name="out_target_position")
         }
 
         self.outputs_queue = []
@@ -101,16 +95,15 @@ class HunterCoordinator(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, record, position, nearest_target = \
-            self.state.get()
+        sigma, current_time, record, position = self.state.get()
         current_time += self.elapsed
 
         if self.inPorts['token'] in inputs:
             #  if token arrives through port self.inPorts['token']
             transmitter, token, distance_meas = inputs[self.inPorts['token']]
 
-            response, nearest_target = self.handle_received_token(
-                token, distance_meas, position, nearest_target
+            response = self.handle_received_token(
+                token, distance_meas, position
             )
 
             if len(response) > 0:    # else pass, nothing to send
@@ -161,15 +154,14 @@ class HunterCoordinator(AtomicDEVS):
             sigma,
             current_time,
             record,
-            position,
-            nearest_target
+            position
         )
 
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, record, position, nearest_target = self.state.get()
+        _, current_time, record, position = self.state.get()
 
         if len(self.outputs_queue) == 0:
             sigma = INFINITY
@@ -186,15 +178,14 @@ class HunterCoordinator(AtomicDEVS):
             sigma,
             current_time,
             record,
-            position,
-            nearest_target
+            position
         )
 
     def outputFnc(self):
         """
         Output Funtion.
         """
-        _, current_time, _, _, _ = self.state.get()
+        _, current_time, _, _ = self.state.get()
 
         if (self.debug):
             print(
@@ -215,7 +206,7 @@ class HunterCoordinator(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition
         # based (typically) on current State.
-        sigma, _, _, _, _ = self.state.get()
+        sigma, _, _, _ = self.state.get()
         return max(sigma, 0.0)
 
     def __lt__(self, other):
@@ -225,8 +216,7 @@ class HunterCoordinator(AtomicDEVS):
             self,
             token,
             distance,
-            position,
-            nearest_target
+            position
             ):
         """Decide what to do with the received token"""
         response = []
@@ -262,22 +252,4 @@ class HunterCoordinator(AtomicDEVS):
                         }
                     )
 
-        # check if it is nearest target
-        elif token.kind == 'active':
-            target_position = token.data
-            square_dist = np.sum(np.square(position - target_position))
-            if token.creator == nearest_target['id']:
-                nearest_target['sqdist'] = square_dist
-            elif square_dist < nearest_target['sqdist']:
-                nearest_target['id'] = token.creator
-                nearest_target['sqdist'] = square_dist
-                response.append(
-                    {self.outPorts['target_position']: target_position}
-                )
-
-        elif token.kind == 'passive':
-            if token.creator == nearest_target['id']:
-                nearest_target['id'] = None
-                nearest_target['sqdist'] = np.inf
-
-        return response, nearest_target
+        return response

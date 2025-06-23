@@ -17,7 +17,6 @@ from multirobot_ebdevs.atomics.misc.logger import Logger
 
 # our coupled models
 from multirobot_ebdevs.coupled.target_tracking.hunter import Hunter
-from multirobot_ebdevs.coupled.target_tracking.target import Target
 from multirobot_ebdevs.utils.files import append_csv_file
 
 
@@ -44,15 +43,15 @@ class MultiRobotSystem(CoupledDEVS):
         # TODO: time cannot be managed as in the other coupled/atomic models
         self.current_time = 0.0
 
-        hunters_ids = [
+        self.hunters_ids = [
             idx for idx in robots_config.keys() if idx.startswith('Hunter')
         ]
-        targets_ids = [
+        self.targets_ids = [
             idx for idx in robots_config.keys() if idx.startswith('Target')
         ]
 
         self.router = self.addSubModel(TransmissionMedium(
-            robots_ids=hunters_ids + targets_ids,
+            robots_ids=self.hunters_ids,
             name='TransmissionMedium',
             debug=self.debug
         ))
@@ -65,7 +64,7 @@ class MultiRobotSystem(CoupledDEVS):
 
         self.robots_states = {}
         self.hunters = {}
-        for hunter_id in hunters_ids:
+        for hunter_id in self.hunters_ids:
             self.hunters[hunter_id] = self.addSubModel(Hunter(
                 world_config[hunter_id],
                 simu_config[hunter_id],
@@ -83,32 +82,15 @@ class MultiRobotSystem(CoupledDEVS):
                 self.hunters[hunter_id].inPorts['radio']
             )
 
-        self.targets = {}
-        for target_id in targets_ids:
-            self.targets[target_id] = self.addSubModel(Target(
-                world_config[target_id],
-                simu_config[target_id],
-                robots_config[target_id],
-                name=target_id,
-                debug=self.debug
-            ))
-            self.connectPorts(
-                self.targets[target_id].outPorts['radio'],
-                self.router.inPorts[target_id]
-            )  # target -> router
-            self.connectPorts(
-                self.router.outPorts[target_id],
-                self.targets[target_id].inPorts['radio']
-            )  # router -> target
-
+        for target_id in self.targets_ids:
             # targets_states must be initialized at the very beginning
             self.robots_states[target_id] = {
                 'time': 0.0,
                 'pose': [
                     pad_zeros_q(coord) for coord
-                    in world_config[target_id]["position"]
+                    in world_config[target_id]['position']
                 ],
-                'comm_range': world_config[target_id]["comm_range"],
+                'collect_range': world_config[target_id]['collect_range'],
                 'status': 'active',
             }
 
@@ -123,6 +105,14 @@ class MultiRobotSystem(CoupledDEVS):
             micro_id, data = x_b_micro
 
         self.robots_states[micro_id] = data.copy()
+
+        for target_id in self.targets_ids:
+            distance = np.sqrt(np.sum(np.square(np.subtract(
+                self.robots_states[micro_id]['pose'],
+                self.robots_states[target_id]['pose']
+            ))))
+            if distance < self.robots_states[target_id]['collect_range']:
+                self.robots_states[target_id]['status'] = 'passive'
 
         # log new value of micro_states
         micro_pos = [data['pose'][0][0], data['pose'][1][0]]
@@ -171,17 +161,12 @@ class MultiRobotSystem(CoupledDEVS):
 
         return [
             robot_2_id
-            for robot_2_id in self.robots_states.keys()
+            for robot_2_id in self.hunters_ids
             if robot_1_id != robot_2_id and
             self.in_range(robot_1_id, robot_1_pos, robot_2_id, current_time)
         ]
 
     def in_range(self, robot_1_id, robot_1_pos, robot_2_id, current_time):
-        # robots might be hunter or target
-        # tweak to improve performance since target-target comm is not needed
-        if robot_1_id.startswith('Target') and robot_2_id.startswith('Target'):
-            return False
-
         robot_2_pos = self.getRobotPosition(robot_2_id, current_time)
         distance = np.sqrt(np.sum(np.square(np.subtract(
             robot_1_pos, robot_2_pos
@@ -189,6 +174,24 @@ class MultiRobotSystem(CoupledDEVS):
         trasmitter_range = self.robots_states[robot_1_id]['comm_range']
 
         return distance < trasmitter_range
+
+    def getNearestTarget(self, robot_id, current_time):
+        robot_pos = self.getRobotPosition(robot_id, current_time)
+        try:
+            target_pos = min([
+                (
+                    np.sum(np.square(np.subtract(
+                        robot_pos, self.robots_states[target_id]['pose']
+                    ))),
+                    self.robots_states[target_id]['pose']
+                )
+                for target_id in self.targets_ids
+                if self.robots_states[target_id]['status'] == 'active'
+            ])[1]
+        except ValueError:
+            target_pos = None
+
+        return target_pos
 
     def select(self, immChildren):
         """
