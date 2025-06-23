@@ -113,15 +113,15 @@ class Localization(AtomicDEVS):
         """
         Output Funtion.
         """
-        _, current_time, loc_filter = self.state.get()
+        sigma, current_time, _ = self.state.get()
 
-        loc_estimation, loc_metadata = self.loc_filter_results(loc_filter)
+        loc_estimation, loc_metadata = self.loc_filter_results()
 
         if self.debug:
             append_jsonl_file(
                 self.log_path + 'kalman_{}.jsonl'.format(self.robot_id),
                 {
-                    't': current_time,
+                    't': current_time + sigma,
                     'estimation': loc_estimation.tolist(),
                     'metadata': loc_metadata
                 }

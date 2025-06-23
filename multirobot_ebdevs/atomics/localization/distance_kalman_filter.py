@@ -69,9 +69,11 @@ class DistanceKalmanFilter(Localization):
 
         return sigma, loc_filter
 
-    def loc_filter_results(self, loc_filter):
+    def loc_filter_results(self):
         #
         #    get estimation here
         #
+        _, _, loc_filter = self.state.get()
+
         estimation = loc_filter.get_estimation()
         return estimation, None
