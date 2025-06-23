@@ -117,10 +117,12 @@ class DistanceRigidityMaintenance(Controller):
 
         return control
 
-    def compute_action(self, control):
+    def compute_action(self):
         #
         #    compute control action here
         #
+        _, _, control = self.state.get()
+
         control_action, coordination_data = control.compute_action()
 
         return control_action, coordination_data, None

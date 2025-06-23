@@ -122,11 +122,11 @@ class Controller(AtomicDEVS):
         """
         Output Funtion.
         """
-        sigma, current_time, control = self.state.get()
+        sigma, current_time, _ = self.state.get()
 
         if len(self.outputs_queue) == 0:
             control_action, coordination_data, control_metadata = \
-                self.compute_action(control)
+                self.compute_action()
             self.outputs_queue.append(
                 {self.outPorts['action']: control_action}
             )
