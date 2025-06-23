@@ -2,12 +2,12 @@
     "Hunter_0": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -16,12 +16,12 @@
     "Hunter_1": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -30,12 +30,12 @@
     "Hunter_2": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -44,12 +44,12 @@
     "Hunter_3": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -58,12 +58,12 @@
     "Hunter_4": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -72,12 +72,12 @@
     "Hunter_5": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -86,12 +86,12 @@
     "Hunter_6": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -100,12 +100,12 @@
     "Hunter_7": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -114,12 +114,12 @@
     "Hunter_8": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
@@ -128,12 +128,12 @@
     "Hunter_9": {
         "qss": {
             "x": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             },
             "y": {
-                "dQMin": 0.05,
+                "dQMin": 0.01,
                 "dQRel": 0.0,
                 "gain": 1.0
             }
