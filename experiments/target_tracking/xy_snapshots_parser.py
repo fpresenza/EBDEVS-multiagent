@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import numpy as np
 import argparse
 
@@ -22,7 +21,6 @@ arg = parser.parse_args()
 # Read simulated data
 # ------------------------------------------------------------------
 experiment_directory = find_latest_timestamp('output/')
-os.makedirs(experiment_directory + 'snapshots', exist_ok=True)
 print('Experiment located in: {}'.format(experiment_directory))
 
 t = np.loadtxt(experiment_directory + 'logger_time.csv', delimiter=',')
