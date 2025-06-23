@@ -1,7 +1,7 @@
 {
     "Hunter_0": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -86,7 +86,7 @@
     },
     "Hunter_1": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -171,7 +171,7 @@
     },
     "Hunter_2": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -256,7 +256,7 @@
     },
     "Hunter_3": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -341,7 +341,7 @@
     },
     "Hunter_4": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -426,7 +426,7 @@
     },
     "Hunter_5": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -511,7 +511,7 @@
     },
     "Hunter_6": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -596,7 +596,7 @@
     },
     "Hunter_7": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -681,7 +681,7 @@
     },
     "Hunter_8": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
@@ -766,7 +766,7 @@
     },
     "Hunter_9": {
         "controller": {
-            "period": 0.1,
+            "period": 0.02,
             "dim": 2,
             "weights": {
                 "tracking": 1.0,
