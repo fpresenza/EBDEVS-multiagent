@@ -153,9 +153,9 @@ class MultiRobotSystem(CoupledDEVS):
         for robot, state in self.robots_states.items():
             position = self.getRobotPosition(robot, current_time)
             if robot.startswith('Hunter'):
-                robot_data += position
+                robot_data += [coord[0] for coord in position]
             if robot.startswith('Target'):
-                target_data += position
+                target_data += [coord[0] for coord in position]
                 target_data += [1.0 if state['status'] == 'active' else 0.0]
 
         return robot_data, target_data
@@ -163,7 +163,7 @@ class MultiRobotSystem(CoupledDEVS):
     def getRobotPosition(self, robot_id, current_time):
         state = self.robots_states[robot_id]
         delta_time = current_time - state['time']
-        return [evaluate_poly_q(poly, delta_time) for poly in state['pose']]
+        return [[evaluate_poly_q(poly, delta_time)] for poly in state['pose']]
 
     def getNeighbors(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time

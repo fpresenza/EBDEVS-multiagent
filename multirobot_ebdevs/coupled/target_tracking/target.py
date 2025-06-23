@@ -127,7 +127,7 @@ class Target(CoupledDEVS):
     def getRobotPosition(self, current_time):
         state = self.y_up[1]
         delta_time = current_time - state['time']
-        return [evaluate_poly_q(poly, delta_time) for poly in state['pose']]
+        return [[evaluate_poly_q(poly, delta_time)] for poly in state['pose']]
 
     def select(self, immChildren):
         """

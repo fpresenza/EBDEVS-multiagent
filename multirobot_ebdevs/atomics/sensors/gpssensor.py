@@ -16,4 +16,4 @@ class GPSSensor(ExteroceptiveSensor):
             mean=self.noise_mean.ravel(),
             cov=self.noise_covariance
         )
-        return [p[0] + noise[0], p[1] + noise[1]]
+        return [p[0][0] + noise[0], p[1][0] + noise[1]]
