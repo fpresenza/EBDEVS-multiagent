@@ -29,8 +29,10 @@ def minposroot(p):
         # x(t) = p[0] + p[1] * t => 0 = p[0] + p[1] * t0 => t0 = -p[0]/p[1]
         mpr = -p[0] / p[1]
     # sanity check: time cannot be < 0
-    if (mpr < 0):
+    if (mpr < -1e-12):
         mpr = INFINITY
+    elif (mpr < 1e-12):
+        mpr = 0.0
 
     return mpr
 
