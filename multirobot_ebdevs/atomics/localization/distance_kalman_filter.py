@@ -10,6 +10,7 @@ class DKFilter(object):
     def __init__(self, robot_id, config):
         self.robot_id = robot_id
         self.dim = config['dim']
+        self.last_control_action = np.zeros((self.dim, 1), dtype=float)
         ekf_config = {
             key: np.array(val)
             for key, val in config['ekf'].items()
@@ -46,11 +47,11 @@ class DistanceKalmanFilter(Localization):
         #
         if port_name == 'velocity_measurement':
             # if data arrives through port inPorts['velocity_measurement']
-            vel_meas = data
             loc_filter.ekf.dynamic_step(
                 current_time,
-                np.reshape(vel_meas, (-1, 1))
+                loc_filter.last_control_action
             )
+            loc_filter.last_control_action = np.reshape(data, (-1, 1))
             sigma = 0.0  # holds last status
         elif port_name == 'position_measurement':
             # if data arrives through port inPorts['position_measurement']
