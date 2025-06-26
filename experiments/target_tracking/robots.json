@@ -6,7 +6,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -20,7 +20,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -91,7 +91,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -105,7 +105,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -176,7 +176,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -190,7 +190,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -261,7 +261,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -275,7 +275,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -346,7 +346,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -360,7 +360,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -431,7 +431,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -445,7 +445,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -516,7 +516,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -530,7 +530,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -601,7 +601,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -615,7 +615,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -686,7 +686,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -700,7 +700,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
@@ -771,7 +771,7 @@
             "weights": {
                 "tracking": 1.0,
                 "collision": 0.25,
-                "rigidity": 0.375
+                "rigidity": 0.2
             },
             "tracking": {
                 "tracking_radius": 20.0,
@@ -785,7 +785,7 @@
             },
             "rigidity": {
                 "dmax": 12.75,
-                "steepness": 2.0,
+                "steepness": 3.0,
                 "threshold": 0.0001,
                 "eigenvalues": "all",
                 "functional": "log"
