@@ -189,7 +189,7 @@ class QSSIntegrator(AtomicDEVS):
         # make time advance to get next q
         # this change in q will be performed right after
         #  in the internal transition function
-        y = advance_time(xprev, sigma, 1)  # p: y, dt: sigma, order: 1
+        y = advance_time(xprev.copy(), sigma, 1)  # p: y, dt: sigma, order: 1
         # y = [xprev[0] + sigma * xprev[1], 0.0]
         # y[1] = 0.0
 
