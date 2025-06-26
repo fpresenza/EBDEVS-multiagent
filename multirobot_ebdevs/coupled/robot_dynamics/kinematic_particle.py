@@ -80,7 +80,7 @@ class RobotDynamics(CoupledDEVS):
         # Connect coupled model's input with dynamics_function's input
         self.connectPorts(
             self.inPorts['control_input'],
-            self.dynamics_function.inPorts['control_action']
+            self.dynamics_function.inPorts['input']
         )
         # Connect dynamics_function's output with integrator's input
         self.connectPorts(

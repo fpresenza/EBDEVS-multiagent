@@ -18,19 +18,20 @@ class DynamicsFunctionState:
     Encapsulates the system's state
     """
 
-    def __init__(self, sigma, tvalue, data):
+    def __init__(self, sigma, tvalue, x, u):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, data)
+        self.set(sigma, tvalue, x, u)
 
-    def set(self, sigma, tvalue, data):
+    def set(self, sigma, tvalue, x, u):
         self._sigma = sigma
         self._tvalue = tvalue
-        self._data = data
+        self._x = x
+        self._u = u
 
     def get(self):
-        return self._sigma, self._tvalue, self._data
+        return self._sigma, self._tvalue, self._x, self._u
 
 
 class DynamicsFunction(AtomicDEVS):
@@ -54,7 +55,8 @@ class DynamicsFunction(AtomicDEVS):
         self.state = DynamicsFunctionState(
             sigma=INFINITY,
             tvalue=0.0,
-            data=[None, None]
+            x=None,
+            u=None
         )
 
         # ELAPSED TIME:
@@ -66,8 +68,8 @@ class DynamicsFunction(AtomicDEVS):
         #  Declare as many input and output ports as desired
         #  (usually store returned references in local variables):
         self.inPorts = {
-            'control_action': self.addInPort(name="u"),  # dimension m
-            'state': self.addInPort(name="x")  # dimension n
+            'input': self.addInPort(name="input"),  # dimension m
+            'state': self.addInPort(name="state")  # dimension n
         }
 
         self.outPorts = {}
@@ -86,34 +88,29 @@ class DynamicsFunction(AtomicDEVS):
         """
         External Transition Function.
         """
-        _, current_time, data = self.state.get()
+        _, current_time, x, u = self.state.get()
         current_time += self.elapsed
+        sigma = INFINITY
 
         # Received a new event, so start processing it
-        if self.inPorts['control_action'] in inputs:
+        if self.inPorts['input'] in inputs:
             # receives an np.array() as many rows as states
             # and as many columns as polinomial coeffs.
-            data[0] = [
+            u = [
                 pad_zeros_q(ui.tolist())
-                for ui in inputs[self.inPorts['control_action']]
+                for ui in inputs[self.inPorts['input']]
             ]
-            if data[1] is not None:
-                data[1] = [
-                    advance_time_q(poly, self.elapsed) for poly in data[1]
-                ]
+            if x is not None:
+                x = [advance_time_q(poly, self.elapsed) for poly in x]
+                sigma = 0.0
+
         if self.inPorts['state'] in inputs:
             # receives an np.array() as many rows as states
             # and as many columns as polinomial coeffs.
-            data[1] = inputs[self.inPorts['state']]
-            if data[0] is not None:
-                data[0] = [
-                    advance_time_q(poly, self.elapsed) for poly in data[0]
-                ]
-
-        if any(d is None for d in data):
-            sigma = INFINITY
-        else:
-            sigma = 0.0
+            x = inputs[self.inPorts['state']]
+            if u is not None:
+                u = [advance_time_q(poly, self.elapsed) for poly in u]
+                sigma = 0.0
 
         if (self.debug):
             print(
@@ -121,13 +118,13 @@ class DynamicsFunction(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return DynamicsFunctionState(sigma, current_time, data)
+        return DynamicsFunctionState(sigma, current_time, x, u)
 
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        sigma, current_time, data = self.state.get()
+        sigma, current_time, x, u = self.state.get()
         current_time += sigma
 
         if len(self.outputs_queue) == 0:
@@ -141,16 +138,14 @@ class DynamicsFunction(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return DynamicsFunctionState(sigma, current_time, data)
+        return DynamicsFunctionState(sigma, current_time, x, u)
 
     def outputFnc(self):
         """
         Output Function.
         """
         if len(self.outputs_queue) == 0:
-            _, _, data = self.state.get()
-            u = data[0]  # noqa
-            x = data[1]  # noqa
+            _, _, x, u = self.state.get()
 
             xdot = self.vector_field(x, u)
 
@@ -160,7 +155,7 @@ class DynamicsFunction(AtomicDEVS):
             # outputs one polynomial per output port
             self.outputs_queue = [
                 {port: var} for var, port in zip(xdot, self.outPorts.values())
-                ]
+            ]
 
         return self.outputs_queue.pop()
 
@@ -170,7 +165,7 @@ class DynamicsFunction(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _ = self.state.get()
+        sigma, _, _, _ = self.state.get()
         return sigma
 
     def vector_field(self, x, u):
