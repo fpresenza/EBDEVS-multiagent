@@ -13,9 +13,12 @@ from multirobot_ebdevs.utils.files import find_latest_timestamp
 parser = argparse.ArgumentParser(description='')
 parser.add_argument(
     '-r', '--comm_range',
-    default=1.0, type=float, help='common communication range'
+    default=np.nan, type=float, help='common communication range'
 )
 arg = parser.parse_args()
+
+if arg.comm_range is np.nan:
+    raise ValueError('Communication range must be passed as argument.')
 
 # ------------------------------------------------------------------
 # Read simulated data
