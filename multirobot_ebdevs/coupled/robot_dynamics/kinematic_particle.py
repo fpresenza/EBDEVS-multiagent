@@ -5,7 +5,7 @@ import numpy as np  # noqa
 
 from pypdevs.DEVS import CoupledDEVS
 
-from multirobot_ebdevs.atomics.integrators.qss1tools import pad_zeros_q
+from multirobot_ebdevs.atomics.integrators.qss1tools import pad_zeros
 from multirobot_ebdevs.atomics.integrators.qss1integrator import (
     mQSS1Integrator
 )
@@ -36,7 +36,7 @@ class RobotDynamics(CoupledDEVS):
             self.name,
             {
                 'time': 0.0,
-                'pose': [pad_zeros_q(coord) for coord in position],
+                'pose': [pad_zeros(coord) for coord in position],
             }
         ]
         self.current_time = 0

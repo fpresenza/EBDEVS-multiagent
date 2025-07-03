@@ -265,10 +265,10 @@ class mQSS1Integrator(QSS1Integrator):
         # shares information to the parent to compute
         # the Global Transition function
         try:
-            self.y_up[2] = q.copy()
+            self.y_up[2] = x.copy()
             self.y_up[1] = current_time.copy()
         except AttributeError:
-            self.y_up[2] = q
+            self.y_up[2] = x
             self.y_up[1] = current_time
 
         return QSSState(q, x, sigma, current_time)
@@ -282,10 +282,10 @@ class mQSS1Integrator(QSS1Integrator):
         #  shares information to the parent to compute the
         #  Global Transition function
         try:
-            self.y_up[2] = q.copy()
+            self.y_up[2] = x.copy()
             self.y_up[1] = current_time.copy()
         except AttributeError:
-            self.y_up[2] = q
+            self.y_up[2] = x
             self.y_up[1] = current_time
 
         return QSSState(q, x, sigma, current_time)
