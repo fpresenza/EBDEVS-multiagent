@@ -45,7 +45,7 @@ class Hunter(CoupledDEVS):
         self.y_up = [
             self.name,
             {
-                'time': 0.0,
+                'time': [0.0, 0.0],
                 'pose': [pad_zeros(coord) for coord in position],
                 'comm_range': comm_range
             }
@@ -180,8 +180,10 @@ class Hunter(CoupledDEVS):
 
     def getRobotPosition(self, current_time):
         state = self.y_up[1]
-        delta_time = current_time - state['time']
-        return [[evaluate_poly(poly, delta_time)] for poly in state['pose']]
+        return [
+            [evaluate_poly(poly, current_time - t)]
+            for t, poly in zip(state['time'], state['pose'])
+        ]
 
     def select(self, immChildren):
         """

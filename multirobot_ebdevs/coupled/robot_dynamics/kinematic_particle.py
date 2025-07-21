@@ -35,7 +35,7 @@ class RobotDynamics(CoupledDEVS):
         self.y_up = [
             self.name,
             {
-                'time': 0.0,
+                'time': [0.0, 0.0],
                 'pose': [pad_zeros(coord) for coord in position],
             }
         ]
@@ -113,10 +113,11 @@ class RobotDynamics(CoupledDEVS):
 
         micro_id, children_time, data = x_b_micro[0]
 
-        self.y_up[1]['time'] = children_time
         if micro_id == 'x':
+            self.y_up[1]['time'][0] = children_time
             self.y_up[1]['pose'][0] = data.copy()
         elif micro_id == 'y':
+            self.y_up[1]['time'][1] = children_time
             self.y_up[1]['pose'][1] = data.copy()
 
         if (self.debug):

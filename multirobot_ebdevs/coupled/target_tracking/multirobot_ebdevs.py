@@ -123,8 +123,10 @@ class MultiRobotSystem(CoupledDEVS):
 
     def getRobotPosition(self, robot_id, current_time):
         state = self.robot_states[robot_id]
-        delta_time = current_time - state['time']
-        return [[evaluate_poly(poly, delta_time)] for poly in state['pose']]
+        return [
+            [evaluate_poly(poly, current_time - t)]
+            for t, poly in zip(state['time'], state['pose'])
+        ]
 
     def getNeighbors(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
