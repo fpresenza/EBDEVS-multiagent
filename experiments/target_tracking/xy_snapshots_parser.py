@@ -1,24 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
-import argparse
-
-from uvnpy.network.graphs import DiskGraph
-from multirobot_ebdevs.utils.files import find_latest_timestamp
-
-# ------------------------------------------------------------------
-# Parse arguments
-# ------------------------------------------------------------------
-parser = argparse.ArgumentParser(description='')
-parser.add_argument(
-    '-r', '--comm_range',
-    default=np.nan, type=float, help='common communication range'
+from multirobot_ebdevs.utils.core import robot_id_to_index
+from multirobot_ebdevs.utils.files import (
+    find_latest_timestamp, read_jsonl_file, write_csv_file
 )
-arg = parser.parse_args()
-
-if arg.comm_range is np.nan:
-    raise ValueError('Communication range must be passed as argument.')
 
 # ------------------------------------------------------------------
 # Read simulated data
@@ -26,29 +12,19 @@ if arg.comm_range is np.nan:
 experiment_directory = find_latest_timestamp('output/')
 print('Experiment located in: {}'.format(experiment_directory))
 
-t = np.loadtxt(experiment_directory + 'logger_time.csv', delimiter=',')
-robot_data = np.loadtxt(
-    experiment_directory + 'logger_robot_data.csv', delimiter=','
-)
-target_data = np.loadtxt(
-    experiment_directory + 'logger_target_data.csv', delimiter=','
-)
-
+adjacency_list = read_jsonl_file(experiment_directory + 'adjacency_list.jsonl')
 
 # ------------------------------------------------------------------
 # Parse and save
 # ------------------------------------------------------------------
-adjacency_matrix = [
-    DiskGraph(
-        realization=p.reshape(-1, 2),
-        dmax=arg.comm_range
-    ).adjacency_matrix().ravel()
-    for p in robot_data
+edge_list = [
+    sum([
+        sum([[robot_id_to_index(k), robot_id_to_index(m)] for m in v], [])
+        for k, v in adj.items()
+    ], [])
+    for adj in adjacency_list
 ]
 
-np.savetxt(experiment_directory + 't.csv', t, delimiter=',')
-np.savetxt(experiment_directory + 'position.csv', robot_data, delimiter=',')
-np.savetxt(experiment_directory + 'targets.csv', target_data, delimiter=',')
-np.savetxt(
-    experiment_directory + 'adjacency.csv', adjacency_matrix, delimiter=','
+write_csv_file(
+    experiment_directory + 'edge_list.csv', edge_list
 )
