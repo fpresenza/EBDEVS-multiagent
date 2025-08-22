@@ -35,6 +35,13 @@ def read_csv_file(filename):
     return data
 
 
+def write_csv_file(filename, data):
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        for row in data:
+            writer.writerow(row)
+
+
 def append_csv_file(filename, data):
     with open(filename, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=',')
