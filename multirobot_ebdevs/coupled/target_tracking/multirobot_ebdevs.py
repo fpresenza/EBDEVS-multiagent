@@ -40,12 +40,12 @@ class MultiRobotSystem(CoupledDEVS):
         # TODO: time cannot be managed as in the other coupled/atomic models
         self.current_time = 0.0
 
-        self.router = self.addSubModel(TransmissionMedium(
+        router = self.addSubModel(TransmissionMedium(
             robots_ids=list(robots_config.keys()),
             name='TransmissionMedium',
             debug=self.debug
         ))
-        self.logger = self.addSubModel(Logger(
+        self.addSubModel(Logger(
             period=log_period,
             name='Logger',
             log_path=self.log_path,
@@ -54,6 +54,7 @@ class MultiRobotSystem(CoupledDEVS):
 
         self.robot_states = {}
         self.target_states = {}
+        self.adjacency_list = {}
         for name in world_config.keys():
             if name.startswith('Hunter'):
                 robot = self.addSubModel(Hunter(
@@ -66,12 +67,13 @@ class MultiRobotSystem(CoupledDEVS):
                 ))
                 self.connectPorts(
                     robot.outPorts['radio'],
-                    self.router.inPorts[name]
+                    router.inPorts[name]
                 )
                 self.connectPorts(
-                    self.router.outPorts[name],
+                    router.outPorts[name],
                     robot.inPorts['radio']
                 )
+                self.adjacency_list[name] = []
 
             elif name.startswith('Target'):
                 # target_states must be initialized at the very beginning
@@ -119,7 +121,9 @@ class MultiRobotSystem(CoupledDEVS):
             target_data += [coord[0] for coord in state['pose']]
             target_data += [1.0 if state['status'] == 'active' else 0.0]
 
-        return robot_data, target_data
+        adjacency_list = self.adjacency_list
+
+        return robot_data, target_data, adjacency_list
 
     def getRobotPosition(self, robot_id, current_time):
         state = self.robot_states[robot_id]
@@ -133,7 +137,7 @@ class MultiRobotSystem(CoupledDEVS):
         robot_1_pos = self.getRobotPosition(robot_1_id, current_time)
         robot_1_comm_range = self.robot_states[robot_1_id]['comm_range']
 
-        return [
+        neighbors = [
             robot_2_id
             for robot_2_id in self.robot_states.keys()
             if robot_1_id != robot_2_id and
@@ -141,6 +145,9 @@ class MultiRobotSystem(CoupledDEVS):
                 robot_1_pos, robot_1_comm_range, robot_2_id, current_time
             )
         ]
+        self.adjacency_list[robot_1_id] = neighbors
+
+        return neighbors
 
     def inRange(
             self, robot_1_pos, robot_1_comm_range, robot_2_id, current_time

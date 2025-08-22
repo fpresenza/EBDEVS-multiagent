@@ -3,7 +3,7 @@
 
 from pypdevs.DEVS import AtomicDEVS
 
-from multirobot_ebdevs.utils.files import append_csv_file
+from multirobot_ebdevs.utils.files import append_csv_file, append_jsonl_file
 
 
 class LoggerState:
@@ -68,17 +68,20 @@ class Logger(AtomicDEVS):
         """
         sigma, current_time = self.state.get()
 
-        robot_data, target_data = self.parent.getGlobalState(
+        robot_data, target_data, adjacency_list = self.parent.getGlobalState(
             current_time + sigma
         )
         append_csv_file(
-            self.log_path + 'logger_time.csv', [current_time + sigma]
+            self.log_path + 'log_time.csv', [current_time + sigma]
         )
         append_csv_file(
-            self.log_path + 'logger_robot_data.csv', robot_data
+            self.log_path + 'robots_position.csv', robot_data
         )
         append_csv_file(
-            self.log_path + 'logger_target_data.csv', target_data
+            self.log_path + 'targets_position.csv', target_data
+        )
+        append_jsonl_file(
+            self.log_path + 'adjacency_list.jsonl', adjacency_list
         )
 
         if (self.debug):
