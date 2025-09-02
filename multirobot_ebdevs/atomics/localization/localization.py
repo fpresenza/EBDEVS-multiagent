@@ -8,19 +8,18 @@ class LocalizationState:
     """
     Encapsulates the system's state
     """
-    def __init__(self, sigma, tvalue, loc_filter):
+    def __init__(self, sigma, tvalue):
         """
         Constructor (parameterizable).
         """
-        self.set(sigma, tvalue, loc_filter)
+        self.set(sigma, tvalue)
 
-    def set(self, sigma, tvalue, loc_filter):
+    def set(self, sigma, tvalue):
         self._sigma = sigma
         self._tvalue = tvalue
-        self._loc_filter = loc_filter
 
     def get(self):
-        return self._sigma, self._tvalue, self._loc_filter
+        return self._sigma, self._tvalue
 
 
 class Localization(AtomicDEVS):
@@ -47,9 +46,9 @@ class Localization(AtomicDEVS):
         #  Define 'state' attribute (initial sate):
         self.state = LocalizationState(
             sigma=0.0,
-            tvalue=0.0,
-            loc_filter=self.set_loc_filter(robot_id, config)
+            tvalue=0.0
         )
+        self.loc_filter = self.set_loc_filter(config)
         # ELAPSED TIME:
         #  Initialize 'elapsed time' attribute if required
         #  (by default, value is 0.0):
@@ -75,14 +74,14 @@ class Localization(AtomicDEVS):
         """
         External Transition Function.
         """
-        sigma, current_time, loc_filter = self.state.get()
+        sigma, current_time = self.state.get()
         current_time += self.elapsed
 
         port_id, data = inputs.popitem()
         port_name = next(k for k, v in self.inPorts.items() if v == port_id)
 
-        sigma, loc_filter = self.process_inputs(
-            sigma, current_time, loc_filter, port_name, data
+        sigma = self.process_inputs(
+            sigma, current_time, port_name, data
         )
 
         if (self.debug):
@@ -91,13 +90,13 @@ class Localization(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return LocalizationState(sigma, current_time, loc_filter)
+        return LocalizationState(sigma, current_time)
 
     def intTransition(self):
         """
         Internal Transition Function.
         """
-        _, current_time, loc_filter = self.state.get()
+        _, current_time = self.state.get()
 
         sigma = INFINITY
 
@@ -107,15 +106,15 @@ class Localization(AtomicDEVS):
                 .format(current_time, self.name)
             )
 
-        return LocalizationState(sigma, current_time, loc_filter)
+        return LocalizationState(sigma, current_time)
 
     def outputFnc(self):
         """
         Output Funtion.
         """
-        sigma, current_time, _ = self.state.get()
+        sigma, current_time = self.state.get()
 
-        loc_estimation, loc_metadata = self.loc_filter_results()
+        loc_estimation, loc_metadata = self.results()
 
         if self.debug:
             append_jsonl_file(
@@ -135,5 +134,5 @@ class Localization(AtomicDEVS):
         """
         # Compute 'ta', the time to the next scheduled internal transition,
         # based (typically) on current State.
-        sigma, _, _ = self.state.get()
+        sigma, _ = self.state.get()
         return sigma

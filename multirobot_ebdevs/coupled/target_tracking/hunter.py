@@ -14,7 +14,7 @@ from multirobot_ebdevs.atomics.communication. communication_module import (
 from multirobot_ebdevs.atomics.coordination\
     .target_tracking.hunter_coordinator import HunterCoordinator
 from multirobot_ebdevs.atomics.localization.distance_kalman_filter import (
-    DistanceKalmanFilter
+    DistanceBasedKalmanFilter
 )
 from multirobot_ebdevs.atomics.sensors.gpssensor import GPSSensor
 from multirobot_ebdevs.coupled.robot_dynamics.kinematic_particle import (
@@ -74,7 +74,7 @@ class Hunter(CoupledDEVS):
             config=hunter_config['coordinator'],
             debug=self.debug,
         )
-        localization = DistanceKalmanFilter(
+        localization = DistanceBasedKalmanFilter(
             robot_id=self.name,
             config=hunter_config['localization'],
             log_path=log_path,
