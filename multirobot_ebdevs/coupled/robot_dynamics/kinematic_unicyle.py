@@ -13,6 +13,9 @@ from multirobot_ebdevs.atomics.misc.misc import Merger
 from multirobot_ebdevs.atomics.dynamics.unicycle import (
     Unicycle
 )
+from multirobot_ebdevs.atomics.dynamics.feedback_linearization import (
+    FeedbackLinearization
+)
 
 
 class RobotDynamics(CoupledDEVS):
@@ -43,7 +46,7 @@ class RobotDynamics(CoupledDEVS):
 
         # Declare childrens:
         dynamics_function = Unicycle(
-            num_outputs=2,
+            num_outputs=3,
             debug=self.debug
         )
         merger = Merger(
@@ -62,12 +65,25 @@ class RobotDynamics(CoupledDEVS):
             x0=position[1][0],
             debug=self.debug
         )
+        integrator_theta = mQSS1Integrator(
+            name="theta",
+            **config['th'],
+            x0=position[2][0],
+            debug=self.debug
+        )
         # feedback_linearization = ...
-
+        feedback_linearization = FeedbackLinearization(
+            num_outputs=2,
+            debug = self.debug
+        )
+        # TODO: Crear atomico de feedback_linearization. Su input es u = [u_x,u_y] y su output [v,w]
+        # El output de ese atomico va al input de dynamic_function
+        self.feedback_linearization = self.addSubModel(feedback_linearization)
         self.dynamics_function = self.addSubModel(dynamics_function)
         self.merger = self.addSubModel(merger)
         self.integrator_x = self.addSubModel(integrator_x)
         self.integrator_y = self.addSubModel(integrator_y)
+        self.integrator_theta = self.addSubmodel(integrator_theta)
 
         # Declare the coupled model's output ports:
         self.inPorts = {
@@ -78,9 +94,14 @@ class RobotDynamics(CoupledDEVS):
             self.addOutPort(name="out_position_polynomial")
             }
 
-        # Connect coupled model's input with dynamics_function's input
+        # Connect coupled model's input with feedback_linearization's input
         self.connectPorts(
             self.inPorts['control_input'],
+            self.feedback_linearization.inPorts['input']
+        )
+        # Connect feedback_linearization's output with dynamics_function's input
+        self.connectPorts(
+            self.feedback_linearization.outPorts['linearized_output'],
             self.dynamics_function.inPorts['input']
         )
         # Connect dynamics_function's output with integrator's input
@@ -90,17 +111,25 @@ class RobotDynamics(CoupledDEVS):
         self.connectPorts(
             self.dynamics_function.outPorts[1], self.integrator_y.IN_dx
         )
+        self.connectPorts(
+            self.dynamics_function.outPorts[2], self.integrator_theta.IN_dx
+        )
         # Connect integrators with merger's input
         self.connectPorts(self.integrator_x.OUT_q, self.merger.inPorts[0])
         self.connectPorts(self.integrator_y.OUT_q, self.merger.inPorts[1])
+        self.connectPorts(self.integrator_theta.Out_q, self.merger.inPorts[2])
         # Connect merger's output with coupled model's output
         self.connectPorts(
             self.merger.outPort, self.outPorts['position_polynomial']
             )
-        # Connect merger's output with coupled model's output
+        # Connect merger's output with dynamic_function's input
         self.connectPorts(
             self.merger.outPort, self.dynamics_function.inPorts['state']
             )
+        # Connect merger's output with feedback_linearization's input
+        self.connectPorts(
+            self.merger.outPort, self.feedback_linearization.inPorts['state']
+        )
 
         if (self.debug):
             print("t: 0 s, Coupled name: {}, Init Function"
@@ -120,6 +149,9 @@ class RobotDynamics(CoupledDEVS):
         elif micro_id == 'y':
             self.y_up[1]['time'][1] = children_time
             self.y_up[1]['pose'][1] = data.copy()
+        elif micro_id == 'th':
+            self.y_up[1]['time'][2] = children_time
+            self.y_up[1]['pose'][2] = data.copy() 
 
         if (self.debug):
             print("t: {:.2f} s, Coupled name: {}, \
