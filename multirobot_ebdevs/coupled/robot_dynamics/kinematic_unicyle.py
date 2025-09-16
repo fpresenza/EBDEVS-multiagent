@@ -33,7 +33,6 @@ class RobotDynamics(CoupledDEVS):
         CoupledDEVS.__init__(self, name)
 
         self.debug = debug
-
         # dictionary to save childrens' states
         self.y_up = [
             self.name,
@@ -50,7 +49,7 @@ class RobotDynamics(CoupledDEVS):
             debug=self.debug
         )
         merger = Merger(
-            num_inputs=2,
+            num_inputs=3,
             debug=self.debug
         )
         integrator_x = mQSS1Integrator(
@@ -73,7 +72,7 @@ class RobotDynamics(CoupledDEVS):
         )
         # feedback_linearization = ...
         feedback_linearization = FeedbackLinearization(
-            num_outputs=2,
+            num_outputs=1,
             debug = self.debug
         )
         # TODO: Crear atomico de feedback_linearization. Su input es u = [u_x,u_y] y su output [v,w]
@@ -83,7 +82,7 @@ class RobotDynamics(CoupledDEVS):
         self.merger = self.addSubModel(merger)
         self.integrator_x = self.addSubModel(integrator_x)
         self.integrator_y = self.addSubModel(integrator_y)
-        self.integrator_theta = self.addSubmodel(integrator_theta)
+        self.integrator_theta = self.addSubModel(integrator_theta)
 
         # Declare the coupled model's output ports:
         self.inPorts = {
@@ -101,9 +100,12 @@ class RobotDynamics(CoupledDEVS):
         )
         # Connect feedback_linearization's output with dynamics_function's input
         self.connectPorts(
-            self.feedback_linearization.outPorts['linearized_output'],
-            self.dynamics_function.inPorts['input']
+            self.feedback_linearization.outPorts[0], self.dynamics_function.inPorts['input']
         )
+        # self.connectPorts(
+        #     self.feedback_linearization.outPorts['linearized_output'],
+        #     self.dynamics_function.inPorts['input']
+        # )
         # Connect dynamics_function's output with integrator's input
         self.connectPorts(
             self.dynamics_function.outPorts[0], self.integrator_x.IN_dx
@@ -117,7 +119,7 @@ class RobotDynamics(CoupledDEVS):
         # Connect integrators with merger's input
         self.connectPorts(self.integrator_x.OUT_q, self.merger.inPorts[0])
         self.connectPorts(self.integrator_y.OUT_q, self.merger.inPorts[1])
-        self.connectPorts(self.integrator_theta.Out_q, self.merger.inPorts[2])
+        self.connectPorts(self.integrator_theta.OUT_q, self.merger.inPorts[2])
         # Connect merger's output with coupled model's output
         self.connectPorts(
             self.merger.outPort, self.outPorts['position_polynomial']

@@ -13,8 +13,18 @@ class Unicycle(DynamicsFunction):
         #
         # x = [x, y, theta]
         # u = [v, w]
-        dot_x = [0.0, 0.0, 0.0]
-        dot_x[0] = u[0] * np.cos(x[2])
-        dot_x[1] = u[0] * np.sin(x[2])
-        dot_x[2] = u[1]
+        print("Unicycle x={}, u={}".format(x,u))
+
+        u_array = np.array(u)
+        x_array = np.array(x)
+        
+        dot_x = np.array([
+            u_array[0] * np.cos(x_array[2]),
+            u_array[0] * np.sin(x_array[2]),
+            u_array[1]
+        ])
+
+        result = [[val] for val in dot_x.tolist()]
+        print(dot_x)
+
         return dot_x

@@ -6,15 +6,20 @@ from multirobot_ebdevs.atomics.dynamics\
     .dynamics_function import DynamicsFunction
 
 class FeedbackLinearization(DynamicsFunction):
-    def feedback_linearization(self, x, u, d = 1.0):
+    def vector_field(self, x, u, d = 1.0):
+        print("FeedbackLinearization x={}, u={}".format(x,u))
+        u_array = np.array(u)
+        x_array = np.array(x)
 
-        linearized_u = [0.0, 0.0]
-        
-        th = x[2]
+        th = x_array[2]
         ct = np.cos(th)
         st = np.sin(th)
 
-        linearized_u[0] = u[0]*ct + u[1]*st
-        linearized_u[1] = -u[0]*st/d + u[1]*ct/d
+        linearized_u = np.array([
+            u_array[0]*ct + u_array[1]*st,
+            -u_array[0]*st/d + u_array[1]*ct/d
+        ])
 
+        result = [[val] for val in linearized_u.tolist()]
+        print(linearized_u)
         return linearized_u
