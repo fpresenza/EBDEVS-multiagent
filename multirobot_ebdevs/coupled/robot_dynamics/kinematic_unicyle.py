@@ -22,6 +22,7 @@ class RobotDynamics(CoupledDEVS):
     def __init__(
             self,
             position,
+            orientation,
             config,
             name='RobotDynamics',
             debug=False):
@@ -34,11 +35,14 @@ class RobotDynamics(CoupledDEVS):
 
         self.debug = debug
         # dictionary to save childrens' states
+        pose = [pad_zeros(coord) for coord in position]
+        pose.append(pad_zeros([orientation]))
+
         self.y_up = [
             self.name,
             {
-                'time': [0.0, 0.0],
-                'pose': [pad_zeros(coord) for coord in position],
+                'time': [0.0, 0.0, 0.0],
+                'pose': pose
             }
         ]
         self.current_time = 0
@@ -66,8 +70,8 @@ class RobotDynamics(CoupledDEVS):
         )
         integrator_theta = mQSS1Integrator(
             name="theta",
-            **config['th'],
-            x0=position[2][0],
+            **config['theta'],
+            x0=orientation,
             debug=self.debug
         )
         # feedback_linearization = ...
@@ -151,7 +155,7 @@ class RobotDynamics(CoupledDEVS):
         elif micro_id == 'y':
             self.y_up[1]['time'][1] = children_time
             self.y_up[1]['pose'][1] = data.copy()
-        elif micro_id == 'th':
+        elif micro_id == 'theta':
             self.y_up[1]['time'][2] = children_time
             self.y_up[1]['pose'][2] = data.copy() 
 
