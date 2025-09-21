@@ -14,7 +14,7 @@ from multirobot_ebdevs.atomics.communication.transmission_medium import (
 from multirobot_ebdevs.atomics.misc.logger import Logger
 
 # our coupled models
-from multirobot_ebdevs.coupled.target_tracking.hunter import Hunter
+from multirobot_ebdevs.coupled.target_tracking.hunter_unicycle import Hunter
 
 
 class MultiRobotSystem(CoupledDEVS):
@@ -96,7 +96,7 @@ class MultiRobotSystem(CoupledDEVS):
 
         self.robot_states[micro_id] = data.copy()
 
-        robot_pos = [[coord[0]] for coord in data['pose']]
+        robot_pos = [[coord[0]] for coord in data['pose'][:2]]
         for target in self.target_states.values():
             sq_dist = np.sum(np.square(np.subtract(robot_pos, target['pose'])))
             if sq_dist < target['collect_range']**2:
@@ -131,7 +131,7 @@ class MultiRobotSystem(CoupledDEVS):
             [evaluate_poly(poly, current_time - t)]
             for t, poly in zip(state['time'], state['pose'])
         ]
-
+        
     def getNeighbors(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
         robot_1_pos = self.getRobotPosition(robot_1_id, current_time)
