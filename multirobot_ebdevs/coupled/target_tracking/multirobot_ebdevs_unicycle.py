@@ -159,6 +159,7 @@ class MultiRobotSystem(CoupledDEVS):
 
     def getNearestTarget(self, robot_id, current_time):
         robot_pos = self.getRobotPosition(robot_id, current_time)
+        robot_pos = robot_pos[:2]
         try:
             target_pos = min([
                 (
