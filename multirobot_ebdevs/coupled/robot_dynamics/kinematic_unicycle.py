@@ -77,9 +77,10 @@ class RobotDynamics(CoupledDEVS):
         # feedback_linearization = ...
         feedback_linearization = FeedbackLinearization(
             num_outputs=1,
-            debug = self.debug
+            debug=self.debug
         )
-        # TODO: Crear atomico de feedback_linearization. Su input es u = [u_x,u_y] y su output [v,w]
+        # TODO: Crear atomico de feedback_linearization.
+        # Su input es u = [u_x,u_y] y su output [v,w]
         # El output de ese atomico va al input de dynamic_function
         self.feedback_linearization = self.addSubModel(feedback_linearization)
         self.dynamics_function = self.addSubModel(dynamics_function)
@@ -102,9 +103,11 @@ class RobotDynamics(CoupledDEVS):
             self.inPorts['control_input'],
             self.feedback_linearization.inPorts['input']
         )
-        # Connect feedback_linearization's output with dynamics_function's input
+        # Connect feedback_linearization's output
+        # with dynamics_function's input
         self.connectPorts(
-            self.feedback_linearization.outPorts[0], self.dynamics_function.inPorts['input']
+            self.feedback_linearization.outPorts[0],
+            self.dynamics_function.inPorts['input']
         )
         # self.connectPorts(
         #     self.feedback_linearization.outPorts['linearized_output'],
@@ -157,7 +160,7 @@ class RobotDynamics(CoupledDEVS):
             self.y_up[1]['pose'][1] = data.copy()
         elif micro_id == 'theta':
             self.y_up[1]['time'][2] = children_time
-            self.y_up[1]['pose'][2] = data.copy() 
+            self.y_up[1]['pose'][2] = data.copy()
 
         if (self.debug):
             print("t: {:.2f} s, Coupled name: {}, \

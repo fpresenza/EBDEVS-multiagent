@@ -10,9 +10,8 @@ import time
 from pypdevs.simulator import Simulator
 
 # Import the model to be simulated
-from multirobot_ebdevs.coupled.target_tracking.multirobot_ebdevs_unicycle import (
-    MultiRobotSystem
-)
+from multirobot_ebdevs.coupled.target_tracking\
+    .multirobot_ebdevs_particle import MultiRobotSystem
 from multirobot_ebdevs.utils.files import read_json_file, write_json_file
 
 # Configuration (parameter sweeping)

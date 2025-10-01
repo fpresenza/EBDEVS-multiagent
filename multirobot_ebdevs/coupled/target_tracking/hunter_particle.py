@@ -17,7 +17,7 @@ from multirobot_ebdevs.atomics.localization.distance_kalman_filter import (
     DistanceBasedKalmanFilter
 )
 from multirobot_ebdevs.atomics.sensors.gpssensor import GPSSensor
-from multirobot_ebdevs.coupled.robot_dynamics.kinematic_unicyle import (
+from multirobot_ebdevs.coupled.robot_dynamics.kinematic_particle import (
     RobotDynamics
 )
 
