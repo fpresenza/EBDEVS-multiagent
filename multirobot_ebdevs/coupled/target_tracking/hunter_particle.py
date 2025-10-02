@@ -178,7 +178,7 @@ class Hunter(CoupledDEVS):
                 .format(data['time'], self.name, x_b_micro)
             )
 
-    def getRobotPosition(self, current_time):
+    def getRobotPose(self, current_time):
         state = self.y_up[1]
         return [
             [evaluate_poly(poly, current_time - t)]

@@ -107,12 +107,12 @@ class CommunicationModule(AtomicDEVS):
                         record[token.kind][token.creator] = token.order
 
                         if token.hops_travelled == 1:
-                            transmitter_pos = self.parent.parent.getRobotPosition(  # noqa
+                            transmitter_pos = self.parent.parent.getRobotPose(
                                 transmitter, current_time
-                            )
-                            robot_pos = self.parent.getRobotPosition(
+                            )[:2]
+                            robot_pos = self.parent.getRobotPose(
                                 current_time
-                            )
+                            )[:2]
                             distance = np.sqrt(np.sum(np.square(np.subtract(
                                 transmitter_pos, robot_pos
                             ))))

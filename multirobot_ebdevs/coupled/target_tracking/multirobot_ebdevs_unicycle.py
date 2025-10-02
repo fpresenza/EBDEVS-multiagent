@@ -110,31 +110,31 @@ class MultiRobotSystem(CoupledDEVS):
                 )
 
     def getGlobalState(self, current_time):
-        robot_data = []
+        robot_pose = []
         for robot_id in self.robot_states.keys():
-            position = self.getRobotPosition(robot_id, current_time)
-            robot_data += [coord[0] for coord in position]
+            pose = self.getRobotPose(robot_id, current_time)
+            robot_pose += [coord[0] for coord in pose]
 
-        target_data = []
+        target_state = []
         for target_id in self.target_states.keys():
             state = self.target_states[target_id]
-            target_data += [coord[0] for coord in state['pose']]
-            target_data += [1.0 if state['status'] == 'active' else 0.0]
+            target_state += [coord[0] for coord in state['pose']]
+            target_state += [1.0 if state['status'] == 'active' else 0.0]
 
         adjacency_list = self.adjacency_list
 
-        return robot_data, target_data, adjacency_list
+        return robot_pose, target_state, adjacency_list
 
-    def getRobotPosition(self, robot_id, current_time):
+    def getRobotPose(self, robot_id, current_time):
         state = self.robot_states[robot_id]
         return [
             [evaluate_poly(poly, current_time - t)]
             for t, poly in zip(state['time'], state['pose'])
         ]
-        
+
     def getNeighbors(self, robot_1_id, current_time):
         # need to know the current time to make the polynomial advance in time
-        robot_1_pos = self.getRobotPosition(robot_1_id, current_time)
+        robot_1_pos = self.getRobotPose(robot_1_id, current_time)[:2]
         robot_1_comm_range = self.robot_states[robot_1_id]['comm_range']
 
         neighbors = [
@@ -152,14 +152,13 @@ class MultiRobotSystem(CoupledDEVS):
     def inRange(
             self, robot_1_pos, robot_1_comm_range, robot_2_id, current_time
             ):
-        robot_2_pos = self.getRobotPosition(robot_2_id, current_time)
+        robot_2_pos = self.getRobotPose(robot_2_id, current_time)[:2]
         sq_dist = np.sum(np.square(np.subtract(robot_1_pos, robot_2_pos)))
 
         return sq_dist < robot_1_comm_range**2
 
     def getNearestTarget(self, robot_id, current_time):
-        robot_pos = self.getRobotPosition(robot_id, current_time)
-        robot_pos = robot_pos[:2]
+        robot_pos = self.getRobotPose(robot_id, current_time)[:2]
         try:
             target_pos = min([
                 (
