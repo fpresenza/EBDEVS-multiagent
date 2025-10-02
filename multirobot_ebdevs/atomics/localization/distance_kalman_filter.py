@@ -35,9 +35,8 @@ class DistanceBasedKalmanFilter(Localization):
             # if data arrives through port inPorts['velocity_measurement']
             self.loc_filter.dynamic_step(
                 current_time,
-                self.loc_filter.last_vel_meas
+                np.reshape(data, (-1, 1))
             )
-            self.loc_filter.last_vel_meas = np.reshape(data, (-1, 1))
             sigma = 0.0  # holds last status
         elif port_name == 'position_measurement':
             # if data arrives through port inPorts['position_measurement']
